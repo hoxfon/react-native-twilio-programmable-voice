@@ -1,7 +1,7 @@
 # react-native-twilio-programmable-voice
 React Native wrapper for Twilio Programmable Voice SDK
 
-Before start we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk). 
+Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk). 
 It's easier to integrate this module into your react-native app if you follow the Quickstart tutorial from Twilio, because it makes very clear which setup steps are required.
 
 ## Installation
@@ -12,7 +12,7 @@ npm install react-native-twilio-programmable-voice --save
 Setup GCM or FCM
 
 You must download the file `google-services.json` from the Firebase console.
-It contains keys and settings for all your Application under Firebase. This library uses it to read the resource `senderID` for registering for remote GCM.
+It contains keys and settings for all your applications under Firebase. This library obtains the resource `senderID` for registering for remote GCM from that file.
 
 ## iOS Installation
 
@@ -118,7 +118,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 ## Usage
 
-```
+```javascript
 import TwilioVoice from 'react-native-twilio-programmable-voice'
 ...
 
@@ -163,6 +163,7 @@ TwilioVoice.requestPermission(GCM_sender_id)
 ## Credits
 
 [voice-quickstart-android](https://github.com/twilio/voice-quickstart-android)
+
 [react-native-twilio-programmable-voice](https://github.com/zo0r/react-native-twilio-programmable-voice)
 
 
