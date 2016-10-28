@@ -9,9 +9,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.hoxfon.react.TwilioVoice.TwilioVoiceModule;
 
-public class GCMRegistrationService extends IntentService {
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.LOG_TAG;
 
-    private static final String TAG = "GCMRegistration";
+public class GCMRegistrationService extends IntentService {
 
     public GCMRegistrationService() {
         super("GCMRegistrationService");
@@ -37,7 +37,7 @@ public class GCMRegistrationService extends IntentService {
              * If we are unable to retrieve the GCM token we notify the Activity
              * letting the user know this step failed.
              */
-            Log.e(TAG, "Failed to retrieve GCM token", e);
+            Log.e(LOG_TAG, "Failed to retrieve GCM token", e);
             sendGCMTokenToActivity(null);
         }
     }
