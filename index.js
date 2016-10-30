@@ -44,6 +44,9 @@ const Twilio = {
     requestPermissions(senderId) {
         TwilioVoice.requestPermissions(senderId)
     },
+    getIncomingCall() {
+        return TwilioVoice.getIncomingCall()
+    },
     addEventListener (type, handler) {
         _eventHandlers[type].set(handler, NativeAppEventEmitter.addListener(
             type, (rtn) => {

@@ -61,6 +61,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                 ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
                 ReactContext context = mReactInstanceManager.getCurrentReactContext();
                 // If it's constructed, send a notification
+                Log.d(LOG_TAG, "on voice message received: context "+context);
                 if (context != null) {
                     prepareNotification((ReactApplicationContext)context, bundle);
                 } else {
@@ -217,7 +218,12 @@ public class VoiceGCMListenerService extends GcmListenerService {
     /*
      * Send the IncomingCallMessage to the TwilioVoiceModule
      */
-    private void sendIncomingCallMessageToActivity(ReactApplicationContext context, IncomingCallMessage incomingCallMessage, int notificationId) {
+    private void sendIncomingCallMessageToActivity(
+            ReactApplicationContext context,
+            IncomingCallMessage incomingCallMessage,
+            int notificationId
+    ) {
+        Log.d(LOG_TAG, "sendIncomingCallMessageToActivity()");
         Intent intent = new Intent(ACTION_INCOMING_CALL);
         intent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
         intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);

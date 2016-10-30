@@ -157,6 +157,16 @@ TwilioVoice.setMuted(mutedValue)
 TwilioVoice.sendDigits(digits)
 
 TwilioVoice.requestPermission(GCM_sender_id)
+
+// should be called after the app is initialised
+// to catch incoming call when the app was in the background
+TwilioVoice.getIncomingCall()
+    .then(incomingCall => {
+        if (incomingCall){
+            _deviceDidReceiveIncoming(incomingCall)
+        }
+    })
+
 ```
 
 
