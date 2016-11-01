@@ -18,6 +18,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.facebook.react.bridge.ReadableMap;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -221,11 +222,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             @Override
             public void onRegistered(String accessToken, String gcmToken) {
                 Log.d(LOG_TAG, "Successfully registered. Access token "+accessToken+" gcm "+gcmToken);
+                sendEvent("deviceReady", null);
             }
 
             @Override
             public void onError(RegistrationException error, String accessToken, String gcmToken) {
                 Log.e(LOG_TAG, String.format("Error: %d, %s", error.getErrorCode(), error.getMessage()));
+                WritableMap params = Arguments.createMap();
+                params.putString("err", error.getMessage());
+                sendEvent("deviceNotReady", params);
             }
         };
     }
@@ -482,7 +487,16 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     @ReactMethod
-    public void connect() {
+    public void connect(ReadableMap params) {
+        Log.d(LOG_TAG, "connect params: "+params);
+        if (params == null || params.getString("To") == null) {
+            WritableMap errParams = Arguments.createMap();
+            errParams.putString("err", "Invalid To parameter");
+            sendEvent("connectionDidDisconnect", errParams);
+            return;
+        }
+        twiMLParams.put("To", params.getString("To"));
+//        twiMLParams.put("From", params.getString("From"));
         activeOutgoingCall = VoiceClient.call(getReactApplicationContext(), accessToken, twiMLParams, outgoingCallListener);
     }
 
@@ -545,16 +559,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
      */
     private void register() {
         VoiceClient.register(getReactApplicationContext(), accessToken, gcmToken, registrationListener);
-        sendEvent("deviceReady", null);
-//        Log.d(LOG_TAG, "active incoming call "+activeIncomingCall);
-//        if (activeIncomingCall != null) {
-//            WritableMap params = Arguments.createMap();
-//            params.putString("call_sid",   activeIncomingCall.getCallSid());
-//            params.putString("call_from",  activeIncomingCall.getFrom());
-//            params.putString("call_to",    activeIncomingCall.getTo());
-//            params.putString("call_state", activeIncomingCall.getState().name());
-//            sendEvent("deviceDidReceiveIncoming", params);
-//        }
     }
 
     /*
