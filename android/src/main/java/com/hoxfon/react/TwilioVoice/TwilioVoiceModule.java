@@ -93,7 +93,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     public TwilioVoiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        VoiceClient.setLogLevel(LogLevel.DEBUG);
+        if (BuildConfig.DEBUG) {
+            VoiceClient.setLogLevel(LogLevel.DEBUG);
+        } else {
+            VoiceClient.setLogLevel(LogLevel.ERROR);
+        }
         reactContext.addActivityEventListener(this);
 
         notificationHelper = new NotificationHelper();
@@ -136,7 +140,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     public void onNewIntent(Intent intent) {
-        Log.d(LOG_TAG, "Module::onNewIntent()");
         handleIncomingCallIntent(intent);
     }
 
@@ -173,18 +176,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (action.equals(ACTION_ANSWER_CALL)) {
-                    Log.d(LOG_TAG, "ANSWER tapped");
 //                    Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
 //                    if (launchIntent != null) {
 //                        context.startActivity(launchIntent);
 //                    }
                     accept();
                 } else if (action.equals(ACTION_REJECT_CALL)) {
-                    Log.d(LOG_TAG, "Reject tapped");
                     reject();
 
                 } else if (action.equals(ACTION_HANGUP_CALL)) {
-                    Log.d(LOG_TAG, "Hangup tapped");
                     disconnect();
                 }
                 // Dismiss the notification popup.
@@ -197,7 +197,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         return new IncomingCallMessageListener() {
             @Override
             public void onIncomingCall(IncomingCall incomingCall) {
-                Log.d(LOG_TAG, "Incoming call from " + incomingCall.getFrom());
                 activeIncomingCall = incomingCall;
 
                 WritableMap params = Arguments.createMap();
@@ -238,13 +237,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         return new IncomingCallMessageListener() {
             @Override
             public void onIncomingCall(IncomingCall incomingCall) {
-                Log.d(LOG_TAG, "Incoming call from " + incomingCall.getFrom());
                 activeIncomingCall = incomingCall;
             }
 
             @Override
             public void onIncomingCallCancelled(IncomingCall incomingCall) {
-                Log.d(LOG_TAG, "Incoming call from " + incomingCall.getFrom() + " was cancelled active call "+activeIncomingCall);
                 if (activeIncomingCall != null) {
                     if (incomingCall.getCallSid() == activeIncomingCall.getCallSid() &&
                             incomingCall.getState() == CallState.PENDING) {
@@ -259,7 +256,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         return new RegistrationListener() {
             @Override
             public void onRegistered(String accessToken, String gcmToken) {
-                Log.d(LOG_TAG, "Successfully registered. Access token "+accessToken+" gcm "+gcmToken);
                 sendEvent("deviceReady", null);
             }
 
@@ -277,7 +273,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         return new OutgoingCall.Listener() {
             @Override
             public void onConnected(OutgoingCall outgoingCall) {
-                Log.d(LOG_TAG, "Connected");
                 WritableMap params = Arguments.createMap();
                 if (outgoingCall != null) {
                     params.putString("call_sid",   outgoingCall.getCallSid());
@@ -288,7 +283,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             @Override
             public void onDisconnected(OutgoingCall outgoingCall) {
-                Log.d(LOG_TAG, "Disconnect");
                 WritableMap params = Arguments.createMap();
                 if (activeIncomingCall != null) {
                     params.putString("call_sid",   outgoingCall.getCallSid());
@@ -299,7 +293,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             @Override
             public void onDisconnected(OutgoingCall outgoingCall, CallException error) {
-                Log.e(LOG_TAG, String.format("Error: %d, %s", error.getErrorCode(), error.getMessage()));
+                Log.e(LOG_TAG, String.format("onDisconnected error: %d, %s", error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
                 if (activeIncomingCall != null) {
                     params.putString("call_sid",   outgoingCall.getCallSid());
@@ -319,7 +313,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         return new IncomingCall.Listener() {
             @Override
             public void onConnected(IncomingCall incomingCall) {
-                Log.d(LOG_TAG, "Connected");
                 WritableMap params = Arguments.createMap();
                 if (incomingCall != null) {
                     params.putString("call_sid",   incomingCall.getCallSid());
@@ -332,7 +325,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             @Override
             public void onDisconnected(IncomingCall incomingCall) {
-                Log.d(LOG_TAG, "Disconnected");
                 WritableMap params = Arguments.createMap();
                 if (incomingCall != null) {
                     params.putString("call_sid",   incomingCall.getCallSid());
@@ -362,18 +354,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     // removed @Override temporarily just to get it working on different versions of RN
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         onActivityResult(requestCode, resultCode, data);
-        Log.d(LOG_TAG, "onActivityResult");
     }
 
     // removed @Override temporarily just to get it working on different versions of RN
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Ignored, required to implement ActivityEventListener for RN 0.33
-        Log.d(LOG_TAG, "onActivityResult");
     }
 
     private void handleIncomingCallIntent(Intent intent) {
         String action = intent.getAction();
-        Log.d(LOG_TAG, "handleIncomingCallIntent action: "+action);
         if (intent != null && action != null) {
             if (action == TwilioVoiceModule.ACTION_INCOMING_CALL ||
                     action == TwilioVoiceModule.ACTION_ANSWER_CALL ||
@@ -389,10 +378,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.d(LOG_TAG, "voiceBroadcast onReceive action: "+action);
             if (action.equals(ACTION_SET_GCM_TOKEN)) {
                 String gcmToken = intent.getStringExtra(KEY_GCM_TOKEN);
-                Log.d(LOG_TAG, "GCM Token: " + gcmToken);
                 TwilioVoiceModule.this.gcmToken = gcmToken;
                 if (gcmToken == null) {
                     WritableMap params = Arguments.createMap();
@@ -400,8 +387,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     sendEvent("deviceNotReady", params);
                 }
             } else if (action.equals(ACTION_INCOMING_CALL)) {
-                Log.d(LOG_TAG, "incoming call n_id: "+intent.getIntExtra(TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID, 0));
-                Log.d(LOG_TAG, "incoming call intent: "+intent);
                 int appImportance = notificationHelper.getApplicationImportance(getReactApplicationContext());
 
                 /*
@@ -467,7 +452,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void initWithAccessToken(final String accessToken) {
         if (accessToken != "") {
-            Log.d(LOG_TAG, "Access token: " + accessToken);
             TwilioVoiceModule.this.accessToken = accessToken;
             if (gcmToken != null) {
                 register();

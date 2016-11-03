@@ -161,8 +161,6 @@ public class NotificationHelper {
     }
 
     public void sendHangupLocalNotification(ReactApplicationContext context, String caller) {
-        Log.d(LOG_TAG, "createHangupNotification() caller: "+caller);
-
         Random randomNumberGenerator = new Random(System.currentTimeMillis());
         int notificationId = randomNumberGenerator.nextInt();
         Intent intent = new Intent(ACTION_HANGUP_CALL)

@@ -35,7 +35,9 @@ public class VoiceGCMListenerService extends GcmListenerService {
 
     private NotificationHelper notificationHelper;
 
-    public VoiceGCMListenerService() {
+    @Override
+    public void onCreate() {
+        super.onCreate();
         notificationHelper = new NotificationHelper();
     }
 
@@ -86,6 +88,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
          * Create an IncomingCallMessage from the bundle
          */
         IncomingCallMessage incomingCallMessage = new IncomingCallMessage(bundle);
+        Log.d(LOG_TAG, "prepareNotification messageTyp: "+bundle.getString("twi_message_type"));
         sendIncomingCallMessageToActivity(context, incomingCallMessage, bundle);
         if (!notificationHelper.isAppInForeground(context)) {
             showNotification(context, incomingCallMessage, bundle);
@@ -100,7 +103,6 @@ public class VoiceGCMListenerService extends GcmListenerService {
             IncomingCallMessage incomingCallMessage,
             Bundle bundle
     ) {
-        Log.d(LOG_TAG, "sendIncomingCallMessageToActivity()");
         int notificationId = Integer.parseInt(bundle.getString("id"));
         Intent intent = new Intent(ACTION_INCOMING_CALL);
         intent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
@@ -142,7 +144,8 @@ public class VoiceGCMListenerService extends GcmListenerService {
                  * notification id of any incoming calls using shared preferences or some other form
                  * of persistent storage.
                  */
-                notificationManager.cancelAll();
+                // don't do this. It will remove the HANG UP ongoing notification
+                // notificationManager.cancelAll();
             }
         }
     }
