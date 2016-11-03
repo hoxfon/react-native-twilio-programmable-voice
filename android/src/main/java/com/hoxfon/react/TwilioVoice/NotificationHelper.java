@@ -79,23 +79,30 @@ public class NotificationHelper {
         }
     }
 
-    public void sendIncomingCallNotification(ReactApplicationContext context,
-                                             IncomingCallMessage incomingCallMessage,
-                                             Bundle bundle) {
-
-        int notificationId = Integer.parseInt(bundle.getString("id"));
-
+    private PendingIntent getActivityOpenPendingIntent(ReactApplicationContext context,
+                                                       IncomingCallMessage incomingCallMessage,
+                                                       int notificationId) {
         /*
          * Create a PendingIntent to specify the action when the notification is
          * selected in the notification drawer
          */
         Intent intent = new Intent(context, getMainActivityClass(context));
         intent.setAction(ACTION_INCOMING_CALL)
-                .putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage)
                 .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        if (incomingCallMessage != null) {
+            intent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
+        }
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+    }
+
+    public void sendIncomingCallNotification(ReactApplicationContext context,
+                                             IncomingCallMessage incomingCallMessage,
+                                             Bundle bundle) {
+
+        int notificationId = Integer.parseInt(bundle.getString("id"));
+
+        PendingIntent pendingIntent = getActivityOpenPendingIntent(context, incomingCallMessage, notificationId);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
@@ -169,6 +176,8 @@ public class NotificationHelper {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+        PendingIntent activityPendingIntent = getActivityOpenPendingIntent(context, null, notificationId);
+
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context)
                 .setContentTitle("call in progress")
                 .setContentText(caller)
@@ -177,8 +186,7 @@ public class NotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setOngoing(true)
-//                .setContentIntent(pendingIntent)
-                ;
+                .setContentIntent(activityPendingIntent);
 
         notification.addAction(0, "HUNG UP", pendingIntent);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
