@@ -2,15 +2,11 @@ package com.hoxfon.react.TwilioVoice.gcm;
 
 import android.annotation.TargetApi;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -28,8 +24,7 @@ import java.util.Random;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.LOG_TAG;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_MESSAGE;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_ID;
 
 public class VoiceGCMListenerService extends GcmListenerService {
 
@@ -83,16 +78,12 @@ public class VoiceGCMListenerService extends GcmListenerService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             bundle.putString("id", String.valueOf(randomNumberGenerator.nextInt()));
         }
-
         /*
          * Create an IncomingCallMessage from the bundle
          */
         IncomingCallMessage incomingCallMessage = new IncomingCallMessage(bundle);
-        Log.d(LOG_TAG, "prepareNotification messageTyp: "+bundle.getString("twi_message_type"));
         sendIncomingCallMessageToActivity(context, incomingCallMessage, bundle);
-        if (!notificationHelper.isAppInForeground(context)) {
-            showNotification(context, incomingCallMessage, bundle);
-        }
+        showNotification(context, incomingCallMessage, bundle);
     }
 
     /*
@@ -106,7 +97,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
         int notificationId = Integer.parseInt(bundle.getString("id"));
         Intent intent = new Intent(ACTION_INCOMING_CALL);
         intent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
-        intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
+        intent.putExtra(NOTIFICATION_ID, notificationId);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
@@ -115,38 +106,12 @@ public class VoiceGCMListenerService extends GcmListenerService {
      */
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private void showNotification(ReactApplicationContext context, IncomingCallMessage incomingCallMessage, Bundle bundle) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        Log.d(LOG_TAG, "prepareNotification messageTyp: "+bundle.getString("twi_message_type"));
         if (!incomingCallMessage.isCancelled()) {
-            notificationHelper.sendIncomingCallNotification(context, incomingCallMessage, bundle);
+            notificationHelper.createIncomingCallNotification(context, incomingCallMessage, bundle);
         } else {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                /*
-                 * If the incoming call was cancelled then remove the notification by matching
-                 * it with the call sid from the list of notifications in the notification drawer.
-                 */
-                StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
-                for (StatusBarNotification statusBarNotification : activeNotifications) {
-                    Notification notification = statusBarNotification.getNotification();
-                    Bundle extras = notification.extras;
-                    String notificationCallSid = extras.getString(CALL_SID_KEY);
-                    if (incomingCallMessage.getCallSid().equals(notificationCallSid)) {
-                        notificationManager.cancel(extras.getInt(INCOMING_CALL_NOTIFICATION_ID));
-                    }
-                }
-            } else {
-                /*
-                 * Prior to Android M the notification manager did not provide a list of
-                 * active notifications so we lazily clear all the notifications when
-                 * receiving a cancelled call.
-                 *
-                 * In order to properly cancel a notification using
-                 * NotificationManager.cancel(notificationId) we should store the call sid &
-                 * notification id of any incoming calls using shared preferences or some other form
-                 * of persistent storage.
-                 */
-                // don't do this. It will remove the HANG UP ongoing notification
-                // notificationManager.cancelAll();
-            }
+            Log.d(LOG_TAG, "incoming call cancelled");
+            notificationHelper.removeIncomingCallNotification(context, incomingCallMessage, 0);
         }
     }
 }
