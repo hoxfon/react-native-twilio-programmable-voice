@@ -36,6 +36,7 @@ import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_MESSAGE;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_ID;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_TYPE;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_NOTIFICATION_PREFIX;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_PREFIX;
@@ -117,6 +118,7 @@ public class NotificationHelper {
         Bundle extras = new Bundle();
         extras.putInt(NOTIFICATION_ID, notificationId);
         extras.putString(CALL_SID_KEY, incomingCallMessage.getCallSid());
+        extras.putString(NOTIFICATION_TYPE, ACTION_INCOMING_CALL);
 
         /*
          * Create the notification shown in the notification drawer
@@ -153,7 +155,6 @@ public class NotificationHelper {
         answerIntent
                 .putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage)
                 .putExtra(NOTIFICATION_ID, notificationId)
-                .setAction(ACTION_ANSWER_CALL)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0, answerIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -163,7 +164,6 @@ public class NotificationHelper {
         Intent rejectIntent = new Intent(ACTION_REJECT_CALL)
                 .putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage)
                 .putExtra(NOTIFICATION_ID, notificationId)
-                .setAction(ACTION_REJECT_CALL)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1, rejectIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -177,8 +177,7 @@ public class NotificationHelper {
         Random randomNumberGenerator = new Random(System.currentTimeMillis());
         int notificationId = randomNumberGenerator.nextInt();
         Intent intent = new Intent(ACTION_HANGUP_CALL)
-                .putExtra(NOTIFICATION_ID, notificationId)
-                .setAction(ACTION_HANGUP_CALL);
+                .putExtra(NOTIFICATION_ID, notificationId);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -191,6 +190,7 @@ public class NotificationHelper {
         Bundle extras = new Bundle();
         extras.putInt(NOTIFICATION_ID, notificationId);
         extras.putString(CALL_SID_KEY, incomingCall.getCallSid());
+        extras.putString(NOTIFICATION_TYPE, ACTION_HANGUP_CALL);
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context)
                 .setContentTitle("call in progress")
@@ -223,7 +223,8 @@ public class NotificationHelper {
                 StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
                 for (StatusBarNotification statusBarNotification : activeNotifications) {
                     Notification notification = statusBarNotification.getNotification();
-                    if (incomingCallMessage.getCallSid().equals(notification.extras.getString(CALL_SID_KEY))) {
+                    if (incomingCallMessage.getCallSid().equals(notification.extras.getString(CALL_SID_KEY)) &&
+                            notification.extras.getString(NOTIFICATION_TYPE).equals(ACTION_INCOMING_CALL)) {
                         notificationManager.cancel(notification.extras.getInt(NOTIFICATION_ID));
                     }
                 }
@@ -259,7 +260,8 @@ public class NotificationHelper {
                 StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
                 for (StatusBarNotification statusBarNotification : activeNotifications) {
                     Notification notification = statusBarNotification.getNotification();
-                    if (incomingCall.getCallSid().equals(notification.extras.getString(CALL_SID_KEY))) {
+                    if (incomingCall.getCallSid().equals(notification.extras.getString(CALL_SID_KEY)) &&
+                            notification.extras.getString(NOTIFICATION_TYPE).equals(ACTION_HANGUP_CALL)) {
                         notificationManager.cancel(notification.extras.getInt(NOTIFICATION_ID));
                     }
                 }

@@ -71,10 +71,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String ACTION_SET_GCM_TOKEN = "SET_GCM_TOKEN";
     public static final String INCOMING_CALL_MESSAGE = "INCOMING_CALL_MESSAGE";
     public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
-    public static final String ACTION_INCOMING_CALL = "INCOMING_CALL";
-    public static final String ACTION_ANSWER_CALL = "ANSWER_CALL";
-    public static final String ACTION_REJECT_CALL = "REJECT_CALL";
-    public static final String ACTION_HANGUP_CALL = "HANGUP_CALL";
+    public static final String NOTIFICATION_TYPE = "NOTIFICATION_TYPE";
+    public static final String ACTION_INCOMING_CALL = "com.hoxfon.react.TwilioVoice.INCOMING_CALL";
+    public static final String ACTION_ANSWER_CALL = "com.hoxfon.react.TwilioVoice.ANSWER_CALL";
+    public static final String ACTION_REJECT_CALL = "com.hoxfon.react.TwilioVoice.REJECT_CALL";
+    public static final String ACTION_HANGUP_CALL = "com.hoxfon.react.TwilioVoice.HANGUP_CALL";
     public static final String CALL_SID_KEY = "CALL_SID";
     public static final String INCOMING_NOTIFICATION_PREFIX = "Incoming_";
     public static final String HANGUP_NOTIFICATION_PREFIX = "Hangup_";
