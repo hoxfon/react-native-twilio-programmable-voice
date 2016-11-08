@@ -88,6 +88,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private String gcmToken;
     private String accessToken;
 
+    private String toNumber = "";
+    private String toName = "";
+
     public static Map<String, Integer> callNotificationMap;
 
     RegistrationListener registrationListener = registrationListener();
@@ -279,8 +282,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (outgoingCall != null) {
                     params.putString("call_sid",   outgoingCall.getCallSid());
                     params.putString("call_state", outgoingCall.getState().name());
+                    String caller = "Show call details in the app";
+                    if (toName != "") {
+                        caller = toName;
+                    } else if (toNumber != "") {
+                        caller = toNumber;
+                    }
                     notificationHelper.createHangupLocalNotification(getReactApplicationContext(),
-                            outgoingCall.getCallSid(), "Show call details in the app");
+                            outgoingCall.getCallSid(), caller);
                 }
                 sendEvent("connectionDidConnect", params);
             }
@@ -299,6 +308,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
                 sendEvent("connectionDidDisconnect", params);
                 notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
+                toNumber = "";
+                toName = "";
             }
 
             @Override
@@ -318,6 +329,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
                 sendEvent("connectionDidDisconnect", params);
                 notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
+                toNumber = "";
+                toName = "";
             }
         };
     }
@@ -513,10 +526,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             errParams.putString("err", "Invalid parameters");
             sendEvent("connectionDidDisconnect", errParams);
             return;
-        } else if (params.getString("To") == null) {
+        } else if (!params.hasKey("To")) {
             errParams.putString("err", "Invalid To parameter");
             sendEvent("connectionDidDisconnect", errParams);
             return;
+        }
+        toNumber = params.getString("To");
+        if (params.hasKey("ToName")) {
+            toName = params.getString("ToName");
         }
         twiMLParams.put("To", params.getString("To"));
         activeOutgoingCall = VoiceClient.call(getReactApplicationContext(), accessToken, twiMLParams, outgoingCallListener);
