@@ -174,7 +174,7 @@ TwilioVoice.getIncomingCall()
 
 [voice-quickstart-android](https://github.com/twilio/voice-quickstart-android)
 
-[react-native-twilio-programmable-voice](https://github.com/zo0r/react-native-twilio-programmable-voice)
+[react-native-push-notification](https://github.com/zo0r/react-native-push-notification)
 
 
 ## License
