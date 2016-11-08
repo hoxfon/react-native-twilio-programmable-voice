@@ -182,7 +182,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (action.equals(ACTION_ANSWER_CALL)) {
-                    answer();
+                    accept();
                 } else if (action.equals(ACTION_REJECT_CALL)) {
                     reject();
                 } else if (action.equals(ACTION_HANGUP_CALL)) {
@@ -217,7 +217,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 Log.d(LOG_TAG, "Incoming call from " + incomingCall.getFrom() + " was cancelled active call "+activeIncomingCall);
                 if (activeIncomingCall != null) {
                     if (incomingCall.getCallSid() == activeIncomingCall.getCallSid() &&
-                        incomingCall.getState() == CallState.PENDING) {
+                            incomingCall.getState() == CallState.PENDING) {
                         activeIncomingCall = null;
                     }
                     WritableMap params = Arguments.createMap();
@@ -280,10 +280,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (outgoingCall != null) {
                     params.putString("call_sid",   outgoingCall.getCallSid());
                     params.putString("call_state", outgoingCall.getState().name());
+                    notificationHelper.createHangupLocalNotification(getReactApplicationContext(),
+                            outgoingCall.getCallSid(), "Show call details in the app");
                 }
                 sendEvent("connectionDidConnect", params);
-                notificationHelper.createHangupLocalNotification(getReactApplicationContext(),
-                        outgoingCall.getCallSid(), "Show call details in the app");
             }
 
             @Override
@@ -327,6 +327,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     params.putString("call_from",  incomingCall.getFrom());
                     params.putString("call_to",    incomingCall.getTo());
                     params.putString("call_state", incomingCall.getState().name());
+                    notificationHelper.createHangupLocalNotification(getReactApplicationContext(),
+                            incomingCall.getCallSid(),
+                            incomingCall.getFrom());
                 }
                 sendEvent("connectionDidConnect", params);
             }
@@ -378,7 +381,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (intent != null && action != null) {
             if (action == ACTION_INCOMING_CALL) {
                 IncomingCallMessage incomingCallMessage = intent.getParcelableExtra(INCOMING_CALL_MESSAGE);
-                TwilioVoiceModule.callNotificationMap.put(incomingCallMessage.getCallSid(),
+                TwilioVoiceModule.callNotificationMap.put(HANGUP_NOTIFICATION_PREFIX+incomingCallMessage.getCallSid(),
                         intent.getIntExtra(NOTIFICATION_ID, 0));
                 Log.d(LOG_TAG, "callNotificationMap "+ callNotificationMap.toString());
                 VoiceClient.handleIncomingCallMessage(getReactApplicationContext(), incomingCallMessage, incomingCallMessageListener);
@@ -445,25 +448,19 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private void clearIncomingNotification(IncomingCall activeIncomingCall) {
         // remove incoming call notification
         String notificationKey = INCOMING_NOTIFICATION_PREFIX +activeIncomingCall.getCallSid();
-        int notificationId = TwilioVoiceModule.callNotificationMap.get(notificationKey);
+        int notificationId = 0;
+        if (TwilioVoiceModule.callNotificationMap.containsKey(notificationKey)) {
+            notificationId = TwilioVoiceModule.callNotificationMap.get(notificationKey);
+        }
         notificationHelper.removeIncomingCallNotification(getReactApplicationContext(), null, notificationId);
         TwilioVoiceModule.callNotificationMap.remove(notificationKey);
     }
 
     @ReactMethod
     public void accept() {
-        answer();
-        if (activeIncomingCall != null) {
-            clearIncomingNotification(activeIncomingCall);
-        }
-    }
-
-    private void answer() {
         if (activeIncomingCall != null){
             activeIncomingCall.accept(incomingCallListener);
-            notificationHelper.createHangupLocalNotification(getReactApplicationContext(),
-                    activeIncomingCall.getCallSid(),
-                    activeIncomingCall.getFrom());
+            clearIncomingNotification(activeIncomingCall);
         } else {
             sendEvent("connectionDidDisconnect", null);
         }
@@ -531,7 +528,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void getIncomingCall(Promise promise) {
-        Log.d(LOG_TAG, "client checks for active incoming calls");
+        Log.d(LOG_TAG, "client checks for active incoming calls. Active incoming call: "+activeIncomingCall);
         if (activeIncomingCall != null) {
             WritableMap params = Arguments.createMap();
             params.putString("call_sid",   activeIncomingCall.getCallSid());

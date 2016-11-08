@@ -106,7 +106,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
      */
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private void showNotification(ReactApplicationContext context, IncomingCallMessage incomingCallMessage, Bundle bundle) {
-        Log.d(LOG_TAG, "prepareNotification messageTyp: "+bundle.getString("twi_message_type"));
+        Log.d(LOG_TAG, "showNotification messageType: "+bundle.getString("twi_message_type"));
         if (!incomingCallMessage.isCancelled()) {
             notificationHelper.createIncomingCallNotification(context, incomingCallMessage, bundle);
         } else {

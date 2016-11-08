@@ -171,6 +171,7 @@ public class NotificationHelper {
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notification.build());
+        TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+incomingCallMessage.getCallSid(), notificationId);
     }
 
     public void createHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
@@ -236,7 +237,7 @@ public class NotificationHelper {
                 Log.d(LOG_TAG, "cancel direct notification id "+ notificationId);
                 notificationManager.cancel(notificationId);
             } else if (incomingCallMessage != null) {
-                String notificationKey = INCOMING_NOTIFICATION_PREFIX +incomingCallMessage.getCallSid();
+                String notificationKey = INCOMING_NOTIFICATION_PREFIX+incomingCallMessage.getCallSid();
                 if (TwilioVoiceModule.callNotificationMap.containsKey(notificationKey)) {
                     notificationId = TwilioVoiceModule.callNotificationMap.get(notificationKey);
                     Log.d(LOG_TAG, "cancel map notification id " + notificationId);
