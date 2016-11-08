@@ -129,7 +129,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 //         * Enable changing the volume using the up/down keys during a conversation
 //         */
 //        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-
         /*
          * Ensure the microphone permission is enabled
          */
@@ -289,12 +288,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             @Override
             public void onDisconnected(OutgoingCall outgoingCall) {
                 WritableMap params = Arguments.createMap();
-                if (activeIncomingCall != null) {
-                    params.putString("call_sid",   outgoingCall.getCallSid());
+                String callSid = "";
+                if (outgoingCall != null) {
+                    callSid = outgoingCall.getCallSid();
+                    params.putString("call_sid", callSid);
                     params.putString("call_state", outgoingCall.getState().name());
                 }
+                if (activeOutgoingCall != null && activeOutgoingCall.getCallSid() == callSid) {
+                    activeOutgoingCall = null;
+                }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), outgoingCall.getCallSid(), 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
             }
 
             @Override
@@ -302,13 +306,18 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 Log.e(LOG_TAG, String.format("outgoingCallListener onDisconnected error: %d, %s",
                         error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
-                if (activeIncomingCall != null) {
-                    params.putString("call_sid",   outgoingCall.getCallSid());
+                String callSid = "";
+                if (outgoingCall != null) {
+                    callSid = outgoingCall.getCallSid();
+                    params.putString("call_sid", callSid);
                     params.putString("call_state", outgoingCall.getState().name());
                     params.putString("err", error.getMessage());
                 }
+                if (activeOutgoingCall != null && activeOutgoingCall.getCallSid() == callSid) {
+                    activeOutgoingCall = null;
+                }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), outgoingCall.getCallSid(), 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
             }
         };
     }
@@ -337,30 +346,40 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             @Override
             public void onDisconnected(IncomingCall incomingCall) {
                 WritableMap params = Arguments.createMap();
+                String callSid = "";
                 if (incomingCall != null) {
-                    params.putString("call_sid",   incomingCall.getCallSid());
+                    callSid = incomingCall.getCallSid();
+                    params.putString("call_sid",   callSid);
                     params.putString("call_from",  incomingCall.getFrom());
                     params.putString("call_to",    incomingCall.getTo());
                     params.putString("call_state", incomingCall.getState().name());
                 }
+                if (activeIncomingCall != null && incomingCall.getCallSid() == callSid) {
+                    activeIncomingCall = null;
+                }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), incomingCall.getCallSid(), 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
             }
 
             @Override
             public void onDisconnected(IncomingCall incomingCall, CallException error) {
-                Log.e(LOG_TAG, String.format("incomingCallListener onDisconnected error: %d, %s, cause %s",
-                        error.getErrorCode(), error.getMessage(), error.getCause()));
+                Log.e(LOG_TAG, String.format("incomingCallListener onDisconnected error: %d, %s",
+                        error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
+                String callSid = "";
                 if (incomingCall != null) {
-                    params.putString("call_sid",   incomingCall.getCallSid());
+                    callSid = incomingCall.getCallSid();
+                    params.putString("call_sid",   callSid);
                     params.putString("call_from",  incomingCall.getFrom());
                     params.putString("call_to",    incomingCall.getTo());
                     params.putString("call_state", incomingCall.getState().name());
                     params.putString("err", error.getMessage());
                 }
+                if (activeIncomingCall != null && incomingCall.getCallSid() == callSid) {
+                    activeIncomingCall = null;
+                }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), incomingCall.getCallSid(), 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
             }
         };
     }
@@ -505,7 +524,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void disconnect() {
-        disconnectCall();
+        if (activeOutgoingCall != null) {
+            activeOutgoingCall.disconnect();
+        } else if (activeIncomingCall != null) {
+            activeIncomingCall.disconnect();
+        }
     }
 
     @ReactMethod
@@ -562,28 +585,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
      */
     private void register() {
         VoiceClient.register(getReactApplicationContext(), accessToken, gcmToken, registrationListener);
-    }
-
-    /*
-     * Disconnect an active Call
-     */
-    private void disconnectCall() {
-        WritableMap params = Arguments.createMap();
-        if (activeOutgoingCall != null) {
-            activeOutgoingCall.disconnect();
-            params.putString("call_sid",   activeOutgoingCall.getCallSid());
-            params.putString("call_state", activeOutgoingCall.getState().name());
-            activeOutgoingCall = null;
-        } else if (activeIncomingCall != null) {
-            activeIncomingCall.reject();
-            params.putString("call_sid",   activeIncomingCall.getCallSid());
-            params.putString("call_from",  activeIncomingCall.getFrom());
-            params.putString("call_to",    activeIncomingCall.getTo());
-            params.putString("call_state", activeIncomingCall.getState().name());
-            activeIncomingCall = null;
-        }
-        // check whether this should be communicated. Could it cause an infinite recursion?
-        sendEvent("connectionDidDisconnect", params);
     }
 
 //    private void toggleSpeakerPhone() {
