@@ -535,6 +535,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (params.hasKey("ToName")) {
             toName = params.getString("ToName");
         }
+        // optional parameter that will be delivered to the server
+        if (params.hasKey("CallerId")) {
+            twiMLParams.put("CallerId", params.getString("CallerId"));
+        }
         twiMLParams.put("To", params.getString("To"));
         activeOutgoingCall = VoiceClient.call(getReactApplicationContext(), accessToken, twiMLParams, outgoingCallListener);
     }
