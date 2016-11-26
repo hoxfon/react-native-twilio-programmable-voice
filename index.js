@@ -20,7 +20,6 @@ const Twilio = {
         TwilioVoice.initWithAccessToken(token)
     },
     connect(params = {}) {
-        console.log('params:', params)
         TwilioVoice.connect(params)
     },
     disconnect() {
@@ -37,6 +36,9 @@ const Twilio = {
     },
     setMuted(isMuted) {
         TwilioVoice.setMuted(isMuted)
+    },
+    setSpeakerPhone(value) {
+        TwilioVoice.setSpeakerPhone(value)
     },
     sendDigits(digits) {
         TwilioVoice.sendDigits(digits)

@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-//import android.media.AudioManager;
+import android.media.AudioManager;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReadableMap;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -48,21 +49,20 @@ import java.util.Map;
 
 import com.hoxfon.react.TwilioVoice.gcm.GCMRegistrationService;
 
-public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
     public static String LOG_TAG = "TwilioVoice";
 
     private static final int MIC_PERMISSION_REQUEST_CODE = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-//    private boolean speakerPhone;
-//    private AudioManager audioManager;
-//    private int savedAudioMode = AudioManager.MODE_INVALID;
+    private AudioManager audioManager;
+    private int savedAudioMode = AudioManager.MODE_INVALID;
 
     private boolean isReceiverRegistered;
     private VoiceBroadcastReceiver voiceBroadcastReceiver;
 
-    // Empty HashMap, never populated for the Quickstart
+    // Empty HashMap, contains parameters for the Outbound call
     HashMap<String, String> twiMLParams = new HashMap<>();
 
     private OutgoingCall activeOutgoingCall;
@@ -107,6 +107,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             VoiceClient.setLogLevel(LogLevel.ERROR);
         }
         reactContext.addActivityEventListener(this);
+        reactContext.addLifecycleEventListener(this);
 
         notificationHelper = new NotificationHelper();
 
@@ -122,16 +123,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         registerActionReceiver();
 
         TwilioVoiceModule.callNotificationMap = new HashMap<String, Integer>();
-//
-//        /*
-//         * Needed for setting/abandoning audio focus during a call
-//         */
-//        audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
-//
-//        /*
-//         * Enable changing the volume using the up/down keys during a conversation
-//         */
-//        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+
+        /*
+         * Needed for setting/abandoning audio focus during a call
+         */
+        audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
+
         /*
          * Ensure the microphone permission is enabled
          */
@@ -140,6 +137,22 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         } else {
             startGCMRegistration();
         }
+    }
+
+    @Override
+    public void onHostResume() {
+        /*
+         * Enable changing the volume using the up/down keys during a conversation
+         */
+        getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+    }
+
+    @Override
+    public void onHostPause() {
+    }
+
+    @Override
+    public void onHostDestroy() {
     }
 
     @Override
@@ -585,10 +598,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         promise.resolve(null);
     }
 
-//    @ReactMethod
-//    public void speakerPhoneToggle() {
-//        toggleSpeakerPhone();
-//    }
+    @ReactMethod
+    public void setSpeakerPhone(Boolean value) {
+        setAudioFocus(value);
+        audioManager.setSpeakerphoneOn(value);
+    }
 
     private void sendEvent(String eventName, @Nullable WritableMap params) {
         Log.d(LOG_TAG, "sendEvent "+eventName+" params "+params);
@@ -608,42 +622,27 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         VoiceClient.register(getReactApplicationContext(), accessToken, gcmToken, registrationListener);
     }
 
-//    private void toggleSpeakerPhone() {
-//        speakerPhone = !speakerPhone;
-//
-//        setAudioFocus(speakerPhone);
-//        audioManager.setSpeakerphoneOn(speakerPhone);
-//
-//        if(speakerPhone) {
-//            // send event to JS mute
-//            // speakerActionFab.setImageDrawable(ContextCompat.getDrawable(VoiceActivity.this, R.drawable.ic_volume_mute_white_24px));
-//        } else {
-//            // send event to JS volume down
-//            // speakerActionFab.setImageDrawable(ContextCompat.getDrawable(VoiceActivity.this, R.drawable.ic_volume_down_white_24px));
-//        }
-//    }
+    private void setAudioFocus(boolean setFocus) {
+        if (audioManager != null) {
+            if (setFocus) {
+                savedAudioMode = audioManager.getMode();
+                // Request audio focus before making any device switch.
+                audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
 
-//    private void setAudioFocus(boolean setFocus) {
-//        if (audioManager != null) {
-//            if (setFocus) {
-//                savedAudioMode = audioManager.getMode();
-//                // Request audio focus before making any device switch.
-//                audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-//                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-//
-//                /*
-//                 * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-//                 * required to be in this mode when playout and/or recording starts for
-//                 * best possible VoIP performance. Some devices have difficulties with speaker mode
-//                 * if this is not set.
-//                 */
-//                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-//            } else {
-//                audioManager.setMode(savedAudioMode);
-//                audioManager.abandonAudioFocus(null);
-//            }
-//        }
-//    }
+                /*
+                 * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+                 * required to be in this mode when playout and/or recording starts for
+                 * best possible VoIP performance. Some devices have difficulties with speaker mode
+                 * if this is not set.
+                 */
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            } else {
+                audioManager.setMode(savedAudioMode);
+                audioManager.abandonAudioFocus(null);
+            }
+        }
+    }
 
     private boolean checkPermissionForMicrophone() {
         int resultMic = ContextCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.RECORD_AUDIO);
