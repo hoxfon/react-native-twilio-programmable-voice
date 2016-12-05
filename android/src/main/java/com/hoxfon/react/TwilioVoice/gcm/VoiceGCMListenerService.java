@@ -50,7 +50,6 @@ public class VoiceGCMListenerService extends GcmListenerService {
                 ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
                 ReactContext context = mReactInstanceManager.getCurrentReactContext();
                 // If it's constructed, send a notification
-                Log.d(LOG_TAG, "on voice message received: context "+context);
                 if (context != null) {
                     prepareNotification((ReactApplicationContext)context, bundle);
                 } else {

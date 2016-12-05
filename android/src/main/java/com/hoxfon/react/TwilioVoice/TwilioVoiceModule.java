@@ -161,6 +161,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     public void onNewIntent(Intent intent) {
+        Log.d(LOG_TAG, "onNewIntent" + intent.toString());
         handleIncomingCallIntent(intent);
     }
 
@@ -229,7 +230,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             @Override
             public void onIncomingCallCancelled(IncomingCall incomingCall) {
-                Log.d(LOG_TAG, "Incoming call from " + incomingCall.getFrom() + " was cancelled active call "+activeIncomingCall);
+                Log.d(LOG_TAG, "onIncomingCallCancelled: Incoming call from " + incomingCall.getFrom() + " was cancelled active call "+activeIncomingCall);
                 if (activeIncomingCall != null) {
                     if (incomingCall.getCallSid() == activeIncomingCall.getCallSid() &&
                             incomingCall.getState() == CallState.PENDING) {
@@ -426,6 +427,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (intent != null && action != null) {
             if (action == ACTION_INCOMING_CALL) {
                 IncomingCallMessage incomingCallMessage = intent.getParcelableExtra(INCOMING_CALL_MESSAGE);
+                Log.d(LOG_TAG, "handleIncomingCallIntent incomingCallMessage call_sid"+incomingCallMessage.getCallSid());
                 TwilioVoiceModule.callNotificationMap.put(HANGUP_NOTIFICATION_PREFIX+incomingCallMessage.getCallSid(),
                         intent.getIntExtra(NOTIFICATION_ID, 0));
                 Log.d(LOG_TAG, "callNotificationMap "+ callNotificationMap.toString());
@@ -535,6 +537,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public void connect(ReadableMap params) {
         Log.d(LOG_TAG, "connect params: "+params);
         WritableMap errParams = Arguments.createMap();
+        if (accessToken == null) {
+            errParams.putString("err", "Invalid access token");
+            sendEvent("deviceNotReady", errParams);
+            return;
+        }
         if (params == null) {
             errParams.putString("err", "Invalid parameters");
             sendEvent("connectionDidDisconnect", errParams);
