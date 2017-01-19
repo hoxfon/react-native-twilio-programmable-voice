@@ -24,6 +24,15 @@ TODO
 ```gradle
 ...
 
+buildscript {
+  ...
+  dependencies {
+    classpath 'com.google.gms:google-services:3.0.0'
+  }
+}
+
+...
+
 dependencies {
     ...
 
