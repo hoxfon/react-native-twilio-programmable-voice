@@ -69,10 +69,10 @@ In your `AndroidManifest.xml`
             </intent-filter>
         </receiver>
 
-        <service android:name=".gcm.GCMRegistrationService" />
+        <service android:name="com.hoxfon.react.TwilioVoice.gcm.GCMRegistrationService" />
 
         <service
-            android:name=".gcm.VoiceGCMListenerService"
+            android:name="com.hoxfon.react.TwilioVoice.gcm.VoiceGCMListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -80,7 +80,7 @@ In your `AndroidManifest.xml`
         </service>
 
         <service
-            android:name=".gcm.VoiceInstanceIDListenerService"
+            android:name="com.hoxfon.react.TwilioVoice.gcm.VoiceInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
