@@ -50,6 +50,9 @@ const Twilio = {
         return TwilioVoice.getIncomingCall()
     },
     addEventListener (type, handler) {
+        if (_eventHandlers[type].has(handler)) {
+            return
+        }
         _eventHandlers[type].set(handler, NativeAppEventEmitter.addListener(
             type, (rtn) => {
                 handler(rtn)

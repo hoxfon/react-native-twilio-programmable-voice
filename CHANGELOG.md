@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.3.1
+
+- avoid registering the same event listener multiple times
+
 ## 0.3.0
 
 - Check if Google Play Services are available before initialising Twilio for receiving calls.
