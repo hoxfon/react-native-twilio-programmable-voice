@@ -17,6 +17,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
+import com.facebook.react.bridge.AssertionException;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReadableMap;
 import com.google.android.gms.common.ConnectionResult;
@@ -88,6 +90,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private String gcmToken;
     private String accessToken;
 
+    private Boolean isGooglePlayServicesAvailable = false;
+
     private String toNumber = "";
     private String toName = "";
 
@@ -129,6 +133,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
          */
         audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
 
+        isGooglePlayServicesAvailable = getPlayServicesAvailability();
+
         /*
          * Ensure the microphone permission is enabled
          */
@@ -166,7 +172,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     private void startGCMRegistration() {
-        if (checkPlayServices()) {
+        if (isGooglePlayServicesAvailable == true) {
             ReactContext reactContext = getReactApplicationContext();
             Intent intent = new Intent(reactContext, GCMRegistrationService.class);
             reactContext.startService(intent);
@@ -427,7 +433,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (intent != null && action != null) {
             if (action == ACTION_INCOMING_CALL) {
                 IncomingCallMessage incomingCallMessage = intent.getParcelableExtra(INCOMING_CALL_MESSAGE);
-                Log.d(LOG_TAG, "handleIncomingCallIntent incomingCallMessage call_sid"+incomingCallMessage.getCallSid());
+                Log.d(LOG_TAG, "handleIncomingCallIntent incomingCallMessage call_sid "+incomingCallMessage.getCallSid());
                 TwilioVoiceModule.callNotificationMap.put(HANGUP_NOTIFICATION_PREFIX+incomingCallMessage.getCallSid(),
                         intent.getIntExtra(NOTIFICATION_ID, 0));
                 Log.d(LOG_TAG, "callNotificationMap "+ callNotificationMap.toString());
@@ -444,7 +450,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (action.equals(ACTION_SET_GCM_TOKEN)) {
                 String gcmToken = intent.getStringExtra(KEY_GCM_TOKEN);
                 TwilioVoiceModule.this.gcmToken = gcmToken;
-                if (gcmToken == null) {
+                if (isGooglePlayServicesAvailable == false) {
+                    WritableMap params = Arguments.createMap();
+                    params.putString("err", "Failed to get GCM Token. Google Play Services is not available.");
+                    sendEvent("deviceNotReady", params);
+                } else if (gcmToken == null) {
                     WritableMap params = Arguments.createMap();
                     params.putString("err", "Failed to get GCM Token. Unable to receive calls.");
                     sendEvent("deviceNotReady", params);
@@ -460,7 +470,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                             incomingCallMsg,
                             incomingCallMessageListenerBackground
                     );
-                // if (appImportance == RunningAppProcessInfo.IMPORTANCE_SERVICE || appImportance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+                    // if (appImportance == RunningAppProcessInfo.IMPORTANCE_SERVICE || appImportance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
                 } else {
                     VoiceClient.handleIncomingCallMessage(
                             getReactApplicationContext(),
@@ -473,13 +483,25 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     @ReactMethod
-    public void initWithAccessToken(final String accessToken) {
-        if (accessToken != "") {
-            TwilioVoiceModule.this.accessToken = accessToken;
-            if (gcmToken != null) {
-                register();
-            }
+    public void initWithAccessToken(final String accessToken, Promise promise) {
+        if (accessToken == "") {
+            promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
+            return;
         }
+        if (isGooglePlayServicesAvailable == false) {
+            promise.reject(new AssertionException("Google Play Services not available"));
+            return;
+        }
+        if (gcmToken == null) {
+            promise.reject(new AssertionException("Push notification token not available"));
+            return;
+        }
+
+        TwilioVoiceModule.this.accessToken = accessToken;
+        register();
+        WritableMap params = Arguments.createMap();
+        params.putBoolean("initilized", true);
+        promise.resolve(params);
     }
 
     @ReactMethod
@@ -661,6 +683,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private void requestPermissionForMicrophone() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
+            // TODO implement this to fit react-native logic
             // Snackbar.make(coordinatorLayout,
             //         "Microphone permissions needed. Please allow in your application settings.",
             //         Snackbar.LENGTH_LONG).show();
@@ -673,24 +696,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
+     * Returns the Google Play Services APK availability.
      */
-    private boolean checkPlayServices() {
+    private boolean getPlayServicesAvailability() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(getReactApplicationContext());
         if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(getCurrentActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-                        .show();
-            } else {
-                Log.e(LOG_TAG, "This device is not supported.");
-                getCurrentActivity().finish();
-            }
+            Log.e(LOG_TAG, "Google Play Services not available");
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
 }

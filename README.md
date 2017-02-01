@@ -105,23 +105,21 @@ import com.hoxfon.react.TwilioVoice.TwilioVoicePackage;  // <--- Import Package
 
 public class MainApplication extends Application implements ReactApplication {
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-      @Override
-      protected boolean getUseDeveloperSupport() {
-        return BuildConfig.DEBUG;
-      }
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        protected boolean getUseDeveloperSupport() {
+            return BuildConfig.DEBUG;
+        }
 
-      @Override
-      protected List<ReactPackage> getPackages() {
-
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-          new TwilioVoicePackage() // <---- Add the Package
-      );
-    }
-  };
-
-  ....
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.<ReactPackage>asList(
+                new MainReactPackage(),
+                new TwilioVoicePackage() // <---- Add the Package
+            );
+        }
+    };
+    ....
 }
 ```
 
@@ -132,8 +130,16 @@ import TwilioVoice from 'react-native-twilio-programmable-voice'
 ...
 
 // initialise the Programmable Voice SDK passing an access token obtained from the server.
-const accessToken = ... from server
-TwilioVoice.initWithToken(accessToken)
+
+async function initTelephony() {
+    try {
+        const accessToken = await getAccessTokenFromServer()
+        const success = await TwilioVoice.initWithToken(accessToken)  
+    } catch (err) {
+        console.err(err)
+    }
+}
+
 
 // add listeners 
 TwilioVoice.addEventListener('deviceReady', deviceReadyHandler)

@@ -17,7 +17,7 @@ const _eventHandlers = {
 
 const Twilio = {
     initWithToken(token) {
-        TwilioVoice.initWithAccessToken(token)
+        return TwilioVoice.initWithAccessToken(token)
     },
     connect(params = {}) {
         TwilioVoice.connect(params)
