@@ -6,7 +6,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -20,7 +19,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.twilio.voice.IncomingCall;
 import com.twilio.voice.IncomingCallMessage;
 
 import java.util.List;
@@ -58,20 +56,6 @@ public class NotificationHelper {
             }
         }
         return 0;
-    }
-
-    public boolean isAppInForeground(ReactApplicationContext context) {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> processInfos = activityManager.getRunningAppProcesses();
-        if (processInfos == null) {
-            return false;
-        }
-        for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
-            if (processInfo.processName.equals(getApplication().getPackageName())) {
-                return processInfo.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
-            }
-        }
-        return false;
     }
 
     public Class getMainActivityClass(ReactApplicationContext context) {
@@ -224,8 +208,9 @@ public class NotificationHelper {
                 StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
                 for (StatusBarNotification statusBarNotification : activeNotifications) {
                     Notification notification = statusBarNotification.getNotification();
+                    String notificationType = notification.extras.getString(NOTIFICATION_TYPE);
                     if (incomingCallMessage.getCallSid().equals(notification.extras.getString(CALL_SID_KEY)) &&
-                            notification.extras.getString(NOTIFICATION_TYPE).equals(ACTION_INCOMING_CALL)) {
+                            notificationType != null && notificationType.equals(ACTION_INCOMING_CALL)) {
                         notificationManager.cancel(notification.extras.getInt(NOTIFICATION_ID));
                     }
                 }
@@ -253,7 +238,7 @@ public class NotificationHelper {
                                          int notificationId) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (callSid != "") {
+            if (!callSid.equals("")) {
                 /*
                  * If the call disconnected then remove the notification by matching
                  * it with the call sid from the list of notifications in the notification drawer.
@@ -261,8 +246,9 @@ public class NotificationHelper {
                 StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
                 for (StatusBarNotification statusBarNotification : activeNotifications) {
                     Notification notification = statusBarNotification.getNotification();
+                    String notificationType = notification.extras.getString(NOTIFICATION_TYPE);
                     if (callSid.equals(notification.extras.getString(CALL_SID_KEY)) &&
-                            notification.extras.getString(NOTIFICATION_TYPE).equals(ACTION_HANGUP_CALL)) {
+                            notificationType != null && notificationType.equals(ACTION_HANGUP_CALL)) {
                         notificationManager.cancel(notification.extras.getInt(NOTIFICATION_ID));
                     }
                 }
@@ -273,7 +259,7 @@ public class NotificationHelper {
             if (notificationId != 0) {
                 Log.d(LOG_TAG, "cancel direct notification id "+ notificationId);
                 notificationManager.cancel(notificationId);
-            } else if (callSid != "") {
+            } else if (!callSid.equals("")) {
                 String notificationKey = HANGUP_NOTIFICATION_PREFIX +callSid;
                 if (TwilioVoiceModule.callNotificationMap.containsKey(notificationKey)) {
                     notificationId = TwilioVoiceModule.callNotificationMap.get(notificationKey);

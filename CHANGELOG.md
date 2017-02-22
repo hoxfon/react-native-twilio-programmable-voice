@@ -1,5 +1,11 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.3.3
+
+- add null checks on all `call` variables before invoking getCallSid()
+- remove unused import
+- follow Android Studio linting instructions
+
 ## 0.3.2
 
 - fix typo in setMuted()
