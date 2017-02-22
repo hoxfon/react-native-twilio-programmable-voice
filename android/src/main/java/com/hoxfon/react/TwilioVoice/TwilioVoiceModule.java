@@ -599,7 +599,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (activeOutgoingCall != null) {
             activeOutgoingCall.mute(muteValue);
         } else if (activeIncomingCall != null) {
-            activeOutgoingCall.mute(muteValue);
+            activeIncomingCall.mute(muteValue);
         }
     }
 

@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.3.2
+
+- fix typo in setMuted()
+
 ## 0.3.1
 
 - avoid registering the same event listener multiple times
