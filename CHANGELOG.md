@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.3.4
+
+- fix wrong boolean, from the previous refactoring
+
 ## 0.3.3
 
 - add null checks on all `call` variables before invoking getCallSid()

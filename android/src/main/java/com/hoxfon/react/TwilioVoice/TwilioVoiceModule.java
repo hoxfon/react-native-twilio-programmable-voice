@@ -171,7 +171,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     private void startGCMRegistration() {
-        if (!isGooglePlayServicesAvailable) {
+        if (isGooglePlayServicesAvailable) {
             ReactContext reactContext = getReactApplicationContext();
             Intent intent = new Intent(reactContext, GCMRegistrationService.class);
             reactContext.startService(intent);
