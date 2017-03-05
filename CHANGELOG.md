@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.3.5
+
+- add protections from null callSid
+
 ## 0.3.4
 
 - fix wrong boolean, from the previous refactoring
