@@ -1,12 +1,12 @@
 package com.hoxfon.react.TwilioVoice;
 
-
 import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +19,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.twilio.voice.IncomingCall;
 import com.twilio.voice.IncomingCallMessage;
 
 import java.util.List;
@@ -32,15 +33,20 @@ import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_ANSWER_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_REJECT_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_MISSED_CALL;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_MESSAGE;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_ID;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_TYPE;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_NOTIFICATION_PREFIX;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_PREFIX;
-
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_GROUP;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_NOTIFICATION_ID;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
 
 public class NotificationHelper {
+
+    private NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
     public NotificationHelper() {}
 
@@ -84,7 +90,7 @@ public class NotificationHelper {
         if (incomingCallMessage != null) {
             intent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
         }
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public void createIncomingCallNotification(ReactApplicationContext context,
@@ -158,6 +164,74 @@ public class NotificationHelper {
         TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+incomingCallMessage.getCallSid(), notificationId);
     }
 
+    public void createMissedCallNotification(ReactApplicationContext context, IncomingCall incomingCall) {
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+
+        /*
+         * Create a PendingIntent to specify the action when the notification is
+         * selected in the notification drawer
+         */
+        Intent intent = new Intent(context, getMainActivityClass(context));
+        intent.setAction(ACTION_MISSED_CALL)
+                .putExtra(NOTIFICATION_ID, MISSED_CALLS_NOTIFICATION_ID)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        /*
+         * Pass the notification id and call sid to use as an identifier to open the notification
+         */
+        Bundle extras = new Bundle();
+        extras.putInt(NOTIFICATION_ID, MISSED_CALLS_NOTIFICATION_ID);
+        extras.putString(CALL_SID_KEY, incomingCall.getCallSid());
+        extras.putString(NOTIFICATION_TYPE, ACTION_MISSED_CALL);
+
+        /*
+         * Create the notification shown in the notification drawer
+         */
+        NotificationCompat.Builder notification =
+                new NotificationCompat.Builder(context)
+                        .setGroup(MISSED_CALLS_GROUP)
+                        .setGroupSummary(true)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                        .setSmallIcon(R.drawable.ic_call_missed_white_24dp)
+                        .setContentTitle("Missed call")
+                        .setContentText(incomingCall.getFrom() + " called")
+                        .setAutoCancel(true)
+                        .setShowWhen(true)
+                        .setExtras(extras)
+                        .setDeleteIntent(pendingIntent)
+                        .setContentIntent(pendingIntent);
+
+        int missedCalls = sharedPref.getInt(MISSED_CALLS_GROUP, 0);
+        missedCalls++;
+        if (missedCalls == 1) {
+            inboxStyle = new NotificationCompat.InboxStyle();
+            inboxStyle.setBigContentTitle("Missed call");
+        } else {
+            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " missed calls");
+        }
+        inboxStyle.addLine("from: " +incomingCall.getFrom());
+        sharedPrefEditor.putInt(MISSED_CALLS_GROUP, missedCalls);
+        sharedPrefEditor.commit();
+
+        notification.setStyle(inboxStyle);
+
+        // build notification large icon
+        Resources res = context.getResources();
+        int largeIconResId = res.getIdentifier("ic_launcher", "mipmap", context.getPackageName());
+        Bitmap largeIconBitmap = BitmapFactory.decodeResource(res, largeIconResId);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && largeIconResId != 0) {
+            notification.setLargeIcon(largeIconBitmap);
+        }
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(MISSED_CALLS_NOTIFICATION_ID, notification.build());
+    }
+
     public void createHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
         Random randomNumberGenerator = new Random(System.currentTimeMillis());
         int notificationId = randomNumberGenerator.nextInt();
@@ -185,6 +259,7 @@ public class NotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setOngoing(true)
+                .setUsesChronometer(true)
                 .setExtras(extras)
                 .setContentIntent(activityPendingIntent);
 
