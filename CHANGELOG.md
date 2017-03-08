@@ -1,5 +1,11 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.4.0
+
+- add notification for missed calls
+- add chronometer for ongoing calls
+- use FLAG_UPDATE_CURRENT rather than FLAG_ONE_SHOT for pending intents
+
 ## 0.3.5
 
 - add protections from null callSid

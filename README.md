@@ -16,11 +16,13 @@ It contains keys and settings for all your applications under Firebase. This lib
 
 ## iOS Installation
 
-TODO
+## Help needed
+
+We are constantly looking for contributors for this module. If you want to add the `iOS` implementation for this library please get in touch with us with an issue or PR.
 
 ## Android Installation
 
-**NOTE: To use a specific `play-service-gcm` version, use in your `android/app/build.gradle` (change `9.6.1` for your version):**
+**NOTE: To use a specific `play-service-gcm` version, update the `compile` instruction in your App's `android/app/build.gradle` (replace `10.2.0` with the version you prefer):**
 ```gradle
 ...
 
@@ -37,7 +39,7 @@ dependencies {
     ...
 
     compile project(':react-native-twilio-programmable-voice')
-    compile ('com.google.android.gms:play-services-gcm:9.6.1') {
+    compile ('com.google.android.gms:play-services-gcm:10.2.0') {
         force = true;
     }
 }
