@@ -23,7 +23,6 @@ import com.twilio.voice.IncomingCall;
 import com.twilio.voice.IncomingCallMessage;
 
 import java.util.List;
-import java.util.Random;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static com.facebook.react.common.ApplicationHolder.getApplication;
@@ -39,9 +38,9 @@ import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_ID;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_TYPE;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_NOTIFICATION_PREFIX;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_PREFIX;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_GROUP;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_NOTIFICATION_ID;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_ID;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
 
 public class NotificationHelper {
@@ -233,21 +232,19 @@ public class NotificationHelper {
     }
 
     public void createHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
-        Random randomNumberGenerator = new Random(System.currentTimeMillis());
-        int notificationId = randomNumberGenerator.nextInt();
         Intent intent = new Intent(ACTION_HANGUP_CALL)
-                .putExtra(NOTIFICATION_ID, notificationId);
+                .putExtra(NOTIFICATION_ID, HANGUP_NOTIFICATION_ID);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent activityPendingIntent = getActivityOpenPendingIntent(context, null, notificationId);
+        PendingIntent activityPendingIntent = getActivityOpenPendingIntent(context, null, HANGUP_NOTIFICATION_ID);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
          * notification later
          */
         Bundle extras = new Bundle();
-        extras.putInt(NOTIFICATION_ID, notificationId);
+        extras.putInt(NOTIFICATION_ID, HANGUP_NOTIFICATION_ID);
         extras.putString(CALL_SID_KEY, callSid);
         extras.putString(NOTIFICATION_TYPE, ACTION_HANGUP_CALL);
 
@@ -265,9 +262,7 @@ public class NotificationHelper {
 
         notification.addAction(0, "HUNG UP", pendingIntent);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(notificationId, notification.build());
-
-        TwilioVoiceModule.callNotificationMap.put(HANGUP_NOTIFICATION_PREFIX+callSid, notificationId);
+        notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
     }
 
     public void removeIncomingCallNotification(ReactApplicationContext context,
@@ -308,41 +303,8 @@ public class NotificationHelper {
         }
     }
 
-    public void removeHangupNotification(ReactApplicationContext context,
-                                         String callSid,
-                                         int notificationId) {
+    public void removeHangupNotification(ReactApplicationContext context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (!callSid.equals("")) {
-                /*
-                 * If the call disconnected then remove the notification by matching
-                 * it with the call sid from the list of notifications in the notification drawer.
-                 */
-                StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
-                for (StatusBarNotification statusBarNotification : activeNotifications) {
-                    Notification notification = statusBarNotification.getNotification();
-                    String notificationType = notification.extras.getString(NOTIFICATION_TYPE);
-                    if (callSid.equals(notification.extras.getString(CALL_SID_KEY)) &&
-                            notificationType != null && notificationType.equals(ACTION_HANGUP_CALL)) {
-                        notificationManager.cancel(notification.extras.getInt(NOTIFICATION_ID));
-                    }
-                }
-            } else if (notificationId != 0) {
-                notificationManager.cancel(notificationId);
-            }
-        } else {
-            if (notificationId != 0) {
-                Log.d(LOG_TAG, "cancel direct notification id "+ notificationId);
-                notificationManager.cancel(notificationId);
-            } else if (!callSid.equals("")) {
-                String notificationKey = HANGUP_NOTIFICATION_PREFIX +callSid;
-                if (TwilioVoiceModule.callNotificationMap.containsKey(notificationKey)) {
-                    notificationId = TwilioVoiceModule.callNotificationMap.get(notificationKey);
-                    Log.d(LOG_TAG, "cancel map notification id " + notificationId);
-                    notificationManager.cancel(notificationId);
-                    TwilioVoiceModule.callNotificationMap.remove(notificationKey);
-                }
-            }
-        }
+        notificationManager.cancel(HANGUP_NOTIFICATION_ID);
     }
 }

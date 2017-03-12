@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.4.1
+
+- simplify lifecycle of local hangup notification
+- remove crash on disconnect
+
 ## 0.4.0
 
 - add notification for missed calls
