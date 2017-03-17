@@ -81,9 +81,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String ACTION_HANGUP_CALL = "com.hoxfon.react.TwilioVoice.HANGUP_CALL";
     public static final String CALL_SID_KEY = "CALL_SID";
     public static final String INCOMING_NOTIFICATION_PREFIX = "Incoming_";
-    public static final String HANGUP_NOTIFICATION_PREFIX = "Hangup_";
     public static final String MISSED_CALLS_GROUP = "MISSED_CALLS";
     public static final int MISSED_CALLS_NOTIFICATION_ID = 1;
+    public static final int HANGUP_NOTIFICATION_ID = 11;
+
     public static final String PREFERENCE_KEY = "com.hoxfon.react.TwilioVoice.PREFERENCE_FILE_KEY";
 
     public static final String KEY_GCM_TOKEN = "GCM_TOKEN";
@@ -341,7 +342,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     activeOutgoingCall = null;
                 }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext());
                 toNumber = "";
                 toName = "";
             }
@@ -362,7 +363,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     activeOutgoingCall = null;
                 }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext());
                 toNumber = "";
                 toName = "";
             }
@@ -405,7 +406,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     activeIncomingCall = null;
                 }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext());
             }
 
             @Override
@@ -426,7 +427,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     }
                 }
                 sendEvent("connectionDidDisconnect", params);
-                notificationHelper.removeHangupNotification(getReactApplicationContext(), callSid, 0);
+                notificationHelper.removeHangupNotification(getReactApplicationContext());
             }
         };
     }
@@ -448,11 +449,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (action.equals(ACTION_INCOMING_CALL)) {
                 IncomingCallMessage incomingCallMessage = intent.getParcelableExtra(INCOMING_CALL_MESSAGE);
                 if (incomingCallMessage != null) {
-                    if (incomingCallMessage.getCallSid() != null) {
-                        Log.d(LOG_TAG, "handleIncomingCallIntent incomingCallMessage call_sid " + incomingCallMessage.getCallSid());
-                        TwilioVoiceModule.callNotificationMap.put(HANGUP_NOTIFICATION_PREFIX + incomingCallMessage.getCallSid(),
-                                intent.getIntExtra(NOTIFICATION_ID, 0));
-                    }
                     Log.d(LOG_TAG, "callNotificationMap " + callNotificationMap.toString());
                     VoiceClient.handleIncomingCallMessage(getReactApplicationContext(), incomingCallMessage, incomingCallMessageListener);
                 }
