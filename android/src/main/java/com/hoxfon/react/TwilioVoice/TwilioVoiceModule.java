@@ -3,6 +3,7 @@ package com.hoxfon.react.TwilioVoice;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.Manifest;
+import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +13,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -108,6 +113,13 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private IncomingCallMessageListener incomingCallMessageListener = incomingCallMessageListener();
     private IncomingCallMessageListener incomingCallMessageListenerBackground = incomingCallMessageListenerBackground();
 
+    private Ringtone ringtone;
+    private KeyguardManager keyguardManager;
+    private PowerManager powerManager;
+    private PowerManager.WakeLock wakeLock;
+
+    private Boolean callCancelledManually = false;
+
     public TwilioVoiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
         if (BuildConfig.DEBUG) {
@@ -139,6 +151,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
 
         isGooglePlayServicesAvailable = getPlayServicesAvailability();
+
+        Uri ringtoneSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        ringtone = RingtoneManager.getRingtone(reactContext, ringtoneSound);
+
+        powerManager = (PowerManager) reactContext.getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, LOG_TAG);
+
+        keyguardManager = (KeyguardManager) reactContext.getSystemService(Context.KEYGUARD_SERVICE);
 
         /*
          * Ensure the microphone permission is enabled
@@ -232,7 +252,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         return new IncomingCallMessageListener() {
             @Override
             public void onIncomingCall(IncomingCall incomingCall) {
+                callCancelledManually = false;
                 activeIncomingCall = incomingCall;
+                ringtone.play();
+
+                KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(LOG_TAG);
+                lock.disableKeyguard();
+
+                wakeLock.acquire();
 
                 WritableMap params = Arguments.createMap();
                 if (activeIncomingCall != null) {
@@ -246,6 +273,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             @Override
             public void onIncomingCallCancelled(IncomingCall incomingCall) {
+                ringtone.stop();
+                if (wakeLock.isHeld()) {
+                    wakeLock.release();
+                }
                 if (activeIncomingCall != null && incomingCall != null) {
                     Log.d(LOG_TAG, "onIncomingCallCancelled: Incoming call from " + incomingCall.getFrom() + " was cancelled active call "+activeIncomingCall);
                     if (incomingCall.getCallSid() != null &&
@@ -260,7 +291,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     params.putString("call_to",    activeIncomingCall.getTo());
                     params.putString("call_state", activeIncomingCall.getState().name());
                     sendEvent("connectionDidDisconnect", params);
-                    notificationHelper.createMissedCallNotification(getReactApplicationContext(), activeIncomingCall);
+                    if (callCancelledManually == false) {
+                        notificationHelper.createMissedCallNotification(getReactApplicationContext(), activeIncomingCall);
+                    }
                 } else {
                     sendEvent("connectionDidDisconnect", null);
                 }
@@ -414,9 +447,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 Log.e(LOG_TAG, String.format("incomingCallListener onDisconnected error: %d, %s",
                         error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
-                String callSid = "";
                 if (incomingCall != null) {
-                    callSid = incomingCall.getCallSid();
+                    String callSid = incomingCall.getCallSid();
                     params.putString("call_sid",   callSid);
                     params.putString("call_from",  incomingCall.getFrom());
                     params.putString("call_to",    incomingCall.getTo());
@@ -551,9 +583,30 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void accept() {
+        ringtone.stop();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         if (activeIncomingCall != null){
-            activeIncomingCall.accept(incomingCallListener);
-            clearIncomingNotification(activeIncomingCall);
+            if (activeIncomingCall.getState() == CallState.PENDING) {
+                activeIncomingCall.accept(incomingCallListener);
+                clearIncomingNotification(activeIncomingCall);
+            } else {
+                // this happens when the user answers a call from a notification
+                // before the react-native App is completely initialised, and the first message got lost
+                // re-send connectionDidConnect message to JS
+                WritableMap params = Arguments.createMap();
+                if (activeIncomingCall != null) {
+                    params.putString("call_sid",   activeIncomingCall.getCallSid());
+                    params.putString("call_from",  activeIncomingCall.getFrom());
+                    params.putString("call_to",    activeIncomingCall.getTo());
+                    params.putString("call_state", activeIncomingCall.getState().name());
+                    notificationHelper.createHangupLocalNotification(getReactApplicationContext(),
+                            activeIncomingCall.getCallSid(),
+                            activeIncomingCall.getFrom());
+                }
+                sendEvent("connectionDidConnect", params);
+            }
         } else {
             sendEvent("connectionDidDisconnect", null);
         }
@@ -561,6 +614,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void reject() {
+        callCancelledManually = true;
+        ringtone.stop();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         if (activeIncomingCall != null){
             activeIncomingCall.reject();
             clearIncomingNotification(activeIncomingCall);
@@ -571,6 +629,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void ignore() {
+        callCancelledManually = true;
+        ringtone.stop();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         if (activeIncomingCall != null){
             activeIncomingCall.ignore();
             clearIncomingNotification(activeIncomingCall);

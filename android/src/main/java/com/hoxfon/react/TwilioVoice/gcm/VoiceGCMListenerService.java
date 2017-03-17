@@ -40,6 +40,17 @@ public class VoiceGCMListenerService extends GcmListenerService {
     public void onMessageReceived(String from, final Bundle bundle) {
         Log.d(LOG_TAG, "onMessageReceived senderId " + from);
 
+        // If notification ID is not provided by the user for push notification, generate one at random
+        if (bundle.getString("id") == null) {
+            Random randomNumberGenerator = new Random(System.currentTimeMillis());
+            bundle.putString("id", String.valueOf(randomNumberGenerator.nextInt()));
+        }
+
+        /*
+         * Create an IncomingCallMessage from the bundle
+         */
+        final IncomingCallMessage incomingCallMessage = new IncomingCallMessage(bundle);
+
         // We need to run this on the main thread, as the React code assumes that is true.
         // Namely, DevServerHelper constructs a Handler() without a Looper, which triggers:
         // "Can't create handler inside thread that has not called Looper.prepare()"
@@ -51,12 +62,16 @@ public class VoiceGCMListenerService extends GcmListenerService {
                 ReactContext context = mReactInstanceManager.getCurrentReactContext();
                 // If it's constructed, send a notification
                 if (context != null) {
-                    prepareNotification((ReactApplicationContext)context, bundle);
+                    final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
+                    context.startActivity(launchIntent);
+                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, false);
                 } else {
                     // Otherwise wait for construction, then send the notification
                     mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
                         public void onReactContextInitialized(ReactContext context) {
-                            prepareNotification((ReactApplicationContext)context, bundle);
+                            final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
+                            context.startActivity(launchIntent);
+                            handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, true);
                         }
                     });
                     if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
@@ -68,21 +83,18 @@ public class VoiceGCMListenerService extends GcmListenerService {
         });
     }
 
-    private void prepareNotification(ReactApplicationContext context, final Bundle bundle) {
+    private void handleIncomingCall(ReactApplicationContext context,
+                                    final Bundle bundle,
+                                    IncomingCallMessage incomingCallMessage,
+                                    Intent launchIntent,
+                                    Boolean showNotification
+    ) {
         if (!IncomingCallMessage.isValidMessage(bundle)) {
             return;
         }
-        // If notification ID is not provided by the user for push notification, generate one at random
-        if (bundle.getString("id") == null) {
-            Random randomNumberGenerator = new Random(System.currentTimeMillis());
-            bundle.putString("id", String.valueOf(randomNumberGenerator.nextInt()));
-        }
-        /*
-         * Create an IncomingCallMessage from the bundle
-         */
-        IncomingCallMessage incomingCallMessage = new IncomingCallMessage(bundle);
+
         sendIncomingCallMessageToActivity(context, incomingCallMessage, bundle);
-        showNotification(context, incomingCallMessage, bundle);
+        showNotification(context, incomingCallMessage, bundle, launchIntent, showNotification);
     }
 
     /*
@@ -104,10 +116,17 @@ public class VoiceGCMListenerService extends GcmListenerService {
      * Show the notification in the Android notification drawer
      */
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
-    private void showNotification(ReactApplicationContext context, IncomingCallMessage incomingCallMessage, Bundle bundle) {
+    private void showNotification(ReactApplicationContext context,
+                                  IncomingCallMessage incomingCallMessage,
+                                  Bundle bundle,
+                                  Intent launchIntent,
+                                  Boolean showNotification
+    ) {
         Log.d(LOG_TAG, "showNotification messageType: "+bundle.getString("twi_message_type"));
         if (!incomingCallMessage.isCancelled()) {
-            notificationHelper.createIncomingCallNotification(context, incomingCallMessage, bundle);
+            if (showNotification) {
+                notificationHelper.createIncomingCallNotification(context, incomingCallMessage, bundle, launchIntent);
+            }
         } else {
             Log.d(LOG_TAG, "incoming call cancelled");
             notificationHelper.removeIncomingCallNotification(context, incomingCallMessage, 0);

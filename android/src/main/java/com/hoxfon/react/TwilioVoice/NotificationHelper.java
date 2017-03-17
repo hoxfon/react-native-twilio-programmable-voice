@@ -11,12 +11,12 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.twilio.voice.IncomingCall;
@@ -75,31 +75,33 @@ public class NotificationHelper {
         }
     }
 
-    private PendingIntent getActivityOpenPendingIntent(ReactApplicationContext context,
-                                                       IncomingCallMessage incomingCallMessage,
-                                                       int notificationId) {
-        /*
-         * Create a PendingIntent to specify the action when the notification is
-         * selected in the notification drawer
-         */
-        Intent intent = new Intent(context, getMainActivityClass(context));
-        intent.setAction(ACTION_INCOMING_CALL)
+    public Intent getLaunchIntent(ReactApplicationContext context, Bundle bundle, IncomingCallMessage incomingCallMessage) {
+        int notificationId = Integer.parseInt(bundle.getString("id"));
+        Intent launchIntent = new Intent(context, getMainActivityClass(context));
+        launchIntent.setAction(ACTION_INCOMING_CALL)
                 .putExtra(NOTIFICATION_ID, notificationId)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                .addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK +
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                );
+
         if (incomingCallMessage != null) {
-            intent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
+            launchIntent.putExtra(INCOMING_CALL_MESSAGE, incomingCallMessage);
         }
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return launchIntent;
     }
 
     public void createIncomingCallNotification(ReactApplicationContext context,
                                                IncomingCallMessage incomingCallMessage,
-                                               Bundle bundle) {
+                                               Bundle bundle,
+                                               Intent launchIntent) {
 
         int notificationId = Integer.parseInt(bundle.getString("id"));
 
-        PendingIntent pendingIntent = getActivityOpenPendingIntent(context, incomingCallMessage, notificationId);
-
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
          * notification later
@@ -117,7 +119,6 @@ public class NotificationHelper {
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setCategory(NotificationCompat.CATEGORY_CALL)
-                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle("Incoming call")
                         .setContentText(incomingCallMessage.getFrom() + " is calling")
@@ -201,7 +202,6 @@ public class NotificationHelper {
                         .setAutoCancel(true)
                         .setShowWhen(true)
                         .setExtras(extras)
-                        .setDeleteIntent(pendingIntent)
                         .setContentIntent(pendingIntent);
 
         int missedCalls = sharedPref.getInt(MISSED_CALLS_GROUP, 0);
@@ -237,7 +237,12 @@ public class NotificationHelper {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent activityPendingIntent = getActivityOpenPendingIntent(context, null, HANGUP_NOTIFICATION_ID);
+        Intent launchIntent = new Intent(context, getMainActivityClass(context));
+        launchIntent.setAction(ACTION_INCOMING_CALL)
+                .putExtra(NOTIFICATION_ID, HANGUP_NOTIFICATION_ID)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the

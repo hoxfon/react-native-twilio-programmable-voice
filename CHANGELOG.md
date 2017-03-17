@@ -1,5 +1,13 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.5.0
+
+- start activity as soon as a call notification arrives
+- wakes up the device when a call arrives
+- use ringtone, removing notification sound
+- handle grafully when a call is accepted twice
+- don't create a missed calls when the call is rejected or ignored manually
+
 ## 0.4.1
 
 - simplify lifecycle of local hangup notification
