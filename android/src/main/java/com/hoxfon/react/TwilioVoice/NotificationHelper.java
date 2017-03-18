@@ -42,6 +42,8 @@ import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_GROUP;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_NOTIFICATION_ID;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_ID;
 import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_CLEAR_MISSED_CALLS_COUNT;
+import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CLEAR_MISSED_CALLS_NOTIFICATION_ID;
 
 public class NotificationHelper {
 
@@ -178,6 +180,9 @@ public class NotificationHelper {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent clearMissedCallsCountIntent = new Intent(ACTION_CLEAR_MISSED_CALLS_COUNT)
+                .putExtra(NOTIFICATION_ID, CLEAR_MISSED_CALLS_NOTIFICATION_ID);
+        PendingIntent clearMissedCallsCountPendingIntent = PendingIntent.getBroadcast(context, 0, clearMissedCallsCountIntent, 0);
         /*
          * Pass the notification id and call sid to use as an identifier to open the notification
          */
@@ -202,6 +207,7 @@ public class NotificationHelper {
                         .setAutoCancel(true)
                         .setShowWhen(true)
                         .setExtras(extras)
+                        .setDeleteIntent(clearMissedCallsCountPendingIntent)
                         .setContentIntent(pendingIntent);
 
         int missedCalls = sharedPref.getInt(MISSED_CALLS_GROUP, 0);

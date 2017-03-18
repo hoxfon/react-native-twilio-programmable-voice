@@ -22,6 +22,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.AssertionException;
@@ -79,16 +81,21 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String INCOMING_CALL_MESSAGE = "INCOMING_CALL_MESSAGE";
     public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
     public static final String NOTIFICATION_TYPE = "NOTIFICATION_TYPE";
+
     public static final String ACTION_INCOMING_CALL = "com.hoxfon.react.TwilioVoice.INCOMING_CALL";
     public static final String ACTION_MISSED_CALL = "com.hoxfon.react.TwilioVoice.MISSED_CALL";
     public static final String ACTION_ANSWER_CALL = "com.hoxfon.react.TwilioVoice.ANSWER_CALL";
     public static final String ACTION_REJECT_CALL = "com.hoxfon.react.TwilioVoice.REJECT_CALL";
     public static final String ACTION_HANGUP_CALL = "com.hoxfon.react.TwilioVoice.HANGUP_CALL";
+    public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "com.hoxfon.react.TwilioVoice.CLEAR_MISSED_CALLS_COUNT";
+
     public static final String CALL_SID_KEY = "CALL_SID";
     public static final String INCOMING_NOTIFICATION_PREFIX = "Incoming_";
     public static final String MISSED_CALLS_GROUP = "MISSED_CALLS";
     public static final int MISSED_CALLS_NOTIFICATION_ID = 1;
     public static final int HANGUP_NOTIFICATION_ID = 11;
+    public static final int CLEAR_MISSED_CALLS_NOTIFICATION_ID = 21;
+
 
     public static final String PREFERENCE_KEY = "com.hoxfon.react.TwilioVoice.PREFERENCE_FILE_KEY";
 
@@ -224,6 +231,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         intentFilter.addAction(ACTION_ANSWER_CALL);
         intentFilter.addAction(ACTION_REJECT_CALL);
         intentFilter.addAction(ACTION_HANGUP_CALL);
+        intentFilter.addAction(ACTION_CLEAR_MISSED_CALLS_COUNT);
 
         getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
             @Override
@@ -239,6 +247,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     case ACTION_HANGUP_CALL:
                         disconnect();
                         break;
+                    case ACTION_CLEAR_MISSED_CALLS_COUNT:
+                        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+                        sharedPrefEditor.putInt(MISSED_CALLS_GROUP, 0);
+                        sharedPrefEditor.commit();
                 }
                 // Dismiss the notification when the user tap on the relative notification action
                 // eventually the notification will be cleared anyway
@@ -259,6 +272,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(LOG_TAG);
                 lock.disableKeyguard();
 
+                Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
                 wakeLock.acquire();
 
                 WritableMap params = Arguments.createMap();
@@ -278,24 +294,28 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     wakeLock.release();
                 }
                 if (activeIncomingCall != null && incomingCall != null) {
-                    Log.d(LOG_TAG, "onIncomingCallCancelled: Incoming call from " + incomingCall.getFrom() + " was cancelled active call "+activeIncomingCall);
-                    if (incomingCall.getCallSid() != null &&
-                            incomingCall.getState() == CallState.PENDING &&
-                            activeIncomingCall.getCallSid() != null &&
-                            incomingCall.getCallSid().equals(activeIncomingCall.getCallSid())) {
-                        activeIncomingCall = null;
-                    }
+                    Log.d(LOG_TAG, "onIncomingCallCancelled: IN call from " + incomingCall.getFrom() +
+                            " was cancelled active call "+activeIncomingCall);
+
                     WritableMap params = Arguments.createMap();
                     params.putString("call_sid",   activeIncomingCall.getCallSid());
                     params.putString("call_from",  activeIncomingCall.getFrom());
                     params.putString("call_to",    activeIncomingCall.getTo());
                     params.putString("call_state", activeIncomingCall.getState().name());
                     sendEvent("connectionDidDisconnect", params);
+
                     if (callCancelledManually == false) {
                         notificationHelper.createMissedCallNotification(getReactApplicationContext(), activeIncomingCall);
                     }
-                } else {
-                    sendEvent("connectionDidDisconnect", null);
+
+                    if (incomingCall.getCallSid() != null &&
+                            (incomingCall.getState() == CallState.PENDING || incomingCall.getState() == CallState.CANCELLED) &&
+                            activeIncomingCall.getCallSid() != null &&
+                            incomingCall.getCallSid().equals(activeIncomingCall.getCallSid()))
+                    {
+                        Log.d(LOG_TAG, "activeIncomingCall = null");
+                        activeIncomingCall = null;
+                    }
                 }
             }
         };

@@ -2,6 +2,8 @@ package com.hoxfon.react.TwilioVoice.gcm;
 
 import android.annotation.TargetApi;
 
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,7 +66,12 @@ public class VoiceGCMListenerService extends GcmListenerService {
                 if (context != null) {
                     final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
                     context.startActivity(launchIntent);
-                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, false);
+                    KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+                    Boolean showNotification = false;
+                    if (keyguardManager.inKeyguardRestrictedInputMode() || (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && keyguardManager.isDeviceLocked()) ) {
+                        showNotification = true;
+                    }
+                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, showNotification);
                 } else {
                     // Otherwise wait for construction, then send the notification
                     mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {

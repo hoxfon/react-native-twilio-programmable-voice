@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.5.1
+- fix showing incoming call
+- add pendingIntent to clear missed calls number
+- prevent double incoming call cancelled message
+
 ## 0.5.0
 
 - start activity as soon as a call notification arrives
