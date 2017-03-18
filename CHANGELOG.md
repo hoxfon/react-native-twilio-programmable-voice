@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.5.2
+- allow custom notification icons
+
 ## 0.5.1
 - fix showing incoming call
 - add pendingIntent to clear missed calls number
