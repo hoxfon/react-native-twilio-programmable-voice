@@ -64,7 +64,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                 ReactContext context = mReactInstanceManager.getCurrentReactContext();
                 // If it's constructed, send a notification
                 if (context != null) {
-                    final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
+                    final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage, false);
                     context.startActivity(launchIntent);
                     KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
                     Boolean shouldShowIncomingCallNotification = false;
@@ -76,7 +76,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                     // Otherwise wait for construction, then send the notification
                     mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
                         public void onReactContextInitialized(ReactContext context) {
-                            final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
+                            final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage, true);
                             context.startActivity(launchIntent);
                             handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, true, true);
                         }

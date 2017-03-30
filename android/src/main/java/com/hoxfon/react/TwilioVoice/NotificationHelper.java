@@ -77,13 +77,20 @@ public class NotificationHelper {
         }
     }
 
-    public Intent getLaunchIntent(ReactApplicationContext context, Bundle bundle, IncomingCallMessage incomingCallMessage) {
+    public Intent getLaunchIntent(ReactApplicationContext context, Bundle bundle,
+                                  IncomingCallMessage incomingCallMessage,
+                                  Boolean shouldStartNewTask
+    ) {
         int notificationId = Integer.parseInt(bundle.getString("id"));
         Intent launchIntent = new Intent(context, getMainActivityClass(context));
+        int launchFlag = Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP;
+        if (shouldStartNewTask) {
+            launchFlag = Intent.FLAG_ACTIVITY_NEW_TASK;
+        }
         launchIntent.setAction(ACTION_INCOMING_CALL)
                 .putExtra(NOTIFICATION_ID, notificationId)
                 .addFlags(
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP +
+                        launchFlag +
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
                         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
                         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
