@@ -67,18 +67,18 @@ public class VoiceGCMListenerService extends GcmListenerService {
                     final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
                     context.startActivity(launchIntent);
                     KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-                    Boolean showNotification = false;
+                    Boolean shouldShowIncomingCallNotification = false;
                     if (keyguardManager.inKeyguardRestrictedInputMode() || (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && keyguardManager.isDeviceLocked()) ) {
-                        showNotification = true;
+                        shouldShowIncomingCallNotification = true;
                     }
-                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, showNotification);
+                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, false, shouldShowIncomingCallNotification);
                 } else {
                     // Otherwise wait for construction, then send the notification
                     mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
                         public void onReactContextInitialized(ReactContext context) {
                             final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage);
                             context.startActivity(launchIntent);
-                            handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, true);
+                            handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, true, true);
                         }
                     });
                     if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
@@ -94,14 +94,17 @@ public class VoiceGCMListenerService extends GcmListenerService {
                                     final Bundle bundle,
                                     IncomingCallMessage incomingCallMessage,
                                     Intent launchIntent,
-                                    Boolean showNotification
+                                    Boolean shouldBroadcastIntent,
+                                    Boolean showIncomingCallNotification
     ) {
         if (!IncomingCallMessage.isValidMessage(bundle)) {
             return;
         }
 
-        sendIncomingCallMessageToActivity(context, incomingCallMessage, bundle);
-        showNotification(context, incomingCallMessage, bundle, launchIntent, showNotification);
+        if (shouldBroadcastIntent) {
+            sendIncomingCallMessageToActivity(context, incomingCallMessage, bundle);
+        }
+        showNotification(context, incomingCallMessage, bundle, launchIntent, showIncomingCallNotification);
     }
 
     /*
@@ -127,11 +130,11 @@ public class VoiceGCMListenerService extends GcmListenerService {
                                   IncomingCallMessage incomingCallMessage,
                                   Bundle bundle,
                                   Intent launchIntent,
-                                  Boolean showNotification
+                                  Boolean showIncomingCallNotification
     ) {
         Log.d(LOG_TAG, "showNotification messageType: "+bundle.getString("twi_message_type"));
         if (!incomingCallMessage.isCancelled()) {
-            if (showNotification) {
+            if (showIncomingCallNotification) {
                 notificationHelper.createIncomingCallNotification(context, incomingCallMessage, bundle, launchIntent);
             }
         } else {

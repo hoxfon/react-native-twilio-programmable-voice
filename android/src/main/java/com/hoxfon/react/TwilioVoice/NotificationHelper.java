@@ -83,7 +83,7 @@ public class NotificationHelper {
         launchIntent.setAction(ACTION_INCOMING_CALL)
                 .putExtra(NOTIFICATION_ID, notificationId)
                 .addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK +
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP +
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
                         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
                         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
@@ -134,9 +134,6 @@ public class NotificationHelper {
         Bitmap largeIconBitmap = BitmapFactory.decodeResource(res, largeIconResId);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            notification
-                    .setVibrate(new long[]{0, 1000, 1000, 1000, 1000})
-                    .setLights(Color.WHITE, 500, 500);
             if (largeIconResId != 0) {
                 notification.setLargeIcon(largeIconBitmap);
             }

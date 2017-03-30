@@ -199,7 +199,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     public void onNewIntent(Intent intent) {
-        Log.d(LOG_TAG, "onNewIntent" + intent.toString());
+        // This is called only when the App is in the foreground
+        Log.d(LOG_TAG, "onNewIntent " + intent.toString());
         handleIncomingCallIntent(intent);
     }
 
@@ -497,19 +498,21 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private void handleIncomingCallIntent(Intent intent) {
         String action = intent.getAction();
         Log.d(LOG_TAG, "handleIncomingCallIntent action "+action);
-        if (action != null) {
-            if (action.equals(ACTION_INCOMING_CALL)) {
-                IncomingCallMessage incomingCallMessage = intent.getParcelableExtra(INCOMING_CALL_MESSAGE);
-                if (incomingCallMessage != null) {
-                    Log.d(LOG_TAG, "callNotificationMap " + callNotificationMap.toString());
-                    VoiceClient.handleIncomingCallMessage(getReactApplicationContext(), incomingCallMessage, incomingCallMessageListener);
-                }
-            } else if (action.equals(ACTION_MISSED_CALL)) {
-                SharedPreferences sharedPref = getReactApplicationContext().getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
-                SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
-                sharedPrefEditor.remove(MISSED_CALLS_GROUP);
-                sharedPrefEditor.commit();
+        if (action == null) {
+            return;
+        }
+        if (action.equals(ACTION_INCOMING_CALL)) {
+            IncomingCallMessage incomingCallMessage = intent.getParcelableExtra(INCOMING_CALL_MESSAGE);
+            if (incomingCallMessage != null) {
+                VoiceClient.handleIncomingCallMessage(getReactApplicationContext(), incomingCallMessage, incomingCallMessageListener);
             }
+        } else if (action.equals(ACTION_MISSED_CALL)) {
+            SharedPreferences sharedPref = getReactApplicationContext().getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+            SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+            sharedPrefEditor.remove(MISSED_CALLS_GROUP);
+            sharedPrefEditor.commit();
+        } else {
+            Log.d(LOG_TAG, "handleIncomingCallIntent unhandled action " + action);
         }
     }
 

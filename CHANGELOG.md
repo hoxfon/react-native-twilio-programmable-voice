@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.5.3
+- Prevent incoming call from starting a new task: use (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP) for the Intent
+- Prevent the incoming call Intent to be broadcasted when the app is in the foreground
+
 ## 0.5.2
 - allow custom notification icons
 
