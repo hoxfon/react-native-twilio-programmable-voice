@@ -2,6 +2,7 @@ package com.hoxfon.react.TwilioVoice.gcm;
 
 import android.annotation.TargetApi;
 
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +41,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, final Bundle bundle) {
-        Log.d(LOG_TAG, "onMessageReceived senderId " + from);
+        Log.d(LOG_TAG, "VoiceGCMListenerService::onMessageReceived senderId " + from);
 
         // If notification ID is not provided by the user for push notification, generate one at random
         if (bundle.getString("id") == null) {
@@ -59,24 +60,30 @@ public class VoiceGCMListenerService extends GcmListenerService {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             public void run() {
+                Boolean shouldBroadcastIntent = true;
                 // Construct and load our normal React JS code bundle
                 ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
                 ReactContext context = mReactInstanceManager.getCurrentReactContext();
                 // If it's constructed, send a notification
                 if (context != null) {
-                    final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage, false);
-                    context.startActivity(launchIntent);
+                    int appImportance = notificationHelper.getApplicationImportance((ReactApplicationContext)context);
+                    Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage, false, appImportance);
+                    if (appImportance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE) {
+                        context.startActivity(launchIntent);
+                        shouldBroadcastIntent = false;
+                    }
                     KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
                     Boolean shouldShowIncomingCallNotification = false;
                     if (keyguardManager.inKeyguardRestrictedInputMode() || (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && keyguardManager.isDeviceLocked()) ) {
                         shouldShowIncomingCallNotification = true;
                     }
-                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, false, shouldShowIncomingCallNotification);
+                    handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, shouldBroadcastIntent, shouldShowIncomingCallNotification);
                 } else {
-                    // Otherwise wait for construction, then send the notification
+                    // Otherwise wait for construction, then handle the incoming call
                     mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
                         public void onReactContextInitialized(ReactContext context) {
-                            final Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage, true);
+                            int appImportance = notificationHelper.getApplicationImportance((ReactApplicationContext)context);
+                            Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, incomingCallMessage, true, appImportance);
                             context.startActivity(launchIntent);
                             handleIncomingCall((ReactApplicationContext)context, bundle, incomingCallMessage, launchIntent, true, true);
                         }

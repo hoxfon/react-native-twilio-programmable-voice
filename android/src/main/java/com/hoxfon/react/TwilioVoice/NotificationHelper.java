@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
@@ -77,14 +76,19 @@ public class NotificationHelper {
         }
     }
 
-    public Intent getLaunchIntent(ReactApplicationContext context, Bundle bundle,
+    public Intent getLaunchIntent(ReactApplicationContext context,
+                                  Bundle bundle,
                                   IncomingCallMessage incomingCallMessage,
-                                  Boolean shouldStartNewTask
+                                  Boolean shouldStartNewTask,
+                                  int appImportance
     ) {
         int notificationId = Integer.parseInt(bundle.getString("id"));
         Intent launchIntent = new Intent(context, getMainActivityClass(context));
+
         int launchFlag = Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP;
-        if (shouldStartNewTask) {
+        if (shouldStartNewTask ||
+                appImportance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND ||
+                appImportance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE) {
             launchFlag = Intent.FLAG_ACTIVITY_NEW_TASK;
         }
         launchIntent.setAction(ACTION_INCOMING_CALL)

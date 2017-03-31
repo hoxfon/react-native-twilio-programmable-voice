@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.5.5
+- improve logic for starting the MainActivity when receiving a call. The Intent flags depends on the App importance (fixes the 0.5.3 for Android 6.0)
+- make sure all wakelock are released after being acquired, and the keyguard renabled
+
 ## 0.5.4
 - set incoming call Intent flag depending on App importance (App status)
 
