@@ -1,10 +1,36 @@
 # react-native-twilio-programmable-voice
-React Native wrapper for Twilio Programmable Voice SDK
+This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your ReactNatvie App. This module is not curated or maintained by Twilio.
 
-Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk). 
-It's easier to integrate this module into your react-native app if you follow the Quickstart tutorial from Twilio, because it makes very clear which setup steps are required.
+## Help wanted!
+
+Please notice that the `iOS` part of `react-native-twilio-programmable-voice` is missing.
+
+No need to ask permission to contribute. Just open an issue or provide a PR. Everybody is welcome to contribute.
+
+ReactNative success is directly linked to module ecosystem. One way to make an impact is helping contributing to this module of another from the community.
+
+![help wanted](images/vjeux_tweet.png "help wanted")
+
+## Integrating the iOS part
+
+The main job consists into follow the [official Twilio docs](https://www.twilio.com/docs/api/voice-sdk/ios/getting-started) and wrap the SDK into a ReactNative library.
+Links:
+- https://github.com/twilio/voice-callkit-quickstart-swift
+- https://github.com/twilio/voice-callkit-quickstart-objc
+- https://github.com/twilio/voice-quickstart-swift
+- https://github.com/twilio/voice-quickstart-objc
+- https://media.twiliocdn.com/sdk/ios/voice/releases/2.0.0-beta7/docs/
+
+If you enjoyed using this module also try to think ways to make it better.
+
+--
 
 ## Installation
+
+Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
+It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required.
+
+
 ```
 npm install react-native-twilio-programmable-voice --save
 ```
@@ -13,12 +39,6 @@ Setup GCM or FCM
 
 You must download the file `google-services.json` from the Firebase console.
 It contains keys and settings for all your applications under Firebase. This library obtains the resource `senderID` for registering for remote GCM from that file.
-
-## iOS Installation
-
-## Help needed
-
-We are constantly looking for contributors for this module. If you want to add the `iOS` implementation for this library please get in touch with us with an issue or PR.
 
 ## Android Installation
 
@@ -136,14 +156,14 @@ import TwilioVoice from 'react-native-twilio-programmable-voice'
 async function initTelephony() {
     try {
         const accessToken = await getAccessTokenFromServer()
-        const success = await TwilioVoice.initWithToken(accessToken)  
+        const success = await TwilioVoice.initWithToken(accessToken)
     } catch (err) {
         console.err(err)
     }
 }
 
 
-// add listeners 
+// add listeners
 TwilioVoice.addEventListener('deviceReady', deviceReadyHandler)
 TwilioVoice.addEventListener('deviceNotReady', deviceNotReadyHandler)
 TwilioVoice.addEventListener('deviceDidReceiveIncoming', deviceDidReceiveIncomingHandler)
@@ -155,7 +175,7 @@ TwilioVoice.addEventListener('connectionDidDisconnect', connectionDidDisconnectH
 // start a call
 TwilioVoice.connect({To: '+61234567890'})
 
-// hangupq
+// hangup
 TwilioVoice.disconnect()
 
 // accept an incoming call
@@ -167,7 +187,7 @@ TwilioVoice.reject()
 // ignore an incoming call
 TwilioVoice.ignore()
 
-// mute or unmute the call
+// mute or un-mute the call
 // mutedValue must be a boolean
 TwilioVoice.setMuted(mutedValue)
 
