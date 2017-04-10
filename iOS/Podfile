@@ -1,0 +1,10 @@
+source 'https://github.com/cocoapods/specs'
+source 'https://github.com/twilio/cocoapod-specs'
+
+target ‘TwilioVoice’ do
+  use_frameworks!
+
+  # Pods for TwilioVoice
+  pod 'TwilioVoiceClient', '=2.0.0-beta6'
+  
+end

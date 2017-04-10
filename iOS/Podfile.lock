@@ -1,0 +1,12 @@
+PODS:
+  - TwilioVoiceClient (2.0.0-beta6)
+
+DEPENDENCIES:
+  - TwilioVoiceClient (= 2.0.0-beta6)
+
+SPEC CHECKSUMS:
+  TwilioVoiceClient: 44e740d32cc56ad3f055b8f1a0af542de734a964
+
+PODFILE CHECKSUM: ea6de2e7f87318f03ac2072479b750344d4286dd
+
+COCOAPODS: 1.1.1

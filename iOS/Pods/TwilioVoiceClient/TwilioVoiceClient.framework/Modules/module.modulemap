@@ -1,0 +1,6 @@
+framework module TwilioVoiceClient {
+  umbrella header "TwilioVoiceClient.h"
+
+  export *
+  module * { export * }
+}

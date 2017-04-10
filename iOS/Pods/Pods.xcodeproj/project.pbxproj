@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6F5E6E8738672EC5DCB3C00F3397568C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */; };
+		9FAEF1BCA7AF3E5058FF980A24DDBCCB /* Pods-TwilioVoice-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 20A1D5629F7485FDE606F29BF3E91B48 /* Pods-TwilioVoice-dummy.m */; };
+		D752890D3CCCF1C885DBF24245760A18 /* Pods-TwilioVoice-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = DFE86BB599E3D5F7D7D14BA52EB0500E /* Pods-TwilioVoice-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1533746141E9E0A448E7A15035E77A01 /* Pods-TwilioVoice-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-TwilioVoice-frameworks.sh"; sourceTree = "<group>"; };
+		1F805E7C86FF7D657A9B781302AB5195 /* Pods-TwilioVoice.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TwilioVoice.debug.xcconfig"; sourceTree = "<group>"; };
+		20A1D5629F7485FDE606F29BF3E91B48 /* Pods-TwilioVoice-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-TwilioVoice-dummy.m"; sourceTree = "<group>"; };
+		2F63622C76C618E6C251843571B61B92 /* TwilioVoiceClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwilioVoiceClient.framework; sourceTree = "<group>"; };
+		30DD1EF35D481D87F18A6CA637F4F74E /* Pods_TwilioVoice.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_TwilioVoice.framework; path = "Pods-TwilioVoice.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A4038853062A3DACD26B310F6701479 /* Pods-TwilioVoice-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-TwilioVoice-acknowledgements.plist"; sourceTree = "<group>"; };
+		5CA286A30AD8AF62A8F29E804FE98E62 /* Pods-TwilioVoice-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-TwilioVoice-acknowledgements.markdown"; sourceTree = "<group>"; };
+		881320BB7C7861DE60DBE8997FB95BCD /* Pods-TwilioVoice.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TwilioVoice.release.xcconfig"; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		C544EEEF69C098B33E0A7114AC2878A1 /* Pods-TwilioVoice-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-TwilioVoice-resources.sh"; sourceTree = "<group>"; };
+		CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		DFE86BB599E3D5F7D7D14BA52EB0500E /* Pods-TwilioVoice-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-TwilioVoice-umbrella.h"; sourceTree = "<group>"; };
+		E07A0515511C6326F6084F6CA4FEEF7C /* Pods-TwilioVoice.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-TwilioVoice.modulemap"; sourceTree = "<group>"; };
+		F696E32D7DFC4A9FE857F6D70314C16A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B564AF66B342AC0F7401A2FA1EC64D40 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6F5E6E8738672EC5DCB3C00F3397568C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7531C8F8DE19F1AA3C8A7AC97A91DC29 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		7B655A53CF8775FC6B8C49BDC37CB984 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				30DD1EF35D481D87F18A6CA637F4F74E /* Pods_TwilioVoice.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7DB346D0F39D3F0E887471402A8071AB = {
+			isa = PBXGroup;
+			children = (
+				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
+				BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */,
+				B0CEE68D22CA28DF92E302D6AED60507 /* Pods */,
+				7B655A53CF8775FC6B8C49BDC37CB984 /* Products */,
+				C1E612C86F04A422F60CA3F8B778DC06 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		8F07937FD4650B83B090D6303853AE9C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2F63622C76C618E6C251843571B61B92 /* TwilioVoiceClient.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9A53786FD8C3DF86248FB43224644DE8 /* TwilioVoiceClient */ = {
+			isa = PBXGroup;
+			children = (
+				8F07937FD4650B83B090D6303853AE9C /* Frameworks */,
+			);
+			name = TwilioVoiceClient;
+			path = TwilioVoiceClient;
+			sourceTree = "<group>";
+		};
+		B0CEE68D22CA28DF92E302D6AED60507 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9A53786FD8C3DF86248FB43224644DE8 /* TwilioVoiceClient */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7531C8F8DE19F1AA3C8A7AC97A91DC29 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C1E612C86F04A422F60CA3F8B778DC06 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				E8C53885482C80E8AA6B67F81EB9403E /* Pods-TwilioVoice */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		E8C53885482C80E8AA6B67F81EB9403E /* Pods-TwilioVoice */ = {
+			isa = PBXGroup;
+			children = (
+				F696E32D7DFC4A9FE857F6D70314C16A /* Info.plist */,
+				E07A0515511C6326F6084F6CA4FEEF7C /* Pods-TwilioVoice.modulemap */,
+				5CA286A30AD8AF62A8F29E804FE98E62 /* Pods-TwilioVoice-acknowledgements.markdown */,
+				5A4038853062A3DACD26B310F6701479 /* Pods-TwilioVoice-acknowledgements.plist */,
+				20A1D5629F7485FDE606F29BF3E91B48 /* Pods-TwilioVoice-dummy.m */,
+				1533746141E9E0A448E7A15035E77A01 /* Pods-TwilioVoice-frameworks.sh */,
+				C544EEEF69C098B33E0A7114AC2878A1 /* Pods-TwilioVoice-resources.sh */,
+				DFE86BB599E3D5F7D7D14BA52EB0500E /* Pods-TwilioVoice-umbrella.h */,
+				1F805E7C86FF7D657A9B781302AB5195 /* Pods-TwilioVoice.debug.xcconfig */,
+				881320BB7C7861DE60DBE8997FB95BCD /* Pods-TwilioVoice.release.xcconfig */,
+			);
+			name = "Pods-TwilioVoice";
+			path = "Target Support Files/Pods-TwilioVoice";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D1967BAEDF6B005029E9CC5BD4A2F84E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D752890D3CCCF1C885DBF24245760A18 /* Pods-TwilioVoice-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		CDEDD20DC5509AAFAB9AE075D3AB38C5 /* Pods-TwilioVoice */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D63664B51F1BBD7D12AFEAD7B91252AB /* Build configuration list for PBXNativeTarget "Pods-TwilioVoice" */;
+			buildPhases = (
+				E97BE91E19BE31161C62D92017A49C87 /* Sources */,
+				B564AF66B342AC0F7401A2FA1EC64D40 /* Frameworks */,
+				D1967BAEDF6B005029E9CC5BD4A2F84E /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-TwilioVoice";
+			productName = "Pods-TwilioVoice";
+			productReference = 30DD1EF35D481D87F18A6CA637F4F74E /* Pods_TwilioVoice.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0700;
+			};
+			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
+			productRefGroup = 7B655A53CF8775FC6B8C49BDC37CB984 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CDEDD20DC5509AAFAB9AE075D3AB38C5 /* Pods-TwilioVoice */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E97BE91E19BE31161C62D92017A49C87 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9FAEF1BCA7AF3E5058FF980A24DDBCCB /* Pods-TwilioVoice-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		156284431C64CB05C59BDA0595A1E95A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		52A42948E19F4BCC8F9D6A1A66E72F18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 881320BB7C7861DE60DBE8997FB95BCD /* Pods-TwilioVoice.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-TwilioVoice/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-TwilioVoice/Pods-TwilioVoice.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_TwilioVoice;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		A09D5AA0C90F5EBFF5ADC53D53C026FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1F805E7C86FF7D657A9B781302AB5195 /* Pods-TwilioVoice.debug.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-TwilioVoice/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-TwilioVoice/Pods-TwilioVoice.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_TwilioVoice;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		C382132BB6BF8CA1A911872A2062FD0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C382132BB6BF8CA1A911872A2062FD0D /* Debug */,
+				156284431C64CB05C59BDA0595A1E95A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D63664B51F1BBD7D12AFEAD7B91252AB /* Build configuration list for PBXNativeTarget "Pods-TwilioVoice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A09D5AA0C90F5EBFF5ADC53D53C026FB /* Debug */,
+				52A42948E19F4BCC8F9D6A1A66E72F18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+}
