@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.6.0
+- Android: use Twilio Voice SDK Beta4
+
 ## 0.5.5
 - improve logic for starting the MainActivity when receiving a call. The Intent flags depends on the App importance (fixes the 0.5.3 for Android 6.0)
 - make sure all wakelock are released after being acquired, and the keyguard renabled
