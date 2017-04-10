@@ -1,7 +1,7 @@
 # react-native-twilio-programmable-voice
 React Native wrapper for Twilio Programmable Voice SDK
 
-Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk). 
+Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
 It's easier to integrate this module into your react-native app if you follow the Quickstart tutorial from Twilio, because it makes very clear which setup steps are required.
 
 ## Installation
@@ -9,18 +9,16 @@ It's easier to integrate this module into your react-native app if you follow th
 npm install react-native-twilio-programmable-voice --save
 ```
 
+## iOS Installation
+
+This current version uses the CallKit method only.
+
+## Android Installation
+
 Setup GCM or FCM
 
 You must download the file `google-services.json` from the Firebase console.
 It contains keys and settings for all your applications under Firebase. This library obtains the resource `senderID` for registering for remote GCM from that file.
-
-## iOS Installation
-
-## Help needed
-
-We are constantly looking for contributors for this module. If you want to add the `iOS` implementation for this library please get in touch with us with an issue or PR.
-
-## Android Installation
 
 **NOTE: To use a specific `play-service-gcm` version, update the `compile` instruction in your App's `android/app/build.gradle` (replace `10.2.0` with the version you prefer):**
 ```gradle
@@ -143,7 +141,7 @@ async function initTelephony() {
 }
 
 
-// add listeners 
+// add listeners
 TwilioVoice.addEventListener('deviceReady', deviceReadyHandler)
 TwilioVoice.addEventListener('deviceNotReady', deviceNotReadyHandler)
 TwilioVoice.addEventListener('deviceDidReceiveIncoming', deviceDidReceiveIncomingHandler)
