@@ -24,7 +24,7 @@ const Twilio = {
 	},
 	initWithTokenUrl(url) {
 		if (Platform.OS !== 'ios') return
-		return TwilioVoice.initWithAccessTokenUrl(url)
+		TwilioVoice.initWithAccessTokenUrl(url)
 	},
 	connect(params = {}) {
 		TwilioVoice.connect(params)
