@@ -153,7 +153,7 @@ function initTelephonyWithUrl(url) {
 
 		try{
 			TwilioVoice.configureCallKit({
-				appName: 'TwilioVoiceExample',  //Required params
+				appName: 'TwilioVoiceExample',  //Required param
 				imageName: 'my_image_name_in_bundle', //OPTIONAL
 				ringtoneSound: 'my_ringtone_sound_filename_in_bundle' //OPTIONAL
 			})
