@@ -3,8 +3,6 @@ package com.hoxfon.react.TwilioVoice.gcm;
 import android.annotation.TargetApi;
 
 import android.app.ActivityManager;
-import android.app.KeyguardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -82,14 +80,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                         context.startActivity(launchIntent);
                         shouldBroadcastIntent = false;
                     }
-                    KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-                    Boolean shouldShowIncomingCallNotification = false;
-                    if (keyguardManager.inKeyguardRestrictedInputMode() ||
-                            (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && keyguardManager.isDeviceLocked())
-                    ) {
-                        shouldShowIncomingCallNotification = true;
-                    }
-                    handleIncomingCall((ReactApplicationContext)context, bundle, callInvite, launchIntent, shouldBroadcastIntent, shouldShowIncomingCallNotification);
+                    handleIncomingCall((ReactApplicationContext)context, bundle, callInvite, launchIntent, shouldBroadcastIntent);
                 } else {
                     // Otherwise wait for construction, then handle the incoming call
                     mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
@@ -97,7 +88,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                             int appImportance = notificationHelper.getApplicationImportance((ReactApplicationContext)context);
                             Intent launchIntent = notificationHelper.getLaunchIntent((ReactApplicationContext)context, bundle, callInvite, true, appImportance);
                             context.startActivity(launchIntent);
-                            handleIncomingCall((ReactApplicationContext)context, bundle, callInvite, launchIntent, true, true);
+                            handleIncomingCall((ReactApplicationContext)context, bundle, callInvite, launchIntent, true);
                         }
                     });
                     if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
@@ -113,13 +104,12 @@ public class VoiceGCMListenerService extends GcmListenerService {
                                     final Bundle bundle,
                                     CallInvite callInvite,
                                     Intent launchIntent,
-                                    Boolean shouldBroadcastIntent,
-                                    Boolean showIncomingCallNotification
+                                    Boolean shouldBroadcastIntent
     ) {
         if (shouldBroadcastIntent) {
             sendIncomingCallMessageToActivity(context, callInvite, bundle);
         }
-        showNotification(context, callInvite, bundle, launchIntent, showIncomingCallNotification);
+        showNotification(context, callInvite, bundle, launchIntent);
     }
 
     /*
@@ -144,14 +134,11 @@ public class VoiceGCMListenerService extends GcmListenerService {
     private void showNotification(ReactApplicationContext context,
                                   CallInvite callInvite,
                                   Bundle bundle,
-                                  Intent launchIntent,
-                                  Boolean showIncomingCallNotification
+                                  Intent launchIntent
     ) {
         Log.d(LOG_TAG, "showNotification messageType: "+bundle.getString("twi_message_type"));
         if (!callInvite.isCancelled()) {
-            if (showIncomingCallNotification) {
-                notificationHelper.createIncomingCallNotification(context, callInvite, bundle, launchIntent);
-            }
+            notificationHelper.createIncomingCallNotification(context, callInvite, bundle, launchIntent);
         } else {
             Log.d(LOG_TAG, "incoming call cancelled");
             notificationHelper.removeIncomingCallNotification(context, callInvite, 0);

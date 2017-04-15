@@ -94,10 +94,10 @@ public class NotificationHelper {
                 .putExtra(NOTIFICATION_ID, notificationId)
                 .addFlags(
                         launchFlag +
-                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
-                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
-                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
+                                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
+                                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
+                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 );
 
         if (callInvite != null) {
@@ -134,6 +134,7 @@ public class NotificationHelper {
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle("Incoming call")
                         .setContentText(callInvite.getFrom() + " is calling")
+                        .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
                         .setContentIntent(pendingIntent);

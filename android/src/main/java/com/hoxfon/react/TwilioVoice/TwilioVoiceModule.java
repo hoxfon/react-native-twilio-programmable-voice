@@ -506,6 +506,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             notificationHelper.removeIncomingCallNotification(getReactApplicationContext(), null, notificationId);
             TwilioVoiceModule.callNotificationMap.remove(notificationKey);
         }
+        activeCallInvite = null;
     }
 
     @ReactMethod
