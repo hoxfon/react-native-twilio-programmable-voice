@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.6.1
+- Android: fix gradle import beta4
+
 ## 0.6.0
 - Android: use Twilio Voice SDK Beta4
 
