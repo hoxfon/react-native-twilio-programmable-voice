@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.6.2
+- Android: fix. Clear callInvite when the caller hangs up
+
 ## 0.6.1
 - Android: fix gradle import beta4
 

@@ -397,7 +397,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 //   - the call is rejected
 
                 ringtone.stop();
-                clearIncomingNotification(activeCallInvite);
+
                 notificationManager.cancel(intent.getIntExtra(NOTIFICATION_ID, 0));
 
                 if (wakeLock.isHeld()) {
@@ -426,9 +426,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                         notificationHelper.createMissedCallNotification(getReactApplicationContext(), activeCallInvite);
                     }
 
-                    activeCallInvite = null;
                     callCancelledManually = false;
                 }
+                clearIncomingNotification(activeCallInvite);
             }
         } else if (action.equals(ACTION_MISSED_CALL)) {
             SharedPreferences sharedPref = getReactApplicationContext().getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
