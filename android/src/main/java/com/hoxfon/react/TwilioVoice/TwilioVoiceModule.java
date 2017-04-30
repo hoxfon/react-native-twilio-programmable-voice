@@ -308,6 +308,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     callSid = call.getCallSid();
                     params.putString("call_sid", callSid);
                     params.putString("call_state", call.getState().name());
+                    params.putString("call_from", call.getFrom());
+                    params.putString("call_to", call.getTo());
                 }
                 if (callSid != null && activeCall != null && activeCall.getCallSid() != null && activeCall.getCallSid().equals(callSid)) {
                     activeCall = null;
@@ -331,6 +333,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     callSid = call.getCallSid();
                     params.putString("call_sid", callSid);
                     params.putString("call_state", call.getState().name());
+                    params.putString("call_from", call.getFrom());
+                    params.putString("call_to", call.getTo());
                     params.putString("err", error.getMessage());
                 }
                 if (callSid != null && activeCall != null && activeCall.getCallSid() != null && activeCall.getCallSid().equals(callSid)) {

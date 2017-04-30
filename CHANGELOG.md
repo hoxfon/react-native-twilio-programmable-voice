@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 0.6.3
+- fix crash when activityManager is null
+- add call_from and call_to to the event connectionDidDisconnect
+
 ## 0.6.2
 - Android: fix. Clear callInvite when the caller hangs up
 

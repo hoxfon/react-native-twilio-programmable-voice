@@ -51,6 +51,9 @@ public class NotificationHelper {
 
     public int getApplicationImportance(ReactApplicationContext context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        if (activityManager == null) {
+            return 0;
+        }
         List<ActivityManager.RunningAppProcessInfo> processInfos = activityManager.getRunningAppProcesses();
         if (processInfos == null) {
             return 0;
