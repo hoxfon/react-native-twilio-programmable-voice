@@ -2,6 +2,7 @@
 android/.idea
 node_modules
 build
+logs
 
 *.iml
 .gradle
