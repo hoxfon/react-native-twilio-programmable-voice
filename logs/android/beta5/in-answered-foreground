@@ -1,0 +1,322 @@
+Emulator Samsung Galaxy 8
+lib: com.twilio:voice-android:2.0.0-beta5
+firebase: com.google.firebase:firebase-messaging:10.2.4
+Android 7.0.0
+
+
+Incoming call Answered app in foreground
+
+call 1
+
+05-08 04:44:05.974 9396-9503/<PKG_NAME> D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 04:44:05.974 9396-9503/<PKG_NAME> I/TwilioVoice: Registering with FCM
+05-08 04:44:06.528 9396-9503/<PKG_NAME> D/TwilioVoice: Successfully registered FCM
+05-08 04:44:06.528 9396-9503/<PKG_NAME> D/TwilioVoice: sendEvent deviceReady params null
+05-08 04:46:21.481 9396-10559/<PKG_NAME> D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_tw_account>, twi_to=client:<redacted_phone_number>, twi_bridge_token=<redacted_token>, twi_message_type=twilio.voice.call, twi_call_sid=CA474665effb308d95f2a9042366a9340d, twi_message_id=FCM0eaa554fd6fa47afa3b3f31e86051308, twi_from=+<redacted_phone_number>}
+05-08 04:46:21.489 9396-9396/<PKG_NAME> D/TwilioVoice: showNotification callInvite state: PENDING
+05-08 04:46:21.499 9396-9396/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-415437527, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@4191057}]
+05-08 04:46:21.499 9396-9396/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 04:46:21.531 9396-9396/<PKG_NAME> D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA474665effb308d95f2a9042366a9340d"} }
+05-08 04:46:23.302 9396-9503/<PKG_NAME> D/TwilioVoice: accept()
+05-08 04:46:23.309 9396-9503/<PKG_NAME> D/TwilioVoice: accept() activeCallInvite
+05-08 04:46:23.309 9396-9503/<PKG_NAME> D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 04:46:23.320 9396-9503/<PKG_NAME> I/PJSIP: 04:46:23.320    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 04:46:23.320 9396-9503/<PKG_NAME> I/PJSIP: 04:46:23.320    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 04:46:28.392 9396-10688/<PKG_NAME> D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_tw_account>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA474665effb308d95f2a9042366a9340d, twi_message_id=FCM6bc02cd8f98b44e08c3e54645d291dfd, twi_from=+<redacted_phone_number>}
+05-08 04:46:28.393 9396-9396/<PKG_NAME> D/TwilioVoice: showNotification callInvite state: CANCELED
+05-08 04:46:28.393 9396-9396/<PKG_NAME> D/TwilioVoice: removeIncomingCallNotification
+05-08 04:46:28.393 9396-9396/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-415430616, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@fbbbdb7}]
+05-08 04:46:28.393 9396-9396/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 04:46:28.393 9396-9396/<PKG_NAME> D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 04:46:28.402 9396-9396/<PKG_NAME> D/TwilioVoice: removeIncomingCallNotification
+05-08 04:46:36.378 9396-9503/<PKG_NAME> D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA474665effb308d95f2a9042366a9340d"} }
+05-08 04:46:48.431 9396-9503/<PKG_NAME> D/TwilioVoice: call disconnected
+05-08 04:46:48.432 9396-9503/<PKG_NAME> D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA474665effb308d95f2a9042366a9340d"} }
+
+call 2
+
+05-08 05:28:42.722 2816-2816/<PKG_NAME> D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 1164997672
+05-08 05:28:42.724 2816-2816/<PKG_NAME> D/TwilioVoice: showNotification() callInvite PENDING
+05-08 05:28:42.741 2816-2816/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1164997672, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@80bc0c7}]
+05-08 05:28:42.741 2816-2816/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:28:42.925 2816-2816/<PKG_NAME> D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA241f40ba75c1a20a1bc2782057ac92bb"} }
+05-08 05:28:42.925 2816-2816/<PKG_NAME> D/TwilioVoice: failed Catalyst instance not active
+05-08 05:28:42.925 2816-2816/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1164997672, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@80bc0c7}]
+05-08 05:28:42.926 2816-2816/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:28:42.930 2816-2816/<PKG_NAME> D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA241f40ba75c1a20a1bc2782057ac92bb"} }
+05-08 05:28:42.930 2816-2816/<PKG_NAME> D/TwilioVoice: failed Catalyst instance not active
+05-08 05:28:42.938 2816-2816/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1164997672, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@80bc0c7}]
+05-08 05:28:42.938 2816-2816/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:28:42.940 2816-2816/<PKG_NAME> D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA241f40ba75c1a20a1bc2782057ac92bb"} }
+05-08 05:28:45.039 2816-7103/<PKG_NAME> D/TwilioVoice: accept()
+05-08 05:28:45.053 2816-7103/<PKG_NAME> D/TwilioVoice: accept() activeCallInvite
+05-08 05:28:45.053 2816-7103/<PKG_NAME> D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 05:28:45.070 2816-7103/<PKG_NAME> I/PJSIP: 05:28:45.070    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 05:28:45.070 2816-7103/<PKG_NAME> I/PJSIP: 05:28:45.070    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 05:28:47.275 2816-7576/<PKG_NAME> D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA241f40ba75c1a20a1bc2782057ac92bb, twi_message_id=FCMc86c18c818144a668ab15092b993a5a6, twi_from=+<redacted_phone_number>}
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 548260510
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: removeIncomingCallNotification
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=548260510, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@bacbe36}]
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: ====> BEGIN this is the important block
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:28:47.277 2816-2816/<PKG_NAME> D/TwilioVoice: creating a missed call, activeCallInvite: com.twilio.voice.CallInvite@bacbe36
+05-08 05:28:47.288 2816-2816/<PKG_NAME> D/TwilioVoice: removeIncomingCallNotification
+05-08 05:28:47.294 2816-2816/<PKG_NAME> D/TwilioVoice: ====> END this is the important block
+05-08 05:28:47.294 2816-2816/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=548260510, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@bacbe36}]
+05-08 05:28:47.294 2816-2816/<PKG_NAME> D/TwilioVoice: ====> BEGIN this is the important block
+05-08 05:28:47.294 2816-2816/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 05:28:47.294 2816-2816/<PKG_NAME> D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:28:47.294 2816-2816/<PKG_NAME> D/TwilioVoice: creating a missed call, activeCallInvite: com.twilio.voice.CallInvite@bacbe36
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: removeIncomingCallNotification
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: ====> END this is the important block
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=548260510, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@bacbe36}]
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: ====> BEGIN this is the important block
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:28:47.325 2816-2816/<PKG_NAME> D/TwilioVoice: creating a missed call, activeCallInvite: com.twilio.voice.CallInvite@bacbe36
+05-08 05:28:47.335 2816-2816/<PKG_NAME> D/TwilioVoice: removeIncomingCallNotification
+05-08 05:28:47.335 2816-2816/<PKG_NAME> D/TwilioVoice: ====> END this is the important block
+05-08 05:28:47.757 2816-7103/<PKG_NAME> D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA241f40ba75c1a20a1bc2782057ac92bb"} }
+05-08 05:28:59.922 2816-7103/<PKG_NAME> D/TwilioVoice: call disconnected
+05-08 05:28:59.922 2816-7103/<PKG_NAME> D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA241f40ba75c1a20a1bc2782057ac92bb"} }
+
+call 3
+
+05-08 05:39:06.617 11933-14557/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 05:39:06.617 11933-14557/ I/TwilioVoice: Registering with FCM
+05-08 05:39:07.148 11933-14557/ D/TwilioVoice: Successfully registered FCM
+05-08 05:39:07.148 11933-14557/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 05:39:15.732 11933-14790/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_bridge_token=eyJraWQiOiJKd2VTM0JpZi0xIiwiY3R5IjoidHdpbGlvLWZwYTt2PTEiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..Oazwr60eRsN41evu.9zo-9yRHiHjOwtWxqOCyn2eTsdW4z1iMi_1yQ67nwvizKgd47J1yUHzceN6LpU0IIPYustkFWXq2LeW57ENkTl5H7UXXS203huyFZPN1g4JOszDWszjsYpKMHuvnoyKX1jp4tX0H4cmfcaxgtl03ahBLb0WNfyHziD8_Dv08pXzpQBQYfX_wP4BrKPlpzFVZ1GqbOVP_pbmUjXmJMVFtUzAX-nJmcZqZkJ7T3XOx7ZYs23WmHTSpEWtK01Idvvb3dOb4rXOYqr7ad71UGGEw9nb3vI8TW-EWfK_gH3QUkP9fBMZr9SaaMw-8ExdCo6US0dbwPlFyCoHSHUrW8tBHNwRuleoWBuC0ubxnr4w1L1dwFZyIMiPw81DhlPycpW_U58jtB4MXoCARpwX6cMIAd6fXUqwKm0Q5VbR2abzeKpL_4eUVajX8ashE5rYHrNHRUHmeua7Tri4wEHTW12pLu74zoaeMQ9H66CKl2vK6fCaAGNt5XcEn5g7BzrApY3hUz-u6s6OWq5cManmX495LjBQHSogCciCAvsfRyX1R6GeFWQjnNcLeF9Y92vtgbzHbXelWDGU8Ri0fYWMuwGJwgmpJCEersEtaS-6MDtH5cwh6xXkXum8NaQae9sC0PVpWRVSVlPGaSxDEsyFa6Rwdr8dE.mQRtcDG3k5TUYBYwWpMMpA, twi_message_type=twilio.voice.call, twi_call_sid=CA74806e6f5e85fd5fdf86c36bad57ae00, twi_message_id=FCM0fd059ee8160477a9a517b2c9af7fa74, twi_from=+<redacted_phone_number>}
+05-08 05:39:15.744 11933-11933/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 1734497732
+05-08 05:39:15.744 11933-11933/ D/TwilioVoice: showNotification() callInvite PENDING
+05-08 05:39:15.772 11933-11933/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1734497732, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@1d5a678}]
+05-08 05:39:15.772 11933-11933/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:39:15.818 11933-11933/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA74806e6f5e85fd5fdf86c36bad57ae00"} }
+05-08 05:39:15.818 11933-11933/ D/TwilioVoice: failed Catalyst instance not active
+05-08 05:39:15.819 11933-11933/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1734497732, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@1d5a678}]
+05-08 05:39:15.819 11933-11933/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:39:15.822 11933-11933/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA74806e6f5e85fd5fdf86c36bad57ae00"} }
+05-08 05:39:15.822 11933-11933/ D/TwilioVoice: failed Catalyst instance not active
+05-08 05:39:15.822 11933-11933/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1734497732, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@1d5a678}]
+05-08 05:39:15.822 11933-11933/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:39:15.824 11933-11933/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA74806e6f5e85fd5fdf86c36bad57ae00"} }
+05-08 05:39:18.911 11933-14557/ D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 05:39:18.973 11933-14557/ I/PJSIP: 05:39:18.973    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 05:39:18.973 11933-14557/ I/PJSIP: 05:39:18.973    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 05:39:22.214 11933-14921/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA74806e6f5e85fd5fdf86c36bad57ae00, twi_message_id=FCM5565f79d78164345bac9b14b9589fe42, twi_from=+<redacted_phone_number>}
+05-08 05:39:22.215 11933-11933/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 2145809630
+05-08 05:39:22.215 11933-11933/ D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 05:39:22.215 11933-11933/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:39:22.216 11933-11933/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=2145809630, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@5864496}]
+05-08 05:39:22.216 11933-11933/ D/TwilioVoice: ====> BEGIN this is the important block
+05-08 05:39:22.216 11933-11933/ D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 05:39:22.216 11933-11933/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:39:22.216 11933-11933/ D/TwilioVoice: creating a missed call, activeCallInvite state: CANCELED
+05-08 05:39:22.247 11933-11933/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 05:39:22.247 11933-11933/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:39:22.256 11933-11933/ D/TwilioVoice: ====> END this is the important block
+05-08 05:39:22.256 11933-11933/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=2145809630, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@5864496}]
+05-08 05:39:22.256 11933-11933/ D/TwilioVoice: ====> BEGIN this is the important block
+05-08 05:39:22.256 11933-11933/ D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 05:39:22.256 11933-11933/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:39:22.256 11933-11933/ D/TwilioVoice: creating a missed call, activeCallInvite state: CANCELED
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: ====> END this is the important block
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=2145809630, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@5864496}]
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: ====> BEGIN this is the important block
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: handleIncomingCallIntent state = CANCELED
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:39:22.317 11933-11933/ D/TwilioVoice: creating a missed call, activeCallInvite state: CANCELED
+05-08 05:39:22.336 11933-11933/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 05:39:22.336 11933-11933/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:39:22.336 11933-11933/ D/TwilioVoice: ====> END this is the important block
+05-08 05:39:29.274 11933-14557/ D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"DISCONNECTED","call_sid":"CA74806e6f5e85fd5fdf86c36bad57ae00"} }
+05-08 05:39:29.398 11933-14557/ D/TwilioVoice: call disconnected
+05-08 05:39:29.399 11933-14557/ D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA74806e6f5e85fd5fdf86c36bad57ae00"} }
+
+call 4 start using private variable Boolean callAccepted to track the call acceptance, because the activeCallInvite' state never becomes ACCEPTED
+
+05-08 05:51:12.024 17347-17427/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 05:51:12.024 17347-17427/ I/TwilioVoice: Registering with FCM
+05-08 05:51:12.657 17347-17427/ D/TwilioVoice: Successfully registered FCM
+05-08 05:51:12.657 17347-17427/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 05:51:34.392 17347-17920/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_bridge_token=eyJraWQiOiJKd2VTM0JpZi0xIiwiY3R5IjoidHdpbGlvLWZwYTt2PTEiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..5iAR_g_tjn5DmGSg.ZsIdF2Ahp1CVQTxLNq_D6PArrWZV1lL0xLAxPt9dveTf_mwWEMB8eg-YvUNkCqlAActarZaYsix8qCP-ZLv5qMmm-wGuSQ4KCS9rGWMEWxoPug9zXCkgCfXRRfjUq0RQUfmo3intRShwEzBZMSr4er5Qhs_UDPbsYgb_7RRE5sG0KzxhpRbjxiXzl3F9P-xDxoxO6jw-L7P6gJnqvNyIElWApg1g2RgrDlVqxD-cRvQ9675D7enPJJqsVAgfFN7OqnISZqXc_vAZQcojWNFYCaxLFp2jhAQVDKrwWOwGxPGFay813weY5_PJSbK5K376IJ2mwL3xu90o9-SHBVpPGDBb_-psv8-bK_XHtmRtsAWJpx_zptatF_KQZdO19RcX12zTrHkQH95lwEioELuM7pdXcqcuzY2pE0BcG3ZSh-5edQ2sN9Lnbd1iBQfevoOt2rXpsZdMmzAlUBDtTAjaTczbmfLrEKd_UD_4U4iVw38L8RFQR_088RSAIUpej23cEGciV-UpwQDZCk_q3ChSALCZnNghssFFf4knN-YGOP35rsPPs3Jb483F2rFNo66TFo7_NKQ8H6RJiEh5Yj48XT4SI7d9ySbouANKKS_yBv5ZZq91bxe-t4ic15WC27q7CJYqvw-I6Thw-lTxBgzW16oHK0k.Vu6mYRuDJsX89ldsNI93cQ, twi_message_type=twilio.voice.call, twi_call_sid=CA902f8cc00a16a0864b08eefbc11618e4, twi_message_id=FCMcd290f30ef874682a4efcf2fa847a051, twi_from=+<redacted_phone_number>}
+05-08 05:51:34.401 17347-17347/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 1300754382
+05-08 05:51:34.401 17347-17347/ D/TwilioVoice: showNotification() callInvite PENDING
+05-08 05:51:34.443 17347-17347/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1300754382, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@6cd114}]
+05-08 05:51:34.443 17347-17347/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:51:34.550 17347-17347/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA902f8cc00a16a0864b08eefbc11618e4"} }
+05-08 05:51:37.070 17347-17427/ D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 05:51:37.118 17347-17427/ I/PJSIP: 05:51:37.118    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 05:51:37.118 17347-17427/ I/PJSIP: 05:51:37.118    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 05:51:40.465 17347-18042/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA902f8cc00a16a0864b08eefbc11618e4, twi_message_id=FCM756f2fb753a24eabaf93cfafd156db71, twi_from=+<redacted_phone_number>}
+05-08 05:51:40.466 17347-17347/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: -602998500
+05-08 05:51:40.466 17347-17347/ D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 05:51:40.466 17347-17347/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-602998500, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@1cc521d}]
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: ====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: activeCallInvite state = CANCELED
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:51:40.467 17347-17347/ D/TwilioVoice: ====> END this is the important block
+05-08 05:51:47.392 17347-17427/ D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA902f8cc00a16a0864b08eefbc11618e4"} }
+05-08 05:51:56.634 17347-17427/ D/TwilioVoice: call disconnected
+05-08 05:51:56.634 17347-17427/ D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA902f8cc00a16a0864b08eefbc11618e4"} }
+
+call 5
+
+05-08 05:55:06.087 20553-20671/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 05:55:06.088 20553-20671/ I/TwilioVoice: Registering with FCM
+05-08 05:55:06.664 20553-20671/ D/TwilioVoice: Successfully registered FCM
+05-08 05:55:06.664 20553-20671/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 05:55:19.503 20553-20988/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_bridge_token=eyJraWQiOiJKd2VTM0JpZi0xIiwiY3R5IjoidHdpbGlvLWZwYTt2PTEiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..OkpYD_o_qRfcnidx.XwYhGjrA_JYmTB3-uiYqzxV-eCi6sr3n6CawElA31UOSPmqe1UKSILj0pw8quKLlZ2FK-4tveuvS6kUc0dqaeiG7iMcnOg8KXYlV6MP6Z8FbEoQzTr86ddyokVpSGQ-XgboAg8mhFcJ7bPoCl-RVORIQlmzll29nknvHmKDG80RdjvKhoJ_zCvK3mvmn60C_n2-W4uE9bH9WB_TcufoCHf53w473U1rqn5SZ5AbrjLdeXjVDf47-Q4HNh5fiNxoD0WkeQR5PyjbdvLzd2Kl6PeVC7385Qs6T4jEhNZl5h-eJ8XsBEuWO6zyAFNqmZ33QkhOkrH7IbWvL7AYE5ZaeSL09mK8JN1Otv0Im0YhegL1PD1tEb73M2qh8Et0IF10ussPW-pOWrCAJoDPQLHjp_klfEI3Z7W3QTM4KzRmyMobtGlRVYAHAvahQWX6LB3uCY2S0dRhAKxuYJ7T_gAkJQQXc-7eEChueYzzpu609zXtcd7SRV9I74zwAFqyx-4tw-uv2ReMMw-5fsFn7T86BawVj69eWAQSypAtdTd7uw9le8q9wei7_YRaQ6E3I73Iz2M_CjP4fSbwR9McPlgFsEhYa7h5za1dH_JQzqpw3KBj8WkocMNX4iJ0f11X-N_eTw3O8YCZscE_-vaPa3AUaNy0v.yhglxciaEcKr-R5_6-lytA, twi_message_type=twilio.voice.call, twi_call_sid=CA48b19f09ff6af24e33f663ef3a5d4fe0, twi_message_id=FCMc93c252d795b443bad34f8a4eac758d1, twi_from=+<redacted_phone_number>}
+05-08 05:55:19.515 20553-20553/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: -663482343
+05-08 05:55:19.515 20553-20553/ D/TwilioVoice: showNotification() callInvite PENDING
+05-08 05:55:19.537 20553-20553/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-663482343, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@3be2c4e}]
+05-08 05:55:19.537 20553-20553/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 05:55:19.567 20553-20553/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA48b19f09ff6af24e33f663ef3a5d4fe0"} }
+05-08 05:55:25.808 20553-20671/ D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 05:55:25.837 20553-20671/ I/PJSIP: 05:55:25.837    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 05:55:25.837 20553-20671/ I/PJSIP: 05:55:25.837    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 05:55:31.176 20553-21238/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA48b19f09ff6af24e33f663ef3a5d4fe0, twi_message_id=FCM471a2827df614bfa92c85c13e2e108d7, twi_from=+<redacted_phone_number>}
+05-08 05:55:31.177 20553-20553/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 616207823
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=616207823, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@267b248}]
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: ====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: activeCallInvite state = CANCELED
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 05:55:31.178 20553-20553/ D/TwilioVoice: removeIncomingCallNotification
+05-08 05:55:31.179 20553-20553/ D/TwilioVoice: ====> END this is the important block
+05-08 05:55:38.762 20553-20671/ D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA48b19f09ff6af24e33f663ef3a5d4fe0"} }
+05-08 05:55:45.650 20553-20671/ D/TwilioVoice: call disconnected
+05-08 05:55:45.651 20553-20671/ D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA48b19f09ff6af24e33f663ef3a5d4fe0"} }
+
+call 6
+
+05-08 09:39:52.329 22675-22784/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 09:39:52.330 22675-22784/ I/TwilioVoice: Registering with FCM
+05-08 09:39:52.992 22675-22784/ D/TwilioVoice: Successfully registered FCM
+05-08 09:39:52.992 22675-22784/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 09:41:11.628 22675-24116/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_bridge_token=eyJraWQiOiJKd2VTM0JpZi0xIiwiY3R5IjoidHdpbGlvLWZwYTt2PTEiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..ecTVRwih3teKKpGu._YP7nA6I_l3J2bhbyOTbosyP3Kr8J2X2YKmdCAFyIkxS594XPH7wRYmRiJGswxdB7m0N69WWjvh0AvzSRfLjaKDwompLDUuhAkWw3WXbcLx9FJJsrXy-naaTTHmV8TAdwhfAgUkHQWar84EjF_vfPdUJ3BAkdw4991RTZEozR35mwMq_Mmcl9k7mdr9FxDbHmoUYPP9LRfqoesSpQ5EO_Ho1TW0U5Khzy9hf1f7rYa2peYLY6DqaVx9VcoJ86AdkH5AhIS2U4R2_Ho3ewNOfrKeFML2Fvy2VKXq1mtEPZAiBnObuFFJde2HXLx5uhNzX3lXOx_6gKgPQaoxTlh34-ULL6rmXrrmSIINJ0nC4X5MFVpqRebnPnmpIN_3itma9iEw_wZtcVcs6NsA32JpNd7qWjZyUfgR_4FWnAWRGJTDWAD8D4m3v8QKroPvEm8kL7kcUITJrUSk6aOB3HxEVV7oK0IvsE1edx-_2aDfxO-jAcvUQbmPvuSuHs2loZfwdOaBEeELnzvRG5JMkGfy9Tdcz36yoCvR2lj3htbjPys5NkuMtRAT6MdavLPeYJAApbzmQKOxXcSG4udEtZgDqW-mhKoZ-MK724EiGk6k4Z9GuM_BNjaJ78U-Y9sN03cYKQJjFcGVvyd72gt-jItLjhC0o.hz3pHy0IzRh0O49gvQ-n2A, twi_message_type=twilio.voice.call, twi_call_sid=CA44e4fc10a53c7ea74f3d471cda8da30a, twi_message_id=FCMf17e35ed4243412e9acf08e37da74799, twi_from=+<redacted_phone_number>}
+05-08 09:41:11.636 22675-22675/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: -165767137
+05-08 09:41:11.637 22675-22675/ D/TwilioVoice: showNotification() callInvite PENDING
+05-08 09:41:11.654 22675-22675/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-165767137, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@f9501fe}]
+05-08 09:41:11.654 22675-22675/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 09:41:11.692 22675-22675/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA44e4fc10a53c7ea74f3d471cda8da30a"} }
+05-08 09:41:17.279 22675-22784/ D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 09:41:17.298 22675-22784/ I/PJSIP: 09:41:17.298    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 09:41:17.298 22675-22784/ I/PJSIP: 09:41:17.298    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 09:41:22.374 22675-22784/ D/TwilioVoice: CALL CONNECTED callListener().onConnected call state = CONNECTED
+05-08 09:41:22.465 22675-24349/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA44e4fc10a53c7ea74f3d471cda8da30a, twi_message_id=FCMdc3e5d0a60b74a1d9171bb3e6ff78c2f, twi_from=+<redacted_phone_number>}
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: -1484454859
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: removeIncomingCallNotification
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-1484454859, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@e435e24}]
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: ====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: activeCallInvite state = CANCELED
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 09:41:22.469 22675-22675/ D/TwilioVoice: removeIncomingCallNotification
+05-08 09:41:22.470 22675-22675/ D/TwilioVoice: ====> END
+05-08 09:41:28.668 22675-22784/ D/TwilioVoice: CALL CONNECTED after setAudio(true)
+05-08 09:41:28.674 22675-22784/ D/TwilioVoice: CALL CONNECTED after createHangupLocalNotification
+05-08 09:41:28.674 22675-22784/ D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA44e4fc10a53c7ea74f3d471cda8da30a"} }
+05-08 09:41:33.232 22675-22784/ D/TwilioVoice: call disconnected
+05-08 09:41:33.233 22675-22784/ D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA44e4fc10a53c7ea74f3d471cda8da30a"} }
+
+
+call 7 real device One Plus 3
+
+05-08 14:46:50.285 30027-30100/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 14:46:50.285 30027-30100/ I/TwilioVoice: Registering with FCM
+05-08 14:46:50.806 30027-30100/ D/TwilioVoice: Successfully registered FCM
+05-08 14:46:50.806 30027-30100/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 14:46:59.372 30027-30027/ D/TwilioVoice: onNewIntent Intent { act=com.hoxfon.react.TwilioVoice.INCOMING_CALL flg=0x10680080 cmp=com.hoxfon.HoxFon.DEV.debug/com.hoxfon.MainActivity (has extras) }
+05-08 14:46:59.372 30027-30027/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 14:46:59.476 30027-30027/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_sid":"CA4a32e595ebff0f3adde73014349f0479"} }
+05-08 14:47:01.397 30027-30100/ D/TwilioVoice: Active call invite found: com.twilio.voice.CallInvite@af98319
+05-08 14:47:02.672 30027-30100/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 14:47:02.673 30027-30100/ I/TwilioVoice: Registering with FCM
+05-08 14:47:03.177 30027-30100/ D/TwilioVoice: Successfully registered FCM
+05-08 14:47:03.177 30027-30100/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 14:47:03.698 30027-30100/ D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 14:47:03.753 30027-30100/ I/PJSIP: 14:47:03.753    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 14:47:03.753 30027-30100/ I/PJSIP: 14:47:03.753    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 14:47:05.122 30027-30100/ D/TwilioVoice: CALL CONNECTED callListener().onConnected call state = CONNECTED
+05-08 14:47:05.126 30027-30100/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.setAudioFocus(TwilioVoiceModule.java:654)
+05-08 14:47:05.126 30027-30100/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.access$200(TwilioVoiceModule.java:52)
+05-08 14:47:05.127 30027-30100/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule$2.onConnected(TwilioVoiceModule.java:215)
+05-08 14:47:05.127 30027-30100/ V/AudioManager: Elem: com.twilio.voice.Call$1.run(Call.java:184)
+05-08 14:47:05.165 30027-31220/ D/TwilioVoice: Bundle data: {twi_account_sid=<redacted_account_id>, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA4a32e595ebff0f3adde73014349f0479, twi_message_id=FCM1dd28a4d402647179ae4c0a1ef403b80, twi_from=+<redacted_phone_number>}
+05-08 14:47:05.174 30027-30027/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: -2031898349
+05-08 14:47:05.174 30027-30027/ D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 14:47:05.174 30027-30027/ D/TwilioVoice: removeIncomingCallNotification
+05-08 14:47:05.175 30027-30027/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-2031898349, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@836139a}]
+05-08 14:47:05.175 30027-30027/ D/TwilioVoice: ====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING
+05-08 14:47:05.176 30027-30027/ D/TwilioVoice: activeCallInvite state = CANCELED
+05-08 14:47:05.176 30027-30027/ D/TwilioVoice: activeCallInvite was cancelled by +<redacted_phone_number>
+05-08 14:47:05.176 30027-30027/ D/TwilioVoice: clearIncomingNotification() callInvite state: CANCELED
+05-08 14:47:05.176 30027-30027/ D/TwilioVoice: removeIncomingCallNotification
+05-08 14:47:05.177 30027-30027/ D/TwilioVoice: ====> END
+05-08 14:47:05.370 30027-30100/ D/TwilioVoice: CALL CONNECTED after setAudio(true)
+05-08 14:47:05.385 30027-30100/ D/TwilioVoice: CALL CONNECTED after createHangupLocalNotification
+05-08 14:47:05.385 30027-30100/ D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA4a32e595ebff0f3adde73014349f0479"} }
+05-08 14:47:08.595 30027-30100/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 14:47:08.595 30027-30100/ I/TwilioVoice: Registering with FCM
+05-08 14:47:09.104 30027-30100/ D/TwilioVoice: Successfully registered FCM
+05-08 14:47:09.104 30027-30100/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 14:47:15.589 30027-30100/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.setAudioFocus(TwilioVoiceModule.java:656)
+05-08 14:47:15.589 30027-30100/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.access$200(TwilioVoiceModule.java:52)
+05-08 14:47:15.589 30027-30100/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule$2.onDisconnected(TwilioVoiceModule.java:241)
+05-08 14:47:15.589 30027-30100/ V/AudioManager: Elem: com.twilio.voice.Call$2.run(Call.java:210)
+05-08 14:47:15.591 30027-30100/ D/TwilioVoice: call disconnected
+05-08 14:47:15.591 30027-30100/ D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+<redacted_phone_number>","call_state":"DISCONNECTED","call_sid":"CA4a32e595ebff0f3adde73014349f0479"} }
+
+call 8 real device One Plus 3
+
+05-08 15:16:36.607 3136-3202/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 15:16:36.607 3136-3202/ I/TwilioVoice: Registering with FCM
+05-08 15:16:37.196 3136-3202/ D/TwilioVoice: Successfully registered FCM
+05-08 15:16:37.197 3136-3202/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 15:16:43.345 4022-4088/ D/TwilioVoice: initWithAccessToken ACTION_FCM_TOKEN
+05-08 15:16:43.345 4022-4088/ I/TwilioVoice: Registering with FCM
+05-08 15:16:43.888 4022-4088/ D/TwilioVoice: Successfully registered FCM
+05-08 15:16:43.888 4022-4088/ D/TwilioVoice: sendEvent deviceReady params null
+05-08 15:17:07.577 4022-4206/ D/TwilioVoice: Bundle data: {twi_account_sid=ACf2f72c54065e0a29b0109595ef6df75f, twi_to=client:<redacted_phone_number>, twi_bridge_token=eyJraWQiOiJKd2VTM0JpZi0xIiwiY3R5IjoidHdpbGlvLWZwYTt2PTEiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..dFKbynTgQyjarEMN.gcP0YxIPiUJceSbDsvWXSBfdjbWR_1zC-b4Ap1ov39_1yAtAXHSq_lBjiWGVirQ9xP6jSNOIRvInyliURBgbomMcChWA0eeItS3r6gL4VaiW1gstYfmtrnrt11SjRow7HjyDLnfJ77D2SKNmmvpJ15PEvg4R2w9_UFv48TLKtJDQ0PF78QXtKeRsjaCU7NxFoyGWCwzF7RTB50i0EGZ1anjnb-3a346ci3r79LTLGXg1r9IWrH1DfXd9i7abhcX6SEL8ULFQEc-ANvUGpwWk_mS_PNWAiqsY3ZhRbDdtGyNuFq4rXKx9oCZQCk6ecRRMi-pP4yB0z99l5T4eG_7EYXG8oHqSNAiKx0PBuVyuYz5B5w8q4wRrXEeMw68mA4xfaOQyfI0-Siiy_Bu6oXZw-yXXNWVrHK2FbGalXM0V3k8s-OY8z1CM3xpRbwIDhQ5tGZrwTAoFKrZe_T_SPXG2SXfGdoMsBuaIqR_YH2sJMB2r5jinRdCDhbi0E5tirpXq5ynUcf-83dNcj-Vncr_yrT6JpNreeJY8zVbhF_ovTtPzUwLjeRXGD_spizhnawY0OSQmUYeu1HdKvgFw8n2pXIviVYLj9FdeYWps_T8rkZijnUSRvc6A6cqjR-G2F2_hHkMyqBD0zoREo0Rc8SWIukrQ.UT6PpQ5W3xi1HiBAGfKnkQ, twi_message_type=twilio.voice.call, twi_call_sid=CA527ee39eefb201d59646a07ea293d146, twi_message_id=FCMad72c972e9074b3c95fd1360b23b8d6b, twi_from=+441253530539}
+05-08 15:17:07.622 4022-4022/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: 1930071204
+05-08 15:17:07.622 4022-4022/ D/TwilioVoice: showNotification() callInvite PENDING
+05-08 15:17:07.637 4022-4022/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=1930071204, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@66b3a44}]
+05-08 15:17:07.637 4022-4022/ D/TwilioVoice: handleIncomingCallIntent state = PENDING
+05-08 15:17:07.698 4022-4022/ D/TwilioVoice: sendEvent deviceDidReceiveIncoming params { NativeMap: {"call_state":"PENDING","call_to":"client:<redacted_phone_number>","call_from":"+441253530539","call_sid":"CA527ee39eefb201d59646a07ea293d146"} }
+05-08 15:17:12.012 4022-4088/ D/TwilioVoice: accept() activeCallInvite.getState() PENDING
+05-08 15:17:12.036 4022-4088/ I/PJSIP: 15:17:12.036    pjsua_acc.c  Adding account: id=sip:twilio@chunderm.gll.twilio.com
+05-08 15:17:12.036 4022-4088/ I/PJSIP: 15:17:12.036    pjsua_acc.c  .Account sip:twilio@chunderm.gll.twilio.com added with id 0
+05-08 15:17:13.404 4022-4088/ D/TwilioVoice: CALL CONNECTED callListener().onConnected call state = CONNECTED
+05-08 15:17:13.412 4022-4088/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.setAudioFocus(TwilioVoiceModule.java:654)
+05-08 15:17:13.413 4022-4088/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.access$200(TwilioVoiceModule.java:52)
+05-08 15:17:13.413 4022-4088/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule$2.onConnected(TwilioVoiceModule.java:215)
+05-08 15:17:13.413 4022-4088/ V/AudioManager: Elem: com.twilio.voice.Call$1.run(Call.java:184)
+05-08 15:17:13.520 4022-4234/ D/TwilioVoice: Bundle data: {twi_account_sid=ACf2f72c54065e0a29b0109595ef6df75f, twi_to=client:<redacted_phone_number>, twi_message_type=twilio.voice.cancel, twi_call_sid=CA527ee39eefb201d59646a07ea293d146, twi_message_id=FCM1298db5ba0c0420bb8e88b7a8660faf6, twi_from=+441253530539}
+05-08 15:17:13.538 4022-4022/ D/TwilioVoice: sendIncomingCallMessageToActivity() notificationId: -22160039
+05-08 15:17:13.538 4022-4022/ D/TwilioVoice: showNotification() callInvite = CANCELED
+05-08 15:17:13.538 4022-4022/ D/TwilioVoice: removeIncomingCallNotification
+05-08 15:17:13.545 4022-4088/ D/TwilioVoice: CALL CONNECTED after setAudio(true)
+05-08 15:17:13.552 4022-4022/ D/TwilioVoice: VoiceBroadcastReceiver.onReceive ACTION_INCOMING_CALL. Intent Bundle[{INCOMING_CALL_NOTIFICATION_ID=-22160039, INCOMING_CALL_INVITE=com.twilio.voice.CallInvite@57497b6}]
+05-08 15:17:13.552 4022-4022/ D/TwilioVoice: ====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING
+05-08 15:17:13.552 4022-4022/ D/TwilioVoice: activeCallInvite state = CANCELED
+05-08 15:17:13.552 4022-4022/ D/TwilioVoice: activeCallInvite was answered. Call com.twilio.voice.Call@ac797a6
+05-08 15:17:13.552 4022-4022/ D/TwilioVoice: ====> END
+05-08 15:17:13.560 4022-4088/ D/TwilioVoice: CALL CONNECTED after createHangupLocalNotification
+05-08 15:17:13.560 4022-4088/ D/TwilioVoice: sendEvent connectionDidConnect params { NativeMap: {"call_state":"CONNECTED","call_sid":"CA527ee39eefb201d59646a07ea293d146"} }
+05-08 15:17:21.572 4022-4088/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.setAudioFocus(TwilioVoiceModule.java:656)
+05-08 15:17:21.572 4022-4088/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule.access$200(TwilioVoiceModule.java:52)
+05-08 15:17:21.572 4022-4088/ V/AudioManager: Elem: com.hoxfon.react.TwilioVoice.TwilioVoiceModule$2.onDisconnected(TwilioVoiceModule.java:241)
+05-08 15:17:21.572 4022-4088/ V/AudioManager: Elem: com.twilio.voice.Call$2.run(Call.java:210)
+05-08 15:17:21.712 4022-4088/ D/TwilioVoice: call disconnected
+05-08 15:17:21.712 4022-4088/ D/TwilioVoice: sendEvent connectionDidDisconnect params { NativeMap: {"call_to":"client:<redacted_phone_number>","call_from":"+441253530539","call_state":"DISCONNECTED","call_sid":"CA527ee39eefb201d59646a07ea293d146"} }

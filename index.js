@@ -46,8 +46,8 @@ const Twilio = {
     requestPermissions(senderId) {
         TwilioVoice.requestPermissions(senderId)
     },
-    getIncomingCall() {
-        return TwilioVoice.getIncomingCall()
+    getActiveCall() {
+        return TwilioVoice.getActiveCall()
     },
     addEventListener (type, handler) {
         if (_eventHandlers[type].has(handler)) {

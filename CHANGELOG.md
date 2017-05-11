@@ -1,5 +1,11 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 1.0.0
+- use Twilio beta 5
+- removed requestPermissions, react-native API should be used instead
+- renamed getIncomingCall() to getActiveCall()
+- set the audio of the call as MODE_IN_COMMUNICATION
+
 ## 0.6.3
 - fix crash when activityManager is null
 - add call_from and call_to to the event connectionDidDisconnect
