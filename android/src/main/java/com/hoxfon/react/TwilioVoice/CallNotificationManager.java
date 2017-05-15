@@ -2,7 +2,6 @@ package com.hoxfon.react.TwilioVoice;
 
 import android.app.ActivityManager;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -90,6 +89,7 @@ public class CallNotificationManager {
         if (shouldStartNewTask || appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
             launchFlag = Intent.FLAG_ACTIVITY_NEW_TASK;
         }
+
         launchIntent.setAction(ACTION_INCOMING_CALL)
                 .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
                 .addFlags(
@@ -115,6 +115,7 @@ public class CallNotificationManager {
             Log.d(TAG, "createIncomingCallNotification intent "+launchIntent.getFlags());
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
          * notification later
@@ -123,11 +124,10 @@ public class CallNotificationManager {
         extras.putInt(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         extras.putString(CALL_SID_KEY, callInvite.getCallSid());
         extras.putString(NOTIFICATION_TYPE, ACTION_INCOMING_CALL);
-
         /*
          * Create the notification shown in the notification drawer
          */
-        NotificationCompat.Builder notification =
+        NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -138,7 +138,7 @@ public class CallNotificationManager {
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
-                        .setContentIntent(pendingIntent);
+                        .setFullScreenIntent(pendingIntent, true);
 
         // build notification large icon
         Resources res = context.getResources();
@@ -147,7 +147,7 @@ public class CallNotificationManager {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (largeIconResId != 0) {
-                notification.setLargeIcon(largeIconBitmap);
+                notificationBuilder.setLargeIcon(largeIconBitmap);
             }
         }
 
@@ -157,7 +157,7 @@ public class CallNotificationManager {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1, rejectIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.addAction(0, "DISMISS", pendingRejectIntent);
+        notificationBuilder.addAction(0, "DISMISS", pendingRejectIntent);
 
         // Answer action
         Intent answerIntent = new Intent(ACTION_ANSWER_CALL);
@@ -166,10 +166,10 @@ public class CallNotificationManager {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0, answerIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.addAction(R.drawable.ic_call_white_24dp, "ANSWER", pendingAnswerIntent);
+        notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "ANSWER", pendingAnswerIntent);
 
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(notificationId, notification.build());
+        notificationManager.notify(notificationId, notificationBuilder.build());
         TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+callInvite.getCallSid(), notificationId);
     }
 

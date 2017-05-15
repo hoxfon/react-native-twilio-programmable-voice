@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 1.0.1
+- Android: use incoming call notification full screen
+
 ## 1.0.0
 - use Twilio beta 5
 - removed requestPermissions, react-native API should be used instead
