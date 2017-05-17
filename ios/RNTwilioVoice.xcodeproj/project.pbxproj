@@ -1,0 +1,303 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		016DD9B51ECCA23A00315CD4 /* TwilioVoice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		38F71DFA1E9C333F0067E86F /* RNTwilioVoice.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */; };
+		38F71DFB1E9C333F0067E86F /* RNTwilioVoice.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		38F71DF31E9C333F0067E86F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				38F71DFB1E9C333F0067E86F /* RNTwilioVoice.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwilioVoice.framework; path = "../../../Downloads/twilio-voice-ios/TwilioVoice.framework"; sourceTree = "<group>"; };
+		38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTwilioVoice.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTwilioVoice.h; sourceTree = "<group>"; };
+		38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTwilioVoice.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		016DD9B31ECCA22F00315CD4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				016DD9B51ECCA23A00315CD4 /* TwilioVoice.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		016DD9801ECC9B4B00315CD4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		38F71DEC1E9C333E0067E86F = {
+			isa = PBXGroup;
+			children = (
+				38F71DF71E9C333F0067E86F /* RNTwilioVoice */,
+				38F71DF61E9C333F0067E86F /* Products */,
+				016DD9801ECC9B4B00315CD4 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		38F71DF61E9C333F0067E86F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		38F71DF71E9C333F0067E86F /* RNTwilioVoice */ = {
+			isa = PBXGroup;
+			children = (
+				38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */,
+				38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */,
+			);
+			path = RNTwilioVoice;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		38F71DF41E9C333F0067E86F /* RNTwilioVoice */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoice" */;
+			buildPhases = (
+				38F71DF11E9C333F0067E86F /* Sources */,
+				38F71DF31E9C333F0067E86F /* CopyFiles */,
+				016DD9B31ECCA22F00315CD4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RNTwilioVoice;
+			productName = TwilioVoice;
+			productReference = 38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		38F71DED1E9C333E0067E86F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = Erva;
+				TargetAttributes = {
+					38F71DF41E9C333F0067E86F = {
+						CreatedOnToolsVersion = 8.3.1;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 38F71DF01E9C333E0067E86F /* Build configuration list for PBXProject "RNTwilioVoice" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 38F71DEC1E9C333E0067E86F;
+			productRefGroup = 38F71DF61E9C333F0067E86F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				38F71DF41E9C333F0067E86F /* RNTwilioVoice */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		38F71DF11E9C333F0067E86F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38F71DFA1E9C333F0067E86F /* RNTwilioVoice.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		38F71DFC1E9C333F0067E86F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../../React",
+					"$(SRCROOT)/../../react-native/React/**",
+					"${SRCROOT}/../../../ios/Pods/Headers/Public/**",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		38F71DFD1E9C333F0067E86F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../../React",
+					"$(SRCROOT)/../../react-native/React/**",
+					"${SRCROOT}/../../../ios/Pods/Headers/Public/**",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		38F71DFF1E9C333F0067E86F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../../ios/Pods/TwilioVoice",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		38F71E001E9C333F0067E86F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../../ios/Pods/TwilioVoice",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		38F71DF01E9C333E0067E86F /* Build configuration list for PBXProject "RNTwilioVoice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38F71DFC1E9C333F0067E86F /* Debug */,
+				38F71DFD1E9C333F0067E86F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38F71DFF1E9C333F0067E86F /* Debug */,
+				38F71E001E9C333F0067E86F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 38F71DED1E9C333E0067E86F /* Project object */;
+}

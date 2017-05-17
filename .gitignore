@@ -49,3 +49,9 @@ captures/
 *.jks
 
 xcuserdata
+
+# ios
+
+*.ipa
+
+ios/Pods

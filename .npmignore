@@ -2,7 +2,6 @@
 android/.idea
 node_modules
 build
-logs
 
 *.iml
 .gradle
@@ -55,4 +54,7 @@ captures/
 
 xcuserdata
 
-images
+images/
+
+# project logs
+logs/
