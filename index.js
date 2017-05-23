@@ -1,9 +1,10 @@
 import {
     NativeModules,
-    NativeEventEmitter
+    NativeEventEmitter,
+    Platform
 } from 'react-native'
 
-const TwilioVoice = NativeModules.TwilioVoice
+const TwilioVoice = NativeModules.RNTwilioVoice
 
 const NativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
 
@@ -13,11 +14,18 @@ const _eventHandlers = {
     deviceDidReceiveIncoming: new Map(),
     connectionDidConnect: new Map(),
     connectionDidDisconnect: new Map(),
-};
+    //iOS specific
+    callRejected: new Map(),
+}
 
 const Twilio = {
     initWithToken(token) {
         return TwilioVoice.initWithAccessToken(token)
+    },
+    initWithTokenUrl(url) {
+        if (Platform.OS === 'ios') {
+            TwilioVoice.initWithAccessTokenUrl(url)
+        }
     },
     connect(params = {}) {
         TwilioVoice.connect(params)
@@ -26,12 +34,21 @@ const Twilio = {
         TwilioVoice.disconnect()
     },
     accept() {
+        if (Platform.OS === 'ios') {
+            return
+        }
         TwilioVoice.accept()
     },
     reject() {
+        if (Platform.OS === 'ios') {
+            return
+        }
         TwilioVoice.reject()
     },
     ignore() {
+        if (Platform.OS === 'ios') {
+            return
+        }
         TwilioVoice.ignore()
     },
     setMuted(isMuted) {
@@ -44,22 +61,33 @@ const Twilio = {
         TwilioVoice.sendDigits(digits)
     },
     requestPermissions(senderId) {
-        TwilioVoice.requestPermissions(senderId)
+        if (Platform.OS === 'android') {
+            TwilioVoice.requestPermissions(senderId)
+        }
     },
     getActiveCall() {
+        if (Platform.OS === 'ios') {
+            return
+        }
         return TwilioVoice.getActiveCall()
     },
-    addEventListener (type, handler) {
+    configureCallKit(params = {}) {
+        if (Platform.OS === 'ios') {
+            TwilioVoice.configureCallKit(params)
+        }
+    },
+    unregister() {
+        if (Platform.OS === 'ios') {
+            TwilioVoice.unregister()
+        }
+    },
+    addEventListener(type, handler) {
         if (_eventHandlers[type].has(handler)) {
             return
         }
-        _eventHandlers[type].set(handler, NativeAppEventEmitter.addListener(
-            type, (rtn) => {
-                handler(rtn)
-            }
-        ))
+        _eventHandlers[type].set(handler, NativeAppEventEmitter.addListener(type, rtn => { handler(rtn) }))
     },
-    removeEventListener (type, handler) {
+    removeEventListener(type, handler) {
         if (!_eventHandlers[type].has(handler)) {
             return
         }

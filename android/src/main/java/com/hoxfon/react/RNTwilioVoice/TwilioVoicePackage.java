@@ -1,4 +1,4 @@
-package com.hoxfon.react.TwilioVoice;
+package com.hoxfon.react.RNTwilioVoice;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.0.0
+- ios implemtation with CallKit
+
 ## 1.1.0
 - use Twilio Voice SDK 2.0.0-beta8
 

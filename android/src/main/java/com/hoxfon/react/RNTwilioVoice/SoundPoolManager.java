@@ -1,11 +1,9 @@
-package com.hoxfon.react.TwilioVoice;
+package com.hoxfon.react.RNTwilioVoice;
 
 import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-
-import static android.content.Context.AUDIO_SERVICE;
 
 public class SoundPoolManager {
 

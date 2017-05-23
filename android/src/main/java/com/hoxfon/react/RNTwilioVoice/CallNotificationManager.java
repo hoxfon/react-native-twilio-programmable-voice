@@ -1,4 +1,4 @@
-package com.hoxfon.react.TwilioVoice;
+package com.hoxfon.react.RNTwilioVoice;
 
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -24,23 +24,23 @@ import java.util.List;
 import static android.content.Context.ACTIVITY_SERVICE;
 import static com.facebook.react.common.ApplicationHolder.getApplication;
 
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.TAG;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_ANSWER_CALL;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_REJECT_CALL;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_MISSED_CALL;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.NOTIFICATION_TYPE;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_NOTIFICATION_PREFIX;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_GROUP;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.MISSED_CALLS_NOTIFICATION_ID;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_ID;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_CLEAR_MISSED_CALLS_COUNT;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.CLEAR_MISSED_CALLS_NOTIFICATION_ID;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ANSWER_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_MISSED_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.NOTIFICATION_TYPE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_NOTIFICATION_PREFIX;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.MISSED_CALLS_GROUP;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.MISSED_CALLS_NOTIFICATION_ID;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATION_ID;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CLEAR_MISSED_CALLS_COUNT;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CLEAR_MISSED_CALLS_NOTIFICATION_ID;
 
 public class CallNotificationManager {
 

@@ -1,4 +1,4 @@
-package com.hoxfon.react.TwilioVoice.fcm;
+package com.hoxfon.react.RNTwilioVoice.fcm;
 
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_FCM_TOKEN;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_FCM_TOKEN;
 
 public class VoiceFirebaseInstanceIDService extends FirebaseInstanceIdService {
 

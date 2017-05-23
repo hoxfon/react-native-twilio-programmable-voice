@@ -1,4 +1,4 @@
-package com.hoxfon.react.TwilioVoice.fcm;
+package com.hoxfon.react.RNTwilioVoice.fcm;
 
 import android.annotation.TargetApi;
 
@@ -17,8 +17,8 @@ import com.facebook.react.bridge.ReactContext;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.hoxfon.react.TwilioVoice.BuildConfig;
-import com.hoxfon.react.TwilioVoice.CallNotificationManager;
+import com.hoxfon.react.RNTwilioVoice.BuildConfig;
+import com.hoxfon.react.RNTwilioVoice.CallNotificationManager;
 import com.twilio.voice.CallInvite;
 import com.twilio.voice.MessageException;
 import com.twilio.voice.MessageListener;
@@ -27,11 +27,11 @@ import com.twilio.voice.Voice;
 import java.util.Map;
 import java.util.Random;
 
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.TAG;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
-import static com.hoxfon.react.TwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
-import com.hoxfon.react.TwilioVoice.SoundPoolManager;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
+import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 

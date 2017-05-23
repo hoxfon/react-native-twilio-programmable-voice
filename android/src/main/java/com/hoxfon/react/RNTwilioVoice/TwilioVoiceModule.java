@@ -1,4 +1,4 @@
-package com.hoxfon.react.TwilioVoice;
+package com.hoxfon.react.RNTwilioVoice;
 
 import android.Manifest;
 import android.app.Activity;
@@ -50,7 +50,7 @@ import java.util.Map;
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
-    public static String TAG = "TwilioVoice";
+    public static String TAG = "RNTwilioVoice";
 
     private static final int MIC_PERMISSION_REQUEST_CODE = 1;
 
