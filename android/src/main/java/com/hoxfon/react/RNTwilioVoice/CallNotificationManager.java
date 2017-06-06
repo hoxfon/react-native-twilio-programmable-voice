@@ -133,8 +133,8 @@ public class CallNotificationManager {
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setCategory(NotificationCompat.CATEGORY_CALL)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
-                        .setContentTitle("Incoming call")
-                        .setContentText(callInvite.getFrom() + " is calling")
+                        .setContentTitle("Llamada entrante")
+                        .setContentText(callInvite.getFrom() + " está llamando")
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
@@ -157,7 +157,7 @@ public class CallNotificationManager {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1, rejectIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.addAction(0, "DISMISS", pendingRejectIntent);
+        notificationBuilder.addAction(0, "IGNORAR", pendingRejectIntent);
 
         // Answer action
         Intent answerIntent = new Intent(ACTION_ANSWER_CALL);
@@ -166,7 +166,7 @@ public class CallNotificationManager {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0, answerIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "ANSWER", pendingAnswerIntent);
+        notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "RESPONDER", pendingAnswerIntent);
 
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notificationBuilder.build());
@@ -209,8 +209,8 @@ public class CallNotificationManager {
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .setSmallIcon(R.drawable.ic_call_missed_white_24dp)
-                        .setContentTitle("Missed call")
-                        .setContentText(callInvite.getFrom() + " called")
+                        .setContentTitle("Llamada perdida")
+                        .setContentText(callInvite.getFrom() + " llamó")
                         .setAutoCancel(true)
                         .setShowWhen(true)
                         .setExtras(extras)
@@ -221,11 +221,11 @@ public class CallNotificationManager {
         missedCalls++;
         if (missedCalls == 1) {
             inboxStyle = new NotificationCompat.InboxStyle();
-            inboxStyle.setBigContentTitle("Missed call");
+            inboxStyle.setBigContentTitle("Llamada perdida");
         } else {
-            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " missed calls");
+            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " llamadas perdidas");
         }
-        inboxStyle.addLine("from: " +callInvite.getFrom());
+        inboxStyle.addLine("de: " +callInvite.getFrom());
         sharedPrefEditor.putInt(MISSED_CALLS_GROUP, missedCalls);
         sharedPrefEditor.commit();
 
@@ -268,7 +268,7 @@ public class CallNotificationManager {
         extras.putString(NOTIFICATION_TYPE, ACTION_HANGUP_CALL);
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context)
-                .setContentTitle("Call in progress")
+                .setContentTitle("Llamada en progreso")
                 .setContentText(caller)
                 .setSmallIcon(R.drawable.ic_call_white_24dp)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -279,7 +279,7 @@ public class CallNotificationManager {
                 .setExtras(extras)
                 .setContentIntent(activityPendingIntent);
 
-        notification.addAction(0, "HANG UP", pendingHangupIntent);
+        notification.addAction(0, "COLGAR", pendingHangupIntent);
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
     }
