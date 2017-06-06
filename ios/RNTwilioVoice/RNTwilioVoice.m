@@ -393,6 +393,13 @@ RCT_EXPORT_METHOD(unregister){
   [action fulfill];
 }
 
+- (void)provider:(CXProvider *)provider performPlayDTMFCallAction:(CXPlayDTMFCallAction *)action {
+  if (self.call && self.call.state == TVOCallStateConnected) {
+    RCTLogInfo(@"SendDigits %@", action.digits);
+    [self.call sendDigits:action.digits];
+  }
+}
+
 #pragma mark - CallKit Actions
 - (void)performStartCallActionWithUUID:(NSUUID *)uuid handle:(NSString *)handle {
   if (uuid == nil || handle == nil) {
