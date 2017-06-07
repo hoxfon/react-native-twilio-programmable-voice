@@ -138,6 +138,7 @@ public class CallNotificationManager {
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
+                        .setDefaults(Notification.DEFAULT_VIBRATE)
                         .setFullScreenIntent(pendingIntent, true);
 
         // build notification large icon
