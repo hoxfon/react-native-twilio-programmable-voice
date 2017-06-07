@@ -226,7 +226,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (call != null) {
                     params.putString("call_sid",   call.getSid());
                     params.putString("call_state", call.getState().name());
-                    String caller = "Show call details in the app";
+                    String caller = "Abrir Keenvil App";
                     if (!toName.equals("")) {
                         caller = toName;
                     } else if (!toNumber.equals("")) {
