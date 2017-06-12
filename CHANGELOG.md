@@ -1,5 +1,11 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.0.2
+- Android: fix library for RN 0.45.1
+
+## 2.0.1
+- ios: send connectionDidDisconnect when the call invite terminates
+
 ## 2.0.0
 - ios implemtation with CallKit
 

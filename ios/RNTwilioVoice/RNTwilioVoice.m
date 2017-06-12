@@ -30,6 +30,7 @@
 NSString * const StateConnecting = @"CONNECTING";
 NSString * const StateConnected = @"CONNECTED";
 NSString * const StateDisconnected = @"DISCONNECTED";
+NSString * const StateRejected = @"REJECTED";
 
 - (dispatch_queue_t)methodQueue
 {
@@ -229,6 +230,22 @@ RCT_EXPORT_METHOD(unregister){
   NSLog(@"callInviteCancelled:");
 
   [self performEndCallActionWithUUID:callInvite.uuid];
+
+  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+  [params setObject:self.callInvite.callSid forKey:@"call_sid"];
+
+  if (self.callInvite.from){
+     [params setObject:self.callInvite.from forKey:@"from"];
+  }
+  if (self.callInvite.to){
+     [params setObject:self.callInvite.to forKey:@"to"];
+  }
+  if (self.callInvite.state == TVOCallInviteStateCancelled) {
+    [params setObject:StateDisconnected forKey:@"call_state"];
+  } else if (self.callInvite.state == TVOCallInviteStateRejected) {
+      [params setObject:StateRejected forKey:@"call_state"];
+  }
+  [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
   self.callInvite = nil;
 }

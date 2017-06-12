@@ -22,7 +22,6 @@ import com.twilio.voice.CallInvite;
 import java.util.List;
 
 import static android.content.Context.ACTIVITY_SERVICE;
-import static com.facebook.react.common.ApplicationHolder.getApplication;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ANSWER_CALL;
@@ -57,8 +56,9 @@ public class CallNotificationManager {
         if (processInfos == null) {
             return 0;
         }
+
         for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
-            if (processInfo.processName.equals(getApplication().getPackageName())) {
+            if (processInfo.processName.equals(context.getApplicationInfo().packageName)) {
                 return processInfo.importance;
             }
         }
