@@ -2,12 +2,14 @@ Please include following information for better support
 
 What verion of React Native are you running?
 What verion of react-native-twilio-programmable-voice are you running?
-What device are you using? (e.g iOS9 emulator, Android 6 device)?
+What device are you using? (e.g iOS9 simulator, Android 6 device)?
 Is your app running in foreground, background or not running?
 Is there any relevant message in the log?
+If ios which pod version are you using?
 
 Advanced:
-Have you tried adding break point in native handlers to see if message gets delivered?
+Have you tried adding break point in native handlers and see the logs printed?
 can share a project with issue?
+Did you try to reinstall the pods completely?
 
 The more context you provide around this issue the faster the community can help you.
