@@ -79,7 +79,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '=2.0.0-beta10'
+    pod 'TwilioVoice', '=2.0.0-beta11'
     ...
 end
 
