@@ -100,6 +100,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 RCT_EXPORT_METHOD(disconnect) {
   RCTLogInfo(@"Disconnecting call");
   [self.call disconnect];
+  [self performEndCallActionWithUUID:self.call.uuid];
 }
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
@@ -352,6 +353,8 @@ RCT_EXPORT_METHOD(unregister){
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didDeactivateAudioSession:");
+
+  [[TwilioVoice sharedInstance] audioSessionDeactivated];
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {
