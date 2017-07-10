@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.3.2
+- Android: Twilio Voice SDK 2.0.0-beta14
+
 ## 2.3.1
 - iOS: call TwilioVoice audioSessionDeactivated on didDeactivateAudioSession
 - iOS: performEndCallActionWithUUID when call is disconnected from the app
