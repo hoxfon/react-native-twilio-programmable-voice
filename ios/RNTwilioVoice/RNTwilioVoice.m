@@ -30,6 +30,7 @@
 NSString * const StateConnecting = @"CONNECTING";
 NSString * const StateConnected = @"CONNECTED";
 NSString * const StateDisconnected = @"DISCONNECTED";
+NSString * const StateRejected = @"REJECTED";
 
 - (dispatch_queue_t)methodQueue
 {
@@ -99,6 +100,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 RCT_EXPORT_METHOD(disconnect) {
   RCTLogInfo(@"Disconnecting call");
   [self.call disconnect];
+  [self performEndCallActionWithUUID:self.call.uuid];
 }
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
@@ -230,6 +232,22 @@ RCT_EXPORT_METHOD(unregister){
 
   [self performEndCallActionWithUUID:callInvite.uuid];
 
+  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+  [params setObject:self.callInvite.callSid forKey:@"call_sid"];
+
+  if (self.callInvite.from){
+    [params setObject:self.callInvite.from forKey:@"from"];
+  }
+  if (self.callInvite.to){
+    [params setObject:self.callInvite.to forKey:@"to"];
+  }
+  if (self.callInvite.state == TVOCallInviteStateCancelled) {
+    [params setObject:StateDisconnected forKey:@"call_state"];
+  } else if (self.callInvite.state == TVOCallInviteStateRejected) {
+    [params setObject:StateRejected forKey:@"call_state"];
+  }
+  [self sendEventWithName:@"connectionDidDisconnect" body:params];
+
   self.callInvite = nil;
 }
 
@@ -242,7 +260,11 @@ RCT_EXPORT_METHOD(unregister){
 
   self.call = call;
   NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
-  [callParams setObject:call.callSid forKey:@"call_sid"];
+
+  if (call.callSid) {
+    NSLog(@"Call Sid %@", call.callSid);
+    [callParams setObject:call.callSid forKey:@"call_sid"];
+  }
   if (call.state == TVOCallStateConnecting) {
     [callParams setObject:StateConnecting forKey:@"call_state"];
   } else if (call.state == TVOCallStateConnected) {
@@ -335,6 +357,8 @@ RCT_EXPORT_METHOD(unregister){
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didDeactivateAudioSession:");
+
+  [[TwilioVoice sharedInstance] stopAudioDevice];
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {
