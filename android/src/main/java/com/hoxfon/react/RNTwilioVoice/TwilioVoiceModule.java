@@ -110,6 +110,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private KeyguardManager keyguardManager;
 
+    // this variable determines when to create missed calls notifications
     private Boolean callAccepted = false;
 
     public TwilioVoiceModule(ReactApplicationContext reactContext) {
@@ -132,8 +133,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
          */
         voiceBroadcastReceiver = new VoiceBroadcastReceiver();
         registerReceiver();
-
-        registerActionReceiver();
 
         TwilioVoiceModule.callNotificationMap = new HashMap<>();
 
@@ -164,7 +163,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
          */
         getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         registerReceiver();
-        registerActionReceiver();
     }
 
     @Override
@@ -286,6 +284,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             intentFilter.addAction(ACTION_MISSED_CALL);
             LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(
                     voiceBroadcastReceiver, intentFilter);
+            registerActionReceiver();
             isReceiverRegistered = true;
         }
     }
@@ -298,6 +297,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 //    }
 
     private void registerActionReceiver() {
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_ANSWER_CALL);
         intentFilter.addAction(ACTION_REJECT_CALL);
@@ -498,16 +498,16 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     /*
- * Register your FCM token with Twilio to receive incoming call invites
- *
- * If a valid google-services.json has not been provided or the FirebaseInstanceId has not been
- * initialized the fcmToken will be null.
- *
- * In the case where the FirebaseInstanceId has not yet been initialized the
- * VoiceFirebaseInstanceIDService.onTokenRefresh should result in a LocalBroadcast to this
- * activity which will attempt registerForCallInvites again.
- *
- */
+     * Register your FCM token with Twilio to receive incoming call invites
+     *
+     * If a valid google-services.json has not been provided or the FirebaseInstanceId has not been
+     * initialized the fcmToken will be null.
+     *
+     * In the case where the FirebaseInstanceId has not yet been initialized the
+     * VoiceFirebaseInstanceIDService.onTokenRefresh should result in a LocalBroadcast to this
+     * activity which will attempt registerForCallInvites again.
+     *
+     */
     private void registerForCallInvites() {
         FirebaseApp.initializeApp(getReactApplicationContext());
         final String fcmToken = FirebaseInstanceId.getInstance().getToken();
@@ -556,9 +556,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (activeCallInvite != null){
             activeCallInvite.reject(getReactApplicationContext());
             clearIncomingNotification(activeCallInvite);
-        } else {
-            sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
         }
+        sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
     }
 
     @ReactMethod
@@ -567,9 +566,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
         if (activeCallInvite != null){
             clearIncomingNotification(activeCallInvite);
-        } else {
-            sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
         }
+        sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
     }
 
     @ReactMethod

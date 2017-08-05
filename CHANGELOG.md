@@ -1,5 +1,13 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.4.0
+- Android: Twilio Voice SDK 2.0.0-beta15
+- use buildToolsVersion "25.0.2"
+- use targetSdkVersion 25
+- fix registerActionReceiver() called twice
+- fix reject() intent not sending CONNECTION_STOP to JavaScript
+- fix ingore() not not sending CONNECTION_STOP to JavaScript when there is not activeInviteCall
+
 ## 2.3.2
 - Android: Twilio Voice SDK 2.0.0-beta14
 
