@@ -1,11 +1,13 @@
 Please include following information for better support
 
-What verion of React Native are you running?
-What verion of react-native-twilio-programmable-voice are you running?
+What version of React Native are you running?
+What version of react-native-twilio-programmable-voice are you running?
 What device are you using? (e.g iOS9 simulator, Android 6 device)?
 Is your app running in foreground, background or not running?
 Is there any relevant message in the log?
-If ios which pod version are you using?
+If using iOS, which pod version are you using?
+
+Step to reproduce
 
 Advanced:
 Have you tried adding break point in native handlers and see the logs printed?

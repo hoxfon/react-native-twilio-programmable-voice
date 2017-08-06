@@ -227,8 +227,8 @@ RCT_EXPORT_METHOD(unregister){
   [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
 }
 
-- (void)callInviteCancelled:(TVOCallInvite *)callInvite {
-  NSLog(@"callInviteCancelled:");
+- (void)callInviteCanceled:(TVOCallInvite *)callInvite {
+  NSLog(@"callInviteCanceled:");
 
   [self performEndCallActionWithUUID:callInvite.uuid];
 
@@ -241,7 +241,7 @@ RCT_EXPORT_METHOD(unregister){
   if (self.callInvite.to){
      [params setObject:self.callInvite.to forKey:@"to"];
   }
-  if (self.callInvite.state == TVOCallInviteStateCancelled) {
+  if (self.callInvite.state == TVOCallInviteStateCanceled) {
     [params setObject:StateDisconnected forKey:@"call_state"];
   } else if (self.callInvite.state == TVOCallInviteStateRejected) {
       [params setObject:StateRejected forKey:@"call_state"];
@@ -260,7 +260,7 @@ RCT_EXPORT_METHOD(unregister){
 
   self.call = call;
   NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
-  [callParams setObject:call.callSid forKey:@"call_sid"];
+  [callParams setObject:call.sid forKey:@"call_sid"];
   if (call.state == TVOCallStateConnecting) {
     [callParams setObject:StateConnecting forKey:@"call_state"];
   } else if (call.state == TVOCallStateConnected) {
@@ -280,7 +280,7 @@ RCT_EXPORT_METHOD(unregister){
   NSLog(@"connectionDidDisconnect:");
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  [params setObject:self.call.callSid forKey:@"call_sid"];
+  [params setObject:self.call.sid forKey:@"call_sid"];
   if (self.call.to){
     [params setObject:self.call.to forKey:@"call_to"];
   }
@@ -301,7 +301,7 @@ RCT_EXPORT_METHOD(unregister){
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   [params setObject:error forKey:@"error"];
-  [params setObject:self.call.callSid forKey:@"call_sid"];
+  [params setObject:self.call.sid forKey:@"call_sid"];
   if (self.call.to){
       [params setObject:self.call.to forKey:@"call_to"];
   }
