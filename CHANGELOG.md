@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.6.0
+- iOS: implementing getActiveCall()
+
 ## 2.5.2
 - iOS: initWithToken() now returns the same value as Android
 

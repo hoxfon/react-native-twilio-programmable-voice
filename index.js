@@ -73,9 +73,6 @@ const Twilio = {
         }
     },
     getActiveCall() {
-        if (Platform.OS === 'ios') {
-            return
-        }
         return TwilioVoice.getActiveCall()
     },
     configureCallKit(params = {}) {

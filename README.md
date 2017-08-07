@@ -272,7 +272,6 @@ TwilioVoice.sendDigits(digits)
 
 // should be called after the app is initialized
 // to catch incoming call when the app was in the background
-// Android Only
 TwilioVoice.getActiveCall()
     .then(incomingCall => {
         if (incomingCall){
