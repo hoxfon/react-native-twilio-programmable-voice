@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.5.1
+- iOS: handle call failure and pass to JS the most descriptive error
+
 ## 2.5.0
 - iOS: Twilio Voice SDK 2.0.0-beta13
 

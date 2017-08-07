@@ -297,11 +297,15 @@ RCT_EXPORT_METHOD(unregister){
 }
 
 - (void)call:(TVOCall *)call didFailWithError:(NSError *)error {
-  NSLog(@"call:didFailWithError: %@", [error localizedDescription]);
-
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  [params setObject:error forKey:@"error"];
-  [params setObject:self.call.sid forKey:@"call_sid"];
+  NSString* errMsg = [error localizedDescription];
+  if (error.localizedFailureReason) {
+      errMsg = [error localizedFailureReason];
+  }
+  [params setObject:errMsg forKey:@"error"];
+  if (self.call.sid) {
+    [params setObject:self.call.sid forKey:@"call_sid"];
+  }
   if (self.call.to){
       [params setObject:self.call.to forKey:@"call_to"];
   }
