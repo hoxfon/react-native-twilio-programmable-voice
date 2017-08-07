@@ -476,6 +476,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         registerForCallInvites();
         WritableMap params = Arguments.createMap();
+        // TODO fix the spell of initialized in the next breaking version
         params.putBoolean("initilized", true);
         promise.resolve(params);
     }

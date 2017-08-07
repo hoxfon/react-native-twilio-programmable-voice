@@ -1,7 +1,7 @@
 import {
     NativeModules,
     NativeEventEmitter,
-    Platform
+    Platform,
 } from 'react-native'
 
 const TwilioVoice = NativeModules.RNTwilioVoice
@@ -19,8 +19,15 @@ const _eventHandlers = {
 }
 
 const Twilio = {
-    initWithToken(token) {
-        return TwilioVoice.initWithAccessToken(token)
+    async initWithToken(token) {
+        const result = await TwilioVoice.initWithAccessToken(token)
+        if (Platform.OS === 'ios') {
+            return {
+                // TODO fix the spell of initialized in the next breaking version
+                initilized: true,
+            }
+        }
+        return result
     },
     initWithTokenUrl(url) {
         if (Platform.OS === 'ios') {

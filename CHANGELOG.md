@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.5.2
+- iOS: initWithToken() now returns the same value as Android
+
 ## 2.5.1
 - iOS: handle call failure and pass to JS the most descriptive error
 
