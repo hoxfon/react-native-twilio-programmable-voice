@@ -78,15 +78,14 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
   _callKitProvider = [[CXProvider alloc] initWithConfiguration:configuration];
   [_callKitProvider setDelegate:self queue:nil];
 
-  RCTLogInfo(@"CallKit Initialized");
+  NSLog(@"CallKit Initialized");
 
   _callKitCallController = [[CXCallController alloc] init];
   [self sendEventWithName:@"deviceReady" body:nil];
 }
 
 RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
-  RCTLogInfo(@"Calling phone number %@", [params valueForKey:@"To"]);
-
+  NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
 
   if (self.call && self.call.state == TVOCallStateConnected) {
     [self.call disconnect];
@@ -99,13 +98,13 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 }
 
 RCT_EXPORT_METHOD(disconnect) {
-  RCTLogInfo(@"Disconnecting call");
+  NSLog(@"Disconnecting call");
   [self.call disconnect];
   [self performEndCallActionWithUUID:self.call.uuid];
 }
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
-  RCTLogInfo(@"Mute/UnMute call");
+  NSLog(@"Mute/UnMute call");
   self.call.muted = muted;
 }
 
@@ -115,7 +114,7 @@ RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
 
 RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
   if (self.call && self.call.state == TVOCallStateConnected) {
-    RCTLogInfo(@"SendDigits %@", digits);
+    NSLog(@"SendDigits %@", digits);
     [self.call sendDigits:digits];
   }
 }
@@ -139,8 +138,8 @@ RCT_EXPORT_METHOD(unregister){
 }
 
 RCT_REMAP_METHOD(getActiveCall,
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject){
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject){
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   if (self.callInvite) {
     if (self.callInvite.callSid){
@@ -183,7 +182,6 @@ RCT_REMAP_METHOD(getActiveCall,
   }
 }
 
-
 - (void)initPushRegistry {
   self.voipRegistry = [[PKPushRegistry alloc] initWithQueue:dispatch_get_main_queue()];
   self.voipRegistry.delegate = self;
@@ -191,7 +189,7 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (NSString *)fetchAccessToken {
-  if(_tokenUrl) {
+  if (_tokenUrl) {
     NSString *accessToken = [NSString stringWithContentsOfURL:[NSURL URLWithString:_tokenUrl]
                                                      encoding:NSUTF8StringEncoding
                                                         error:nil];
@@ -199,13 +197,11 @@ RCT_REMAP_METHOD(getActiveCall,
   } else {
     return _token;
   }
-
 }
-
 
 #pragma mark - PKPushRegistryDelegate
 - (void)pushRegistry:(PKPushRegistry *)registry didUpdatePushCredentials:(PKPushCredentials *)credentials forType:(NSString *)type {
-  NSLog(@"pushRegistry:didUpdatePushCredentials:forType:");
+  NSLog(@"pushRegistry:didUpdatePushCredentials:forType");
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     self.deviceTokenString = [credentials.token description];
@@ -225,7 +221,7 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry didInvalidatePushTokenForType:(PKPushType)type {
-  NSLog(@"pushRegistry:didInvalidatePushTokenForType:");
+  NSLog(@"pushRegistry:didInvalidatePushTokenForType");
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     NSString *accessToken = [self fetchAccessToken];
@@ -247,6 +243,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type {
   NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
+
   if ([type isEqualToString:PKPushTypeVoIP]) {
     [[TwilioVoice sharedInstance] handleNotification:payload.dictionaryPayload
                                             delegate:self];
@@ -273,7 +270,7 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)callInviteCanceled:(TVOCallInvite *)callInvite {
-  NSLog(@"callInviteCanceled:");
+  NSLog(@"callInviteCanceled");
 
   [self performEndCallActionWithUUID:callInvite.uuid];
 
@@ -281,15 +278,15 @@ RCT_REMAP_METHOD(getActiveCall,
   [params setObject:self.callInvite.callSid forKey:@"call_sid"];
 
   if (self.callInvite.from){
-     [params setObject:self.callInvite.from forKey:@"from"];
+    [params setObject:self.callInvite.from forKey:@"from"];
   }
   if (self.callInvite.to){
-     [params setObject:self.callInvite.to forKey:@"to"];
+    [params setObject:self.callInvite.to forKey:@"to"];
   }
   if (self.callInvite.state == TVOCallInviteStateCanceled) {
     [params setObject:StateDisconnected forKey:@"call_state"];
   } else if (self.callInvite.state == TVOCallInviteStateRejected) {
-      [params setObject:StateRejected forKey:@"call_state"];
+    [params setObject:StateRejected forKey:@"call_state"];
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
@@ -302,7 +299,6 @@ RCT_REMAP_METHOD(getActiveCall,
 
 #pragma mark - TVOCallDelegate
 - (void)callDidConnect:(TVOCall *)call {
-
   self.call = call;
   NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
   [callParams setObject:call.sid forKey:@"call_sid"];
@@ -322,7 +318,7 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)callDidDisconnect:(TVOCall *)call {
-  NSLog(@"connectionDidDisconnect:");
+  NSLog(@"connectionDidDisconnect");
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   [params setObject:self.call.sid forKey:@"call_sid"];
@@ -345,20 +341,20 @@ RCT_REMAP_METHOD(getActiveCall,
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   NSString* errMsg = [error localizedDescription];
   if (error.localizedFailureReason) {
-      errMsg = [error localizedFailureReason];
+    errMsg = [error localizedFailureReason];
   }
   [params setObject:errMsg forKey:@"error"];
   if (self.call.sid) {
     [params setObject:self.call.sid forKey:@"call_sid"];
   }
   if (self.call.to){
-      [params setObject:self.call.to forKey:@"call_to"];
+    [params setObject:self.call.to forKey:@"call_to"];
   }
   if (self.call.from){
-      [params setObject:self.call.from forKey:@"call_from"];
+    [params setObject:self.call.from forKey:@"call_from"];
   }
   if (self.call.state == TVOCallStateDisconnected) {
-      [params setObject:StateDisconnected forKey:@"call_state"];
+    [params setObject:StateDisconnected forKey:@"call_state"];
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
@@ -370,7 +366,8 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)routeAudioToSpeaker: (BOOL *)speaker {
   NSError *error = nil;
   NSLog(@"routeAudioToSpeaker");
-  if(speaker) {
+
+  if (speaker) {
     if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
                                           withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
                                                 error:&error]) {
@@ -387,27 +384,27 @@ RCT_REMAP_METHOD(getActiveCall,
 
 #pragma mark - CXProviderDelegate
 - (void)providerDidReset:(CXProvider *)provider {
-  NSLog(@"providerDidReset:");
+  NSLog(@"providerDidReset");
 }
 
 - (void)providerDidBegin:(CXProvider *)provider {
-  NSLog(@"providerDidBegin:");
+  NSLog(@"providerDidBegin");
 }
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
-  NSLog(@"provider:didActivateAudioSession:");
+  NSLog(@"provider:didActivateAudioSession");
 
   [[TwilioVoice sharedInstance] startAudioDevice];
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
-  NSLog(@"provider:didDeactivateAudioSession:");
+  NSLog(@"provider:didDeactivateAudioSession");
 
   [[TwilioVoice sharedInstance] audioSessionDeactivated];
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {
-  NSLog(@"provider:timedOutPerformingAction:");
+  NSLog(@"provider:timedOutPerformingAction");
 }
 
 - (void)provider:(CXProvider *)provider performStartCallAction:(CXStartCallAction *)action {
@@ -430,7 +427,6 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performAnswerCallAction:(CXAnswerCallAction *)action {
   NSLog(@"provider:performAnswerCallAction");
 
-
   // RCP: Workaround from https://forums.developer.apple.com/message/169511 suggests configuring audio in the
   //      completion block of the `reportNewIncomingCallWithUUID:update:completion:` method instead of in
   //      `provider:performAnswerCallAction:` per the WWDC examples.
@@ -447,7 +443,7 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
-  NSLog(@"provider:performEndCallAction:");
+  NSLog(@"provider:performEndCallAction");
 
   [[TwilioVoice sharedInstance] stopAudioDevice];
 
