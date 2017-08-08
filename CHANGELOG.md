@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.7.0
+- iOS: correct handling of calls disconnection
+
 ## 2.6.0
 - iOS: implementing getActiveCall()
 

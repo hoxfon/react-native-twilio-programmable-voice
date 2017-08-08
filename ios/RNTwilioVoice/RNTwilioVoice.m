@@ -99,7 +99,6 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 
 RCT_EXPORT_METHOD(disconnect) {
   NSLog(@"Disconnecting call");
-  [self.call disconnect];
   [self performEndCallActionWithUUID:self.call.uuid];
 }
 
@@ -332,8 +331,9 @@ RCT_REMAP_METHOD(getActiveCall,
     [params setObject:StateDisconnected forKey:@"call_state"];
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
-
-  [self performEndCallActionWithUUID:call.uuid];
+  if (self.call.state == TVOCallStateConnected) {
+    [self performEndCallActionWithUUID:call.uuid];
+  }
   self.call = nil;
 }
 
@@ -358,7 +358,9 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
-  [self performEndCallActionWithUUID:call.uuid];
+  if (self.call.state == TVOCallStateConnected) {
+    [self performEndCallActionWithUUID:call.uuid];
+  }
   self.call = nil;
 }
 
