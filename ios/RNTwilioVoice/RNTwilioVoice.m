@@ -515,7 +515,6 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)performEndCallActionWithUUID:(NSUUID *)uuid {
-
   if (uuid == nil) {
     return;
   }
