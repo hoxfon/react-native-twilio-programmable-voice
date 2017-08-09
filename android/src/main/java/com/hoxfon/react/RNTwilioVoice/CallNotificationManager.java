@@ -153,21 +153,21 @@ public class CallNotificationManager {
         }
 
         // Reject action
-        // Intent rejectIntent = new Intent(ACTION_REJECT_CALL)
-        //         .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
-        //         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        // PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1, rejectIntent,
-        //         PendingIntent.FLAG_UPDATE_CURRENT);
-        // notificationBuilder.addAction(0, "IGNORAR", pendingRejectIntent);
+        Intent rejectIntent = new Intent(ACTION_REJECT_CALL)
+                .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1, rejectIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.addAction(0, "IGNORAR", pendingRejectIntent);
 
-        // // Answer action
-        // Intent answerIntent = new Intent(ACTION_ANSWER_CALL);
-        // answerIntent
-        //         .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
-        //         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        // PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0, answerIntent,
-        //         PendingIntent.FLAG_UPDATE_CURRENT);
-        // notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "RESPONDER", pendingAnswerIntent);
+        // Answer action
+        Intent answerIntent = new Intent(ACTION_ANSWER_CALL);
+        answerIntent
+                .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0, answerIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "RESPONDER", pendingAnswerIntent);
 
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notificationBuilder.build());
@@ -280,7 +280,7 @@ public class CallNotificationManager {
                 .setExtras(extras)
                 .setContentIntent(activityPendingIntent);
 
-        // notification.addAction(0, "COLGAR", pendingHangupIntent);
+        notification.addAction(0, "COLGAR", pendingHangupIntent);
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
     }
