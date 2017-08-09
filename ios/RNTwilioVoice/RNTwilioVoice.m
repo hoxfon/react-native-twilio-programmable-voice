@@ -64,24 +64,26 @@ RCT_EXPORT_METHOD(initWithAccessTokenUrl:(NSString *)tokenUrl) {
 }
 
 RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
-  _settings = [[NSMutableDictionary alloc] initWithDictionary:params];
-  CXProviderConfiguration *configuration = [[CXProviderConfiguration alloc] initWithLocalizedName:params[@"appName"]];
-  configuration.maximumCallGroups = 1;
-  configuration.maximumCallsPerCallGroup = 1;
-  if (_settings[@"imageName"]) {
-    configuration.iconTemplateImageData = UIImagePNGRepresentation([UIImage imageNamed:_settings[@"imageName"]]);
+  if (self.callKitCallController == nil) {
+    _settings = [[NSMutableDictionary alloc] initWithDictionary:params];
+    CXProviderConfiguration *configuration = [[CXProviderConfiguration alloc] initWithLocalizedName:params[@"appName"]];
+    configuration.maximumCallGroups = 1;
+    configuration.maximumCallsPerCallGroup = 1;
+    if (_settings[@"imageName"]) {
+      configuration.iconTemplateImageData = UIImagePNGRepresentation([UIImage imageNamed:_settings[@"imageName"]]);
+    }
+    if (_settings[@"ringtoneSound"]) {
+      configuration.ringtoneSound = _settings[@"ringtoneSound"];
+    }
+
+    _callKitProvider = [[CXProvider alloc] initWithConfiguration:configuration];
+    [_callKitProvider setDelegate:self queue:nil];
+
+    NSLog(@"CallKit Initialized");
+
+    self.callKitCallController = [[CXCallController alloc] init];
+    [self sendEventWithName:@"deviceReady" body:nil];
   }
-  if (_settings[@"ringtoneSound"]) {
-    configuration.ringtoneSound = _settings[@"ringtoneSound"];
-  }
-
-  _callKitProvider = [[CXProvider alloc] initWithConfiguration:configuration];
-  [_callKitProvider setDelegate:self queue:nil];
-
-  NSLog(@"CallKit Initialized");
-
-  _callKitCallController = [[CXCallController alloc] init];
-  [self sendEventWithName:@"deviceReady" body:nil];
 }
 
 RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
