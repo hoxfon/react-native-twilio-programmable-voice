@@ -327,9 +327,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 // Dismiss the notification when the user tap on the relative notification action
                 // eventually the notification will be cleared anyway
                 // but in this way there is no UI lag
-                // notificationManager.cancel(intent.getIntExtra(INCOMING_CALL_NOTIFICATION_ID, 0));
-
-                notificationManager.cancelAll();
+                notificationManager.cancel(intent.getIntExtra(INCOMING_CALL_NOTIFICATION_ID, 0));
             }
         }, intentFilter);
     }
