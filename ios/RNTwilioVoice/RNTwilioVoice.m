@@ -25,6 +25,7 @@
   NSMutableDictionary *_callParams;
   NSString *_tokenUrl;
   NSString *_token;
+  NSUUID *_callUUID;
 }
 
 NSString * const StatePending = @"PENDING";
@@ -99,7 +100,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 
 RCT_EXPORT_METHOD(disconnect) {
   NSLog(@"Disconnecting call");
-  [self performEndCallActionWithUUID:self.call.uuid];
+  [self performEndCallActionWithUUID:_callUUID];
 }
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
@@ -332,7 +333,7 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
   if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:call.uuid];
+    [self performEndCallActionWithUUID:_callUUID];
   }
   self.call = nil;
 }
@@ -359,7 +360,7 @@ RCT_REMAP_METHOD(getActiveCall,
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
   if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:call.uuid];
+    [self performEndCallActionWithUUID:_callUUID];
   }
   self.call = nil;
 }
@@ -420,7 +421,7 @@ RCT_REMAP_METHOD(getActiveCall,
   if (!self.call) {
     [action fail];
   } else {
-    self.call.uuid = action.callUUID;
+    _callUUID = action.callUUID;
 
     [action fulfillWithDateStarted:[NSDate date]];
   }
@@ -436,7 +437,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
   self.call = [self.callInvite acceptWithDelegate:self];
   if (self.call) {
-    self.call.uuid = [action callUUID];
+    _callUUID = [action callUUID];
   }
 
   self.callInvite = nil;
@@ -514,6 +515,7 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)performEndCallActionWithUUID:(NSUUID *)uuid {
+
   if (uuid == nil) {
     return;
   }
