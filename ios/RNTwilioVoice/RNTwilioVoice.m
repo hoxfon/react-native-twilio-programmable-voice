@@ -16,7 +16,7 @@
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
 @property (nonatomic, strong) TVOCallInvite *callInvite;
 @property (nonatomic, strong) TVOCall *call;
-@property (nonatomic, strong) UUID *callUUID;
+@property (nonatomic, strong) NSUUID *callUUID;
 @property (nonatomic, strong) CXProvider *callKitProvider;
 @property (nonatomic, strong) CXCallController *callKitCallController;
 @end
