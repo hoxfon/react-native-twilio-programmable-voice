@@ -16,6 +16,7 @@
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
 @property (nonatomic, strong) TVOCallInvite *callInvite;
 @property (nonatomic, strong) TVOCall *call;
+@property (nonatomic, strong) UUID *callUUID;
 @property (nonatomic, strong) CXProvider *callKitProvider;
 @property (nonatomic, strong) CXCallController *callKitCallController;
 @end
@@ -25,7 +26,6 @@
   NSMutableDictionary *_callParams;
   NSString *_tokenUrl;
   NSString *_token;
-  NSUUID *_callUUID;
 }
 
 NSString * const StatePending = @"PENDING";
@@ -100,7 +100,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 
 RCT_EXPORT_METHOD(disconnect) {
   NSLog(@"Disconnecting call");
-  [self performEndCallActionWithUUID:_callUUID];
+  [self performEndCallActionWithUUID:self.callUUID];
 }
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
@@ -333,7 +333,7 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
   if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:_callUUID];
+    [self performEndCallActionWithUUID:self.callUUID];
   }
   self.call = nil;
 }
@@ -360,7 +360,7 @@ RCT_REMAP_METHOD(getActiveCall,
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
   if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:_callUUID];
+    [self performEndCallActionWithUUID:self.callUUID];
   }
   self.call = nil;
 }
@@ -421,7 +421,7 @@ RCT_REMAP_METHOD(getActiveCall,
   if (!self.call) {
     [action fail];
   } else {
-    _callUUID = action.callUUID;
+    self.callUUID = action.callUUID;
 
     [action fulfillWithDateStarted:[NSDate date]];
   }
@@ -437,7 +437,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
   self.call = [self.callInvite acceptWithDelegate:self];
   if (self.call) {
-    _callUUID = [action callUUID];
+    self.callUUID = [action callUUID];
   }
 
   self.callInvite = nil;
