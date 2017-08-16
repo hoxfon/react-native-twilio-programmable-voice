@@ -302,11 +302,16 @@ RCT_EXPORT_METHOD(unregister){
 }
 
 - (void)call:(TVOCall *)call didFailWithError:(NSError *)error {
-  NSLog(@"call:didFailWithError: %@", [error localizedDescription]);
-
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  [params setObject:error forKey:@"error"];
-  [params setObject:self.call.callSid forKey:@"call_sid"];
+  NSString* errMsg = [error localizedDescription];
+
+  if (error.localizedFailureReason) {
+    errMsg = [error localizedFailureReason];
+  }
+  [params setObject:errMsg forKey:@"error"];
+  if (self.call.callSid) {
+    [params setObject:self.call.callSid forKey:@"call_sid"];
+  }
   if (self.call.to){
       [params setObject:self.call.to forKey:@"call_to"];
   }
@@ -318,9 +323,7 @@ RCT_EXPORT_METHOD(unregister){
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
-  if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:call.uuid];
-  }
+  [self performEndCallActionWithUUID:call.uuid];
   self.call = nil;
 }
 
