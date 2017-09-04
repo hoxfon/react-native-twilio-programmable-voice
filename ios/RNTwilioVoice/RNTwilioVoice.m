@@ -27,6 +27,7 @@
   NSString *_token;
 }
 
+NSString * const StateAccepted = @"ACCEPTED";
 NSString * const StatePending = @"PENDING";
 NSString * const StateConnecting = @"CONNECTING";
 NSString * const StateConnected = @"CONNECTED";
@@ -251,7 +252,7 @@ RCT_REMAP_METHOD(getActiveCall,
     NSString *strFrom = [mutableDictionary[@"twi_from"] stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     mutableDictionary[@"twi_from"] = strFrom;
 
-    [[TwilioVoice sharedInstance] handleNotification:payload.dictionaryPayload
+    [[TwilioVoice sharedInstance] handleNotification:mutableDictionary
                                             delegate:self];
   }
 }
@@ -311,14 +312,18 @@ RCT_REMAP_METHOD(getActiveCall,
   if (call.state == TVOCallStateConnecting) {
     [callParams setObject:StateConnecting forKey:@"call_state"];
   } else if (call.state == TVOCallStateConnected) {
-    [callParams setObject:StateConnected forKey:@"call_state"];
+    if(call.from || call.to ) {
+      [callParams setObject:StateAccepted forKey:@"call_state"];
+    } else {
+      [callParams setObject:StateConnected forKey:@"call_state"];
+    }
   }
 
   if (call.from){
-    [callParams setObject:call.from forKey:@"from"];
+    [callParams setObject:call.from forKey:@"call_from"];
   }
   if (call.to){
-    [callParams setObject:call.to forKey:@"to"];
+    [callParams setObject:call.to forKey:@"call_to"];
   }
   [self sendEventWithName:@"connectionDidConnect" body:callParams];
 }
