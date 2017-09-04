@@ -16,7 +16,6 @@
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
 @property (nonatomic, strong) TVOCallInvite *callInvite;
 @property (nonatomic, strong) TVOCall *call;
-@property (nonatomic, strong) void(^callKitCompletionCallback)(BOOL);
 @property (nonatomic, strong) CXProvider *callKitProvider;
 @property (nonatomic, strong) CXCallController *callKitCallController;
 @end
@@ -43,7 +42,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
+  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady"];
 }
 
 @synthesize bridge = _bridge;
@@ -83,16 +82,12 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
     NSLog(@"CallKit Initialized");
 
     self.callKitCallController = [[CXCallController alloc] init];
+    [self sendEventWithName:@"deviceReady" body:nil];
   }
 }
 
 RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
   NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
-
-//  [[TwilioVoice sharedInstance] setLogLevel:TVOLogLevelVerbose];
-
-  UIDevice* device = [UIDevice currentDevice];
-  device.proximityMonitoringEnabled = YES;
 
   if (self.call && self.call.state == TVOCallStateConnected) {
     [self.call disconnect];
@@ -218,14 +213,9 @@ RCT_REMAP_METHOD(getActiveCall,
                                                completion:^(NSError *error) {
                                                  if (error) {
                                                    NSLog(@"An error occurred while registering: %@", [error localizedDescription]);
-                                                   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                                                   [params setObject:[error localizedDescription] forKey:@"err"];
-
-                                                   [self sendEventWithName:@"deviceNotReady" body:params];
                                                  }
                                                  else {
                                                    NSLog(@"Successfully registered for VoIP push notifications.");
-                                                   [self sendEventWithName:@"deviceReady" body:nil];
                                                  }
                                                }];
   }
@@ -316,9 +306,6 @@ RCT_REMAP_METHOD(getActiveCall,
 #pragma mark - TVOCallDelegate
 - (void)callDidConnect:(TVOCall *)call {
   self.call = call;
-  self.callKitCompletionCallback(YES);
-  self.callKitCompletionCallback = nil;
-
   NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
   [callParams setObject:call.sid forKey:@"call_sid"];
   if (call.state == TVOCallStateConnecting) {
@@ -351,15 +338,10 @@ RCT_REMAP_METHOD(getActiveCall,
     [params setObject:StateDisconnected forKey:@"call_state"];
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
-
-  // if the app initiate and terminates the answered call
-  // EndCallAction inside performEndCallActionWithUUID will result into an error in the log
-  // because the CallKit reference is already ended.
-  // ref https://github.com/hoxfon/react-native-twilio-programmable-voice/pull/30
-  [self performEndCallActionWithUUID:call.uuid];
-
+  //if (self.call.state == TVOCallStateConnected) {
+    [self performEndCallActionWithUUID:call.uuid];
+  //}
   self.call = nil;
-  self.callKitCompletionCallback = nil;
 }
 
 - (void)call:(TVOCall *)call didFailWithError:(NSError *)error {
@@ -383,10 +365,9 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
-  [self performEndCallActionWithUUID:call.uuid];
-
-  self.callKitCompletionCallback(NO);
-  self.callKitCompletionCallback = nil;
+  if (self.call.state == TVOCallStateConnected) {
+    [self performEndCallActionWithUUID:call.uuid];
+  }
   self.call = nil;
 }
 
@@ -439,19 +420,17 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"provider:performStartCallAction");
 
   [[TwilioVoice sharedInstance] configureAudioSession];
+  self.call = [[TwilioVoice sharedInstance] call:[self fetchAccessToken]
+                                          params:_callParams
+                                        delegate:self];
 
-  [self.callKitProvider reportOutgoingCallWithUUID:action.callUUID startedConnectingAtDate:[NSDate date]];
+  if (!self.call) {
+    [action fail];
+  } else {
+    self.call.uuid = action.callUUID;
 
-  __weak typeof(self) weakSelf = self;
-  [self performVoiceCallWithUUID:action.callUUID client:nil completion:^(BOOL success) {
-    __strong typeof(self) strongSelf = weakSelf;
-    if (success) {
-      [strongSelf.callKitProvider reportOutgoingCallWithUUID:action.callUUID connectedAtDate:[NSDate date]];
-      [action fulfill];
-    } else {
-      [action fail];
-    }
-  }];
+    [action fulfillWithDateStarted:[NSDate date]];
+  }
 }
 
 - (void)provider:(CXProvider *)provider performAnswerCallAction:(CXAnswerCallAction *)action {
@@ -462,13 +441,12 @@ RCT_REMAP_METHOD(getActiveCall,
   //      `provider:performAnswerCallAction:` per the WWDC examples.
   // [[TwilioVoice sharedInstance] configureAudioSession];
 
-  [self performAnswerVoiceCallWithUUID:action.callUUID completion:^(BOOL success) {
-    if (success) {
-      [action fulfill];
-    } else {
-      [action fail];
-    }
-  }];
+  self.call = [self.callInvite acceptWithDelegate:self];
+  if (self.call) {
+    self.call.uuid = [action callUUID];
+  }
+
+  self.callInvite = nil;
 
   [action fulfill];
 }
@@ -558,38 +536,6 @@ RCT_REMAP_METHOD(getActiveCall,
       NSLog(@"EndCallAction transaction request successful");
     }
   }];
-}
-
-- (void)performVoiceCallWithUUID:(NSUUID *)uuid
-                          client:(NSString *)client
-                      completion:(void(^)(BOOL success))completionHandler {
-
-    self.call = [[TwilioVoice sharedInstance] call:[self fetchAccessToken]
-                                            params:_callParams
-                                          delegate:self];
-
-    if (!self.call) {
-        completionHandler(NO);
-    } else {
-        self.call.uuid = uuid;
-    }
-
-    self.callKitCompletionCallback = completionHandler;
-}
-
-- (void)performAnswerVoiceCallWithUUID:(NSUUID *)uuid
-                            completion:(void(^)(BOOL success))completionHandler {
-
-    self.call = [self.callInvite acceptWithDelegate:self];
-    if (!self.call) {
-        completionHandler(NO);
-    } else {
-        self.call.uuid = uuid;
-    }
-
-    self.callInvite = nil;
-
-    self.callKitCompletionCallback = completionHandler;
 }
 
 @end
