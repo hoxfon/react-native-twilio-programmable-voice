@@ -62,6 +62,10 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
+            //remove the 'client:' from 'twi_from' key value
+            String from = (String)data.get("twi_from");
+            data.put("twi_from", from.replace("client:", ""));
+
             Voice.handleMessage(this, data, new MessageListener() {
 
                 @Override

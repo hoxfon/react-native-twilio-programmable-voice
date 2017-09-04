@@ -246,6 +246,11 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
+    //remove the 'client:' from 'twi_from' key value
+    NSMutableDictionary *mutableDictionary = [payload.dictionaryPayload mutableCopy];
+    NSString *strFrom = [mutableDictionary[@"twi_from"] stringByReplacingOccurrencesOfString:@"client:" withString:@""];
+    mutableDictionary[@"twi_from"] = strFrom;
+
     [[TwilioVoice sharedInstance] handleNotification:payload.dictionaryPayload
                                             delegate:self];
   }
