@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.9.0
+- make sure the Android build uses the latest version 10 of firebase.messaging to avoid dependencies conflicts crashes
+
 ## 2.8.0
 - iOS: prevent CallKit to be initialised more than once
 
