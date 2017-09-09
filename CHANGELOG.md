@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.11.2
+- Make sure CallKit session is ended when the call is terminated by the callee - @SimonRobinson
+
 ## 2.11.1
 - Make sure CallKit session is ended on fail - @Pagebakers
 

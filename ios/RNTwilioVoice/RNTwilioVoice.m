@@ -333,9 +333,13 @@ RCT_REMAP_METHOD(getActiveCall,
     [params setObject:StateDisconnected forKey:@"call_state"];
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
-  if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:call.uuid];
-  }
+
+  // if the app initiate and terminates the answered call
+  // EndCallAction inside performEndCallActionWithUUID will result into an error in the log
+  // because the CallKit reference is already ended.
+  // ref https://github.com/hoxfon/react-native-twilio-programmable-voice/pull/30
+  [self performEndCallActionWithUUID:call.uuid];
+
   self.call = nil;
 }
 
