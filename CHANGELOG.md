@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.11.0
+- Android: Twilio Voice SDK 2.0.0-beta17
+
 ## 2.10.0
 - Android: Twilio Voice SDK 2.0.0-beta16
 

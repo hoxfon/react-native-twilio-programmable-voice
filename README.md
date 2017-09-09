@@ -3,7 +3,7 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.0.0-beta16 (bundled within this library)
+- Android 2.0.0-beta17 (bundled within this library)
 - iOS 2.0.0-beta13 (specified by the app's own podfile)
 
 ## Migrating Android from v1 to v2 (incoming call use FCM)
