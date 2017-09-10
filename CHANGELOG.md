@@ -2,8 +2,8 @@
 
 ## 3.0.0
 Breaking changes:
-- initWitToken returns an object with a property `initialized`. It was `initilized`
-- make iOS event `connectionDidConnect` return the same properties as Android
+- initWitToken returns an object with a property `initialized` instead of `initilized`
+- iOS event `connectionDidConnect` returns the same properties as Android
 move property `to` => `call_to`
 move property `from` => `call_from`
 

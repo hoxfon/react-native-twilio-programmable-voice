@@ -6,6 +6,13 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 - Android 2.0.0-beta17 (bundled within this library)
 - iOS 2.0.0-beta15 (specified by the app's own podfile)
 
+## Breaking changes in v3.0.0
+
+- initWitToken returns an object with a property `initialized` instead of `initilized`
+- iOS event `connectionDidConnect` returns the same properties as Android
+move property `to` => `call_to`
+move property `from` => `call_from`
+
 ## Migrating Android from v1 to v2 (incoming call use FCM)
 
 You will need to make changes both on your Twilio account using Twilio Web Console and on your react native app.
