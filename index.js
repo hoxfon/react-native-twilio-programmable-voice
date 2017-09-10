@@ -23,8 +23,7 @@ const Twilio = {
         const result = await TwilioVoice.initWithAccessToken(token)
         if (Platform.OS === 'ios') {
             return {
-                // TODO fix the spell of initialized in the next breaking version
-                initilized: true,
+                initialized: true,
             }
         }
         return result

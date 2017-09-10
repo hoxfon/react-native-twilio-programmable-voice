@@ -1,5 +1,19 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.0.0
+Breaking changes:
+- initWitToken returns an object with a property `initialized`. It was `initilized`
+- make iOS event `connectionDidConnect` return the same properties as Android
+move property `to` => `call_to`
+move property `from` => `call_from`
+
+New iOS
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta15
+- iOS use CallKit reportOutgoingCallWithUUID when initing calls
+
+New Android
+- add properties `call_to` and `call_from` to Android event `connectionDidConnect`
+
 ## 2.11.2
 - Make sure CallKit session is ended when the call is terminated by the callee - @SimonRobinson
 
