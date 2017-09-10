@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.1.0
+Make the iOS initialization process he sam as Android
+- iOS: call event `deviceReady` only when the accessToken registration is succesful
+- iOS: implement event `deviceNotReady` called when the accessToken registration is not succesful
+
 ## 3.0.0
 Breaking changes:
 - initWitToken returns an object with a property `initialized` instead of `initilized`

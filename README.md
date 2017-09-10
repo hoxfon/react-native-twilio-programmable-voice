@@ -222,7 +222,7 @@ import TwilioVoice from 'react-native-twilio-programmable-voice'
 ...
 
 // initialize the Programmable Voice SDK passing an access token obtained from the server.
-
+// Listen to deviceReady and deviceNotReady events to see whether the initialization succeeded.
 async function initTelephony() {
     try {
         const accessToken = await getAccessTokenFromServer()

@@ -43,7 +43,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady"];
+  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
 }
 
 @synthesize bridge = _bridge;
@@ -83,7 +83,6 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
     NSLog(@"CallKit Initialized");
 
     self.callKitCallController = [[CXCallController alloc] init];
-    [self sendEventWithName:@"deviceReady" body:nil];
   }
 }
 
@@ -216,9 +215,14 @@ RCT_REMAP_METHOD(getActiveCall,
                                                completion:^(NSError *error) {
                                                  if (error) {
                                                    NSLog(@"An error occurred while registering: %@", [error localizedDescription]);
+                                                   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                                                   [params setObject:[error localizedDescription] forKey:@"err"];
+
+                                                   [self sendEventWithName:@"deviceNotReady" body:params];
                                                  }
                                                  else {
                                                    NSLog(@"Successfully registered for VoIP push notifications.");
+                                                   [self sendEventWithName:@"deviceReady" body:nil];
                                                  }
                                                }];
   }
