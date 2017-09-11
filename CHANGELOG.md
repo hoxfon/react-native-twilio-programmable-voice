@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.1.1
+- iOS: ensure the proximity sensor is enabled when starting a call
+
 ## 3.1.0
 Make the iOS initialization process he sam as Android
 - iOS: call event `deviceReady` only when the accessToken registration is succesful

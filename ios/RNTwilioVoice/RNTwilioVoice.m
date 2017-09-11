@@ -91,6 +91,9 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 
 //  [[TwilioVoice sharedInstance] setLogLevel:TVOLogLevelVerbose];
 
+  UIDevice* device = [UIDevice currentDevice];
+  device.proximityMonitoringEnabled = YES;
+
   if (self.call && self.call.state == TVOCallStateConnected) {
     [self.call disconnect];
   } else {
