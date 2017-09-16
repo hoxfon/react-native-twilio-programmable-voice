@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.2.0
+- Android: add compatibility for react native >= 0.47
+
 ## 3.1.1
 - iOS: ensure the proximity sensor is enabled when starting a call
 
