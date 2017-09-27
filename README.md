@@ -76,7 +76,7 @@ npm install react-native-twilio-programmable-voice --save
 react-native link react-native-twilio-programmable-voice
 ```
 
-### iOS Installation
+### iOS Installation - when projects made with react-native init
 After you have linked the library with `react-native link react-native-twilio-programmable-voice`
 check that `libRNTwilioVoice.a` is present under YOUR_TARGET > Build Phases > Link Binaries With Libraries. If it is not present you can add it using the + sign at the bottom of that list.
 
@@ -99,6 +99,26 @@ end
 
 run `pod install` from inside your project `ios` directory
 
+### iOS Installation - when projects made without react-native init
+Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
+
+```
+source 'https://github.com/cocoapods/specs'
+source 'https://github.com/twilio/cocoapod-specs'
+
+# min version for TwilioVoice to work
+platform :ios, '8.1'
+
+target <YOUR_TARGET> do
+    ...
+    pod 'TwilioVoice', '=2.0.0-beta15'
+    pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
+    ...
+end
+
+```
+
+run `pod install` from inside your project `ios` directory
 
 ### CallKit
 
