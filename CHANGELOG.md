@@ -1,5 +1,45 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.2.0
+- Android: add compatibility for react native >= 0.47
+
+## 3.1.1
+- iOS: ensure the proximity sensor is enabled when starting a call
+
+## 3.1.0
+Make the iOS initialization process he sam as Android
+- iOS: call event `deviceReady` only when the accessToken registration is succesful
+- iOS: implement event `deviceNotReady` called when the accessToken registration is not succesful
+
+## 3.0.0
+Breaking changes:
+- initWitToken returns an object with a property `initialized` instead of `initilized`
+- iOS event `connectionDidConnect` returns the same properties as Android
+move property `to` => `call_to`
+move property `from` => `call_from`
+
+New iOS
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta15
+- iOS use CallKit reportOutgoingCallWithUUID when initing calls
+
+New Android
+- add properties `call_to` and `call_from` to Android event `connectionDidConnect`
+
+## 2.11.2
+- Make sure CallKit session is ended when the call is terminated by the callee - @SimonRobinson
+
+## 2.11.1
+- Make sure CallKit session is ended on fail - @Pagebakers
+
+## 2.11.0
+- Android: Twilio Voice SDK 2.0.0-beta17
+
+## 2.10.0
+- Android: Twilio Voice SDK 2.0.0-beta16
+
+## 2.9.0
+- make sure the Android build uses the latest version 10 of firebase.messaging to avoid dependencies conflicts crashes
+
 ## 2.8.0
 - iOS: prevent CallKit to be initialised more than once
 

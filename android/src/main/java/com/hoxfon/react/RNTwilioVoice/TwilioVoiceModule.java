@@ -224,6 +224,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (call != null) {
                     params.putString("call_sid",   call.getSid());
                     params.putString("call_state", call.getState().name());
+                    params.putString("call_from", call.getFrom());
+                    params.putString("call_to", call.getTo());
                     String caller = "Show call details in the app";
                     if (!toName.equals("")) {
                         caller = toName;
@@ -476,8 +478,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         registerForCallInvites();
         WritableMap params = Arguments.createMap();
-        // TODO fix the spell of initialized in the next breaking version
-        params.putBoolean("initilized", true);
+        params.putBoolean("initialized", true);
         promise.resolve(params);
     }
 
@@ -516,7 +517,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "Registering with FCM");
             }
-            Voice.register(getReactApplicationContext(), accessToken, fcmToken, registrationListener);
+            Voice.register(getReactApplicationContext(), accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
         }
     }
 

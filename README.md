@@ -3,8 +3,15 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.0.0-beta15 (bundled within this library)
-- iOS 2.0.0-beta13 (specified by the app's own podfile)
+- Android 2.0.0-beta17 (bundled within this library)
+- iOS 2.0.0-beta15 (specified by the app's own podfile)
+
+## Breaking changes in v3.0.0
+
+- initWitToken returns an object with a property `initialized` instead of `initilized`
+- iOS event `connectionDidConnect` returns the same properties as Android
+move property `to` => `call_to`
+move property `from` => `call_from`
 
 ## Migrating Android from v1 to v2 (incoming call use FCM)
 
@@ -69,7 +76,7 @@ npm install react-native-twilio-programmable-voice --save
 react-native link react-native-twilio-programmable-voice
 ```
 
-### iOS Installation
+### iOS Installation - when projects made with react-native init
 After you have linked the library with `react-native link react-native-twilio-programmable-voice`
 check that `libRNTwilioVoice.a` is present under YOUR_TARGET > Build Phases > Link Binaries With Libraries. If it is not present you can add it using the + sign at the bottom of that list.
 
@@ -84,7 +91,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '=2.0.0-beta13'
+    pod 'TwilioVoice', '=2.0.0-beta15'
     ...
 end
 
@@ -92,6 +99,26 @@ end
 
 run `pod install` from inside your project `ios` directory
 
+### iOS Installation - when projects made without react-native init
+Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
+
+```
+source 'https://github.com/cocoapods/specs'
+source 'https://github.com/twilio/cocoapod-specs'
+
+# min version for TwilioVoice to work
+platform :ios, '8.1'
+
+target <YOUR_TARGET> do
+    ...
+    pod 'TwilioVoice', '=2.0.0-beta15'
+    pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
+    ...
+end
+
+```
+
+run `pod install` from inside your project `ios` directory
 
 ### CallKit
 
@@ -110,7 +137,7 @@ Setup FCM
 You must download the file `google-services.json` from the Firebase console.
 It contains keys and settings for all your applications under Firebase. This library obtains the resource `senderID` for registering for remote GCM from that file.
 
-**NOTE: To use a specific `play-service-gcm` version, update the `compile` instruction in your App's `android/app/build.gradle` (replace `10.2.0` with the version you prefer):**
+**NOTE: To use a specific `play-service-gcm` version, update the `compile` instruction in your App's `android/app/build.gradle` (replace `10.+` with the version you prefer):**
 
 ```gradle
 ...
@@ -128,7 +155,7 @@ dependencies {
     ...
 
     compile project(':react-native-twilio-programmable-voice')
-    compile ('com.google.android.gms:play-services-gcm:10.2.0') {
+    compile ('com.google.android.gms:play-services-gcm:10.+') {
         force = true;
     }
 }
@@ -215,7 +242,7 @@ import TwilioVoice from 'react-native-twilio-programmable-voice'
 ...
 
 // initialize the Programmable Voice SDK passing an access token obtained from the server.
-
+// Listen to deviceReady and deviceNotReady events to see whether the initialization succeeded.
 async function initTelephony() {
     try {
         const accessToken = await getAccessTokenFromServer()
@@ -241,8 +268,8 @@ function initTelephonyWithUrl(url) {
 
 // add listeners
 TwilioVoice.addEventListener('deviceReady', deviceReadyHandler)
-TwilioVoice.addEventListener('deviceNotReady', deviceNotReadyHandler)  // Android Only
-TwilioVoice.addEventListener('deviceDidReceiveIncoming', deviceDidReceiveIncomingHandler)  // Android Only
+TwilioVoice.addEventListener('deviceNotReady', deviceNotReadyHandler)
+TwilioVoice.addEventListener('deviceDidReceiveIncoming', deviceDidReceiveIncomingHandler)
 TwilioVoice.addEventListener('connectionDidConnect', connectionDidConnectHandler)
 TwilioVoice.addEventListener('connectionDidDisconnect', connectionDidDisconnectHandler)
 TwilioVoice.addEventListener('callRejected', callRejected)  // iOS Only
@@ -255,10 +282,10 @@ TwilioVoice.connect({To: '+61234567890'})
 // hangup
 TwilioVoice.disconnect()
 
-// accept an incoming call (Android only)
+// accept an incoming call (Android only, in iOS CallKit provides the UI for this)
 TwilioVoice.accept()
 
-// reject an incoming call (Android only)
+// reject an incoming call (Android only, in iOS CallKit provides the UI for this)
 TwilioVoice.reject()
 
 // ignore an incoming call (Android only)
@@ -281,6 +308,11 @@ TwilioVoice.getActiveCall()
 
 ```
 
+## Twilio Voice SDK reference
+
+[iOS changelog](https://www.twilio.com/docs/api/voice-sdk/ios/changelog)
+
+[Android changelog](https://www.twilio.com/docs/api/voice-sdk/android/changelog)
 
 ## Credits
 
