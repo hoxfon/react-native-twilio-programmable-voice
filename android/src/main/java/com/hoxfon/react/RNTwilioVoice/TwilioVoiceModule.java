@@ -151,9 +151,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         /*
          * Ensure the microphone permission is enabled
          */
-        if (!checkPermissionForMicrophone()) {
-            requestPermissionForMicrophone();
-        }
+        //if (!checkPermissionForMicrophone()) {
+        //    requestPermissionForMicrophone();
+        //}
     }
 
     @Override
