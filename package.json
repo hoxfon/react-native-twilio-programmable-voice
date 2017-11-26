@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:hoxfon/react-native-twilio-programmable-voice.git"
+    "url": "https://github.com/soluto/react-native-twilio-programmable-voice.git"
   },
   "rnpm": {
     "android": {
