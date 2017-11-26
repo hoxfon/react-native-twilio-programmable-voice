@@ -482,9 +482,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            Log.i(TAG, "received onReceive action 1 " + intent.toString());
-
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "received onReceive action 1 " + intent.toString());
+            }
             String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
             int state = 0;
             if(stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)){
@@ -502,7 +502,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
 
         public void onCallStateChanged(Context context, int state) {
-            Log.e(TAG, "received onCallStateChanged action " + state + " lastState " + lastState);
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "received onCallStateChanged action " + state + " lastState " + lastState);
+            }
             if (lastState == state) {
                 //No change, debounce extras
                 return;
