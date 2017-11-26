@@ -1,5 +1,5 @@
 {
-  "name": "react-native-twilio-programmable-voice",
+  "name": "@npmsoluto/react-native-twilio-programmable-voice",
   "version": "3.2.0",
   "description": "React Native wrapper for Twilio Programmable Voice SDK",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {},
-  "homepage": "https://github.com/hoxfon/react-native-twilio-programmable-voice",
+  "homepage": "https://github.com/soluto/react-native-twilio-programmable-voice",
   "keywords": [
     "twilio",
     "react-native",
@@ -34,7 +34,7 @@
     }
   },
   "author": {
-    "name": "Fabrizio Moscon"
+    "name": "Soluto"
   },
   "license": "MIT"
 }

@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -59,6 +60,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private boolean isReceiverRegistered = false;
     private VoiceBroadcastReceiver voiceBroadcastReceiver;
+    private PhoneCallBroadcastReceiver phoneCallBroadcastReceiver;
 
     // Empty HashMap, contains parameters for the Outbound call
     private HashMap<String, String> twiMLParams = new HashMap<>();
@@ -68,7 +70,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String EVENT_CONNECTION_DID_CONNECT = "connectionDidConnect";
     public static final String EVENT_CONNECTION_DID_DISCONNECT = "connectionDidDisconnect";
     public static final String EVENT_DEVICE_DID_RECEIVE_INCOMING = "deviceDidReceiveIncoming";
-
+    public static final String EVENT_PHONE_CALL_STARTED = "phoneCallStarted";
+    public static final String EVENT_PHONE_CALL_ENDED = "phoneCallEnded";
 
     public static final String INCOMING_CALL_INVITE          = "INCOMING_CALL_INVITE";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
@@ -132,6 +135,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
          * or incoming call messages in this Activity.
          */
         voiceBroadcastReceiver = new VoiceBroadcastReceiver();
+        phoneCallBroadcastReceiver = new PhoneCallBroadcastReceiver();
         registerReceiver();
 
         TwilioVoiceModule.callNotificationMap = new HashMap<>();
@@ -286,7 +290,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             intentFilter.addAction(ACTION_MISSED_CALL);
             LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(
                     voiceBroadcastReceiver, intentFilter);
+
             registerActionReceiver();
+
+            IntentFilter phoneCallIntentFilter = new IntentFilter();
+            phoneCallIntentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+            getReactApplicationContext().registerReceiver(
+                    phoneCallBroadcastReceiver, phoneCallIntentFilter);
+
             isReceiverRegistered = true;
         }
     }
@@ -461,6 +472,59 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 sharedPrefEditor.commit();
             } else {
                 Log.e(TAG, "received broadcast unhandled action " + action);
+            }
+        }
+    }
+
+    private class PhoneCallBroadcastReceiver extends BroadcastReceiver {
+
+        private int lastState = TelephonyManager.CALL_STATE_IDLE;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.i(TAG, "received onReceive action 1 " + intent.toString());
+
+            String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+            int state = 0;
+            if(stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)){
+                state = TelephonyManager.CALL_STATE_IDLE;
+            }
+            else if(stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)){
+                state = TelephonyManager.CALL_STATE_OFFHOOK;
+            }
+            else if(stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)){
+                state = TelephonyManager.CALL_STATE_RINGING;
+            }
+
+            onCallStateChanged(context, state);
+            lastState = state;
+        }
+
+        public void onCallStateChanged(Context context, int state) {
+            Log.e(TAG, "received onCallStateChanged action " + state + " lastState " + lastState);
+            if (lastState == state) {
+                //No change, debounce extras
+                return;
+            }
+            else {
+                switch (state)
+                    {
+                        case TelephonyManager.CALL_STATE_IDLE:
+                            if (lastState == TelephonyManager.CALL_STATE_OFFHOOK) {
+                                sendEvent(EVENT_PHONE_CALL_ENDED, null);
+                            }
+                            break;
+                        case TelephonyManager.CALL_STATE_RINGING:
+                            break;
+                        case TelephonyManager.CALL_STATE_OFFHOOK:
+                            if (lastState == TelephonyManager.CALL_STATE_RINGING) {
+                                sendEvent(EVENT_PHONE_CALL_STARTED, null);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
             }
         }
     }

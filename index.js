@@ -17,6 +17,9 @@ const _eventHandlers = {
     deviceDidReceiveIncoming: new Map(),
     connectionDidConnect: new Map(),
     connectionDidDisconnect: new Map(),
+    //android specific
+    phoneCallStarted: new Map(),
+    phoneCallEnded: new Map(),
     //iOS specific
     callRejected: new Map(),
 }
