@@ -10,7 +10,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.os.Build;
 
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
@@ -755,9 +758,24 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (setFocus) {
                 savedAudioMode = audioManager.getMode();
                 // Request audio focus before making any device switch.
-                audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build();
+                    AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                            .setAudioAttributes(playbackAttributes)
+                            .setAcceptsDelayedFocusGain(true)
+                            .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                                @Override
+                                public void onAudioFocusChange(int i) { }
+                            })
+                            .build();
+                    audioManager.requestAudioFocus(focusRequest);
+                } else {
+                    audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                }
                 /*
                  * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
                  * required to be in this mode when playout and/or recording starts for

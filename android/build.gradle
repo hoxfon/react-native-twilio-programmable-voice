@@ -22,11 +22,11 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "25.0.3"
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
@@ -41,7 +41,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.twilio:voice-android:2.0.0-beta17'
+    compile 'com.twilio:voice-android:2.0.0-beta18'
     compile 'com.facebook.react:react-native:+'
     compile 'com.google.firebase:firebase-messaging:10.+'
     testCompile 'junit:junit:4.12'
