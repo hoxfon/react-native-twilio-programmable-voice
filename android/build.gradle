@@ -41,7 +41,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.twilio:voice-android:2.0.0-beta18'
+    compile 'com.twilio:voice-android:2.0.0-beta20'
     compile 'com.facebook.react:react-native:+'
     compile 'com.google.firebase:firebase-messaging:10.+'
     testCompile 'junit:junit:4.12'

@@ -276,6 +276,36 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 toNumber = "";
                 toName = "";
             }
+
+            @Override
+            public void onConnectFailure(Call call, CallException error) {
+                setAudioFocus(false);
+                callAccepted = false;
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "connect failure");
+                }
+
+                Log.e(TAG, String.format("CallListener onDisconnected error: %d, %s",
+                    error.getErrorCode(), error.getMessage()));
+
+                WritableMap params = Arguments.createMap();
+                params.putString("err", error.getMessage());
+                String callSid = "";
+                if (call != null) {
+                    callSid = call.getSid();
+                    params.putString("call_sid", callSid);
+                    params.putString("call_state", call.getState().name());
+                    params.putString("call_from", call.getFrom());
+                    params.putString("call_to", call.getTo());
+                }
+                if (callSid != null && activeCall != null && activeCall.getSid() != null && activeCall.getSid().equals(callSid)) {
+                    activeCall = null;
+                }
+                sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
+                callNotificationManager.removeHangupNotification(getReactApplicationContext());
+                toNumber = "";
+                toName = "";
+            }
         };
     }
 
