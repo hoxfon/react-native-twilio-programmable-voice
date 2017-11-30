@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.5.0
+- Android: Twilio Voice SDK 2.0.0-beta20
+- Implement Call.Listener onConnectFailure()
+
 ## 3.4.0
 - Fix iOS HEADER_SEARCH_PATHS
 
