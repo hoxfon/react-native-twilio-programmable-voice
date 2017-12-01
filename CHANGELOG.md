@@ -1,5 +1,12 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.6.0
+- Android: Twilio Voice SDK 2.0.0-beta24
+- Implement Android O notification channels
+- Android: ensure that audio settings are set back to normal when the app destroys
+- Android:fix audio settings when set speakers on/off
+- Android: prevent other apps to emit sound when a call is in progress
+
 ## 3.5.0
 - Android: Twilio Voice SDK 2.0.0-beta20
 - Implement Call.Listener onConnectFailure()
