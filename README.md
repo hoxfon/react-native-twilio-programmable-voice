@@ -219,7 +219,8 @@ public class MainApplication extends Application implements ReactApplication {
 
 ```javascript
 import TwilioVoice from 'react-native-twilio-programmable-voice'
-...
+
+// ...
 
 // initialize the Programmable Voice SDK passing an access token obtained from the server.
 // Listen to deviceReady and deviceNotReady events to see whether the initialization succeeded.
@@ -244,17 +245,89 @@ function initTelephonyWithUrl(url) {
         console.err(err)
     }
 }
+```
 
+## Events
 
-// add listeners
-TwilioVoice.addEventListener('deviceReady', deviceReadyHandler)
-TwilioVoice.addEventListener('deviceNotReady', deviceNotReadyHandler)
-TwilioVoice.addEventListener('deviceDidReceiveIncoming', deviceDidReceiveIncomingHandler)
-TwilioVoice.addEventListener('connectionDidConnect', connectionDidConnectHandler)
-TwilioVoice.addEventListener('connectionDidDisconnect', connectionDidDisconnectHandler)
-TwilioVoice.addEventListener('callRejected', callRejected)  // iOS Only
+```javascript
+// add listeners (flowtype notation)
+TwilioVoice.addEventListener('deviceReady', function() {
+    // no data
+})
+TwilioVoice.addEventListener('deviceNotReady', function(data) {
+    // {
+    //     err: string
+    // }
+})
+TwilioVoice.addEventListener('connectionDidConnect', function(data) {
+    // Android
+    // {
+    //     call_sid: string,  // Twilio call sid
+    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     call_from: string, // "+441234567890"
+    //     call_to: string,   // "client:bob"
+    // }
+    // iOS
+    // {
+    //     call_sid: string,  // Twilio call sid
+    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     from: string,      // "+441234567890" // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
+    //     to: string,        // "client:bob"    // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
+    // }
+})
+TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
+    //   | null
+    //   | {
+    //       err: string
+    //     }
+    //   | Android
+    //     {
+    //         call_sid: string,  // Twilio call sid
+    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //         call_from: string, // "+441234567890"
+    //         call_to: string,   // "client:bob"
+    //         err?: string,
+    //     }
+    //   | iOS
+    //     {
+    //         call_sid: string,  // Twilio call sid
+    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //         call_from?: string, // "+441234567890"
+    //         call_to?: string,   // "client:bob"
+    //         from?: string,      // "+441234567890" // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
+    //         to?: string,        // "client:bob"    // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
+    //         error?: string,                        // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
+    //     }
+})
 
-...
+// iOS Only
+TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
+
+// Android Only
+TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
+    // {
+    //     call_sid: string,  // Twilio call sid
+    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     call_from: string, // "+441234567890"
+    //     call_to: string,   // "client:bob"
+    // }
+})
+// Android Only
+TwilioVoice.addEventListener('proximity', function(data) {
+    // {
+    //     isNear: boolean
+    // }
+})
+// Android Only
+TwilioVoice.addEventListener('wiredHeadset', function(data) {
+    // {
+    //     isPlugged: boolean,
+    //     hasMic: boolean,
+    //     deviceName: string
+    // }
+})
+
+// ...
 
 // start a call
 TwilioVoice.connect({To: '+61234567890'})
@@ -300,7 +373,7 @@ TwilioVoice.getActiveCall()
 
 [react-native-push-notification](https://github.com/zo0r/react-native-push-notification)
 
-[voice-callkit-quickstart-objc](https://github.com/twilio/voice-callkit-quickstart-objc)
+[voice-quickstart-objc](https://github.com/twilio/voice-quickstart-objc)
 
 
 ## License
