@@ -58,7 +58,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private static final int MIC_PERMISSION_REQUEST_CODE = 1;
 
     private AudioManager audioManager;
-    private int savedAudioMode = AudioManager.MODE_INVALID;
+    private int savedAudioMode = AudioManager.MODE_NORMAL;
 
     private boolean isReceiverRegistered = false;
     private VoiceBroadcastReceiver voiceBroadcastReceiver;
@@ -176,6 +176,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @Override
     public void onHostDestroy() {
+        setAudioFocus(false);
     }
 
     @Override
@@ -690,7 +691,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void setSpeakerPhone(Boolean value) {
-        setAudioFocus(value);
         audioManager.setSpeakerphoneOn(value);
     }
 
@@ -709,14 +709,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
     }
 
-    /*
-     * Register your GCM token with Twilio to enable receiving incoming calls via GCM
-     */
-    private void register() {
-        final String fcmToken = FirebaseInstanceId.getInstance().getToken();
-        Voice.register(getReactApplicationContext(), accessToken, fcmToken, registrationListener);
-    }
-
     private void setAudioFocus(boolean setFocus) {
         if (audioManager != null) {
             if (setFocus) {
@@ -727,7 +719,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                             .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                             .build();
-                    AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                    AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
                             .setAudioAttributes(playbackAttributes)
                             .setAcceptsDelayedFocusGain(true)
                             .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
@@ -738,7 +730,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     audioManager.requestAudioFocus(focusRequest);
                 } else {
                     audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
                 }
                 /*
                  * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
@@ -746,7 +738,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                  * best possible VoIP performance. Some devices have difficulties with speaker mode
                  * if this is not set.
                  */
-                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                audioManager.setMode(AudioManager.MODE_IN_CALL);
             } else {
                 audioManager.setMode(savedAudioMode);
                 audioManager.abandonAudioFocus(null);
