@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.7.0
+- Android: use proximity sensor to lock screen during calls
+- Android: send event to JavaScript for headset plugged in
+- Android: fix unset audio focus for Android O
+
 ## 3.6.0
 - Android: Twilio Voice SDK 2.0.0-beta24
 - Implement Android O notification channels
@@ -25,9 +30,9 @@
 - iOS: ensure the proximity sensor is enabled when starting a call
 
 ## 3.1.0
-Make the iOS initialization process he sam as Android
-- iOS: call event `deviceReady` only when the accessToken registration is succesful
-- iOS: implement event `deviceNotReady` called when the accessToken registration is not succesful
+Make the iOS initialization process the same as Android
+- iOS: call event `deviceReady` only when the accessToken registration is successful
+- iOS: implement event `deviceNotReady` called when the accessToken registration is not successful
 
 ## 3.0.0
 Breaking changes:
@@ -38,7 +43,7 @@ move property `from` => `call_from`
 
 New iOS
 - iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta15
-- iOS use CallKit reportOutgoingCallWithUUID when initing calls
+- iOS use CallKit reportOutgoingCallWithUUID when initializing calls
 
 New Android
 - add properties `call_to` and `call_from` to Android event `connectionDidConnect`
@@ -108,7 +113,7 @@ New Android
 - ios: send connectionDidDisconnect when the call invite terminates
 
 ## 2.0.0
-- ios implemtation with CallKit
+- ios implementation with CallKit
 
 ## 1.1.0
 - use Twilio Voice SDK 2.0.0-beta8
@@ -137,14 +142,14 @@ New Android
 
 ## 0.5.5
 - improve logic for starting the MainActivity when receiving a call. The Intent flags depends on the App importance (fixes the 0.5.3 for Android 6.0)
-- make sure all wakelock are released after being acquired, and the keyguard renabled
+- make sure all wakelock are released after being acquired, and the keyguard re-enabled
 
 ## 0.5.4
 - set incoming call Intent flag depending on App importance (App status)
 
 ## 0.5.3
 - Prevent incoming call from starting a new task: use (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP) for the Intent
-- Prevent the incoming call Intent to be broadcasted when the app is in the foreground
+- Prevent the incoming call Intent to be broadcast when the app is in the foreground
 
 ## 0.5.2
 - allow custom notification icons
@@ -159,12 +164,12 @@ New Android
 - start activity as soon as a call notification arrives
 - wakes up the device when a call arrives
 - use ringtone, removing notification sound
-- handle grafully when a call is accepted twice
+- handle gracefully when a call is accepted twice
 - don't create a missed calls when the call is rejected or ignored manually
 
 ## 0.4.1
 
-- simplify lifecycle of local hangup notification
+- simplify life-cycle of local hangup notification
 - remove crash on disconnect
 
 ## 0.4.0
