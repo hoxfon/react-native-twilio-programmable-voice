@@ -21,6 +21,8 @@ public class EventManager {
     public static final String EVENT_CONNECTION_DID_CONNECT = "connectionDidConnect";
     public static final String EVENT_CONNECTION_DID_DISCONNECT = "connectionDidDisconnect";
     public static final String EVENT_DEVICE_DID_RECEIVE_INCOMING = "deviceDidReceiveIncoming";
+    public static final String EVENT_PHONE_CALL_STARTED = "phoneCallStarted";
+    public static final String EVENT_PHONE_CALL_ENDED = "phoneCallEnded";
 
     public EventManager(ReactApplicationContext context) {
         mContext = context;
