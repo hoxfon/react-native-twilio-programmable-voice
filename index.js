@@ -75,6 +75,12 @@ const Twilio = {
     setSpeakerPhone(value) {
         TwilioVoice.setSpeakerPhone(value)
     },
+    async isHeadphonesConnected() {
+        if (Platform.OS === IOS) {
+            return false
+        }
+        return await TwilioVoice.getIsHeadphonesConnected()
+    },
     sendDigits(digits) {
         TwilioVoice.sendDigits(digits)
     },

@@ -712,6 +712,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         audioManager.setSpeakerphoneOn(value);
     }
 
+    @ReactMethod
+    public void getIsHeadphonesConnected(Promise promise) {
+        promise.resolve(audioManager.isWiredHeadsetOn());
+    }
+
     private void setAudioFocus() {
         if (audioManager == null) {
             return;
