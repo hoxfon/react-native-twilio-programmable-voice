@@ -120,6 +120,20 @@ RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
   }
 }
 
+RCT_REMAP_METHOD(getIsHeadphonesConnected,
+                  getIsHeadphonesConnectedResolver:(RCTPromiseResolveBlock)resolve
+                  getIsHeadphonesConnectedRejecter:(RCTPromiseRejectBlock)reject){
+  NSLog(@"getIsHeadphonesConnected call");
+  AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
+  for (AVAudioSessionPortDescription* desc in [route outputs]) {
+    if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones]){
+      resolve(@TRUE);
+      return;
+    }
+  }
+  resolve(@FALSE);
+}
+
 RCT_EXPORT_METHOD(unregister){
   NSLog(@"unregister");
   NSString *accessToken = [self fetchAccessToken];
@@ -377,8 +391,7 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"routeAudioToSpeaker");
 
   if (speaker) {
-    if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
-                                          withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
+    if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
                                                 error:&error]) {
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
     }
