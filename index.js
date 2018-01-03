@@ -20,6 +20,8 @@ const _eventHandlers = {
     //android specific
     phoneCallStarted: new Map(),
     phoneCallEnded: new Map(),
+    proximity: new Map(),
+    wiredHeadset: new Map(),
     //iOS specific
     callRejected: new Map(),
 }
