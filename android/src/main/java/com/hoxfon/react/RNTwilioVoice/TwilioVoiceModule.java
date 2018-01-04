@@ -93,13 +93,13 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String PREFERENCE_KEY = "com.hoxfon.react.TwilioVoice.PREFERENCE_FILE_KEY";
 
     private NotificationManager notificationManager;
-    private CallNotificationManager callNotificationManager;
-    private ProximityManager proximityManager;
+    public CallNotificationManager callNotificationManager;
+    public ProximityManager proximityManager;
 
     private String accessToken;
 
-    private String toNumber = "";
-    private String toName = "";
+    public String toNumber = "";
+    public String toName = "";
 
     static Map<String, Integer> callNotificationMap;
 
@@ -107,17 +107,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private Call.Listener callListener = callListener();
 
     private CallInvite activeCallInvite;
-    private Call activeCall;
-    private PowerManager.WakeLock wakeLock;
+    public Call activeCall;
+    public PowerManager.WakeLock wakeLock;
 
     private KeyguardManager keyguardManager;
 
     // this variable determines when to create missed calls notifications
-    private Boolean callAccepted = false;
+    public Boolean callAccepted = false;
 
     private AudioFocusRequest focusRequest;
-    private HeadsetManager headsetManager;
-    private EventManager eventManager;
+    public HeadsetManager headsetManager;
+    public EventManager eventManager;
 
     public TwilioVoiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -218,7 +218,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         };
     }
 
-    private Call.Listener callListener() {
+    public Call.Listener callListener() {
         return new Call.Listener() {
             @Override
             public void onConnected(Call call) {
@@ -707,7 +707,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         audioManager.setSpeakerphoneOn(value);
     }
 
-    private void setAudioFocus() {
+    public void setAudioFocus() {
         if (audioManager == null) {
             return;
         }
@@ -743,7 +743,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
     }
 
-    private void unsetAudioFocus() {
+    public void unsetAudioFocus() {
         if (audioManager == null) {
             return;
         }
