@@ -413,8 +413,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     // send a JS event ONLY if the app's importance is FOREGROUND or SERVICE
                     // at startup the app would try to fetch the activeIncoming calls
                     int appImportance = callNotificationManager.getApplicationImportance(getReactApplicationContext());
-                    if (appImportance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND ||
-                            appImportance == RunningAppProcessInfo.IMPORTANCE_SERVICE) {
+                    if (
+                            appImportance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND ||
+                            appImportance == RunningAppProcessInfo.IMPORTANCE_SERVICE ||
+                            appImportance == RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING
+                       ) {
 
                         WritableMap params = Arguments.createMap();
                         params.putString("call_sid", activeCallInvite.getCallSid());
@@ -705,6 +708,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         // TODO check whether it is necessary to call setAudioFocus again
 //        setAudioFocus();
         audioManager.setSpeakerphoneOn(value);
+    }
+
+    @ReactMethod
+    public void incoming(ReadableMap params) {
     }
 
     public void setAudioFocus() {

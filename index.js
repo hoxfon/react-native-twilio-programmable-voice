@@ -72,6 +72,12 @@ const Twilio = {
     setSpeakerPhone(value) {
         TwilioVoice.setSpeakerPhone(value)
     },
+    incoming(params = {}) {
+        if (Platform.OS === IOS) {
+            return
+        }
+        TwilioVoice.incoming(params)
+    },
     sendDigits(digits) {
         TwilioVoice.sendDigits(digits)
     },
