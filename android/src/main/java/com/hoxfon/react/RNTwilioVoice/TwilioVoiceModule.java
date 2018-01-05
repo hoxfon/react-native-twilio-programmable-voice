@@ -106,7 +106,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private RegistrationListener registrationListener = registrationListener();
     private Call.Listener callListener = callListener();
 
-    private CallInvite activeCallInvite;
+    public CallInvite activeCallInvite;
     public Call activeCall;
     public PowerManager.WakeLock wakeLock;
 
@@ -389,7 +389,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         // Ignored, required to implement ActivityEventListener for RN 0.33
     }
 
-    private void handleIncomingCallIntent(Intent intent) {
+    public void handleIncomingCallIntent(Intent intent) {
         if (intent != null && intent.getAction() != null) {
 
             if (intent.getAction().equals(ACTION_INCOMING_CALL)) {
