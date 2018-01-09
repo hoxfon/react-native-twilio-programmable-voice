@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.8.0
+- Android: Twilio Voice SDK 2.0.2
+
 ## 3.7.0
 - Android: use proximity sensor to lock screen during calls
 - Android: send event to JavaScript for headset plugged in
