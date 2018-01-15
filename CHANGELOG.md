@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.10.0
+- fix crash on Oreo abandonAudioFocusRequest()
+
 ## 3.9.0
 - update com.google.gms:google-services to 3.1.2
 - use latest API 26 support library
