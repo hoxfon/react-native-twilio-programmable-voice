@@ -756,7 +756,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         audioManager.setMode(originalAudioMode);
         if (Build.VERSION.SDK_INT >= 26) {
-            audioManager.abandonAudioFocusRequest(focusRequest);
+            if (focusRequest != null) {
+                audioManager.abandonAudioFocusRequest(focusRequest);
+            }
         } else {
             audioManager.abandonAudioFocus(null);
         }
