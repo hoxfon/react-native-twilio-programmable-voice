@@ -261,6 +261,75 @@ RCT_REMAP_METHOD(getActiveCall,
   }
 }
 
+- (void)jsonFromLocalRNStrogeForKey:(NSString *)key completion:(void (^)(NSDictionary * _Nullable, NSError * _Nullable))completion
+{
+    RCTResponseSenderBlock rnCompletion = ^(NSArray *response) {
+        
+        NSString *jsonAsString;
+        
+        if (response.count > 1) {
+            NSArray *response1 = response[1];
+            if (response1.count > 0) {
+                NSArray *response2 = response1[0];
+                if (response2.count > 1) {
+                    jsonAsString = response2[1];
+                }
+            }
+        }
+        
+        @try {
+            NSData *jsonAsData = [jsonAsString dataUsingEncoding:NSUTF8StringEncoding];
+            
+            NSError *error;
+            
+            NSDictionary *json = [
+              NSJSONSerialization
+              JSONObjectWithData:jsonAsData
+              options:NSJSONReadingMutableContainers
+              error:&error
+            ];
+            
+            completion(json, error);
+        }
+        @catch (NSException *exception) {
+            NSLog(@"twilio: %@", exception.reason);
+            
+            NSMutableDictionary * info = [NSMutableDictionary dictionary];
+            [info setValue:exception.name forKey:@"ExceptionName"];
+            [info setValue:exception.reason forKey:@"ExceptionReason"];
+            [info setValue:exception.callStackReturnAddresses forKey:@"ExceptionCallStackReturnAddresses"];
+            [info setValue:exception.callStackSymbols forKey:@"ExceptionCallStackSymbols"];
+            [info setValue:exception.userInfo forKey:@"ExceptionUserInfo"];
+            
+            NSError *error = [[NSError alloc] initWithDomain:@"" code:1 userInfo:info];
+            
+            completion(nil, error);
+        }
+    };
+   
+    // RCTAsyncLocalStorage *storage = [RCTAsyncLocalStorage new];
+    RCTAsyncLocalStorage *storage = [[RCTAsyncLocalStorage alloc] init];
+    
+    dispatch_async(storage.methodQueue, ^{
+        @try {
+            [storage performSelector:@selector(multiGet:callback:) withObject:@[key] withObject:rnCompletion];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"twilio: %@", exception.reason);
+        }
+    });
+    
+    /* dispatch_async(storage.methodQueue, ^{
+        if ([storage respondsToSelector:@selector(getAllKeys:)]) {
+            [storage performSelector:@selector(getAllKeys:) withObject:^(NSArray* response){
+                NSLog(@"twilio: Contents: %@",response);
+            }];
+        } else {
+            NSLog(@"twilio: storage does not respond to selector `getAllKeys:`");
+        }
+    }); */
+}
+
 #pragma mark - TVONotificationDelegate
 - (void)callInviteReceived:(TVOCallInvite *)callInvite {
   NSLog(@"callInviteReceived");
@@ -277,7 +346,42 @@ RCT_REMAP_METHOD(getActiveCall,
 
   self.callInvite = callInvite;
 
-  [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
+  [self jsonFromLocalRNStrogeForKey:@"persist:root" completion:^(NSDictionary* data,NSError* error) {
+    if (data) {
+      // getting the membership json [{\"id\": \"1\", \"name\":\"Aaa\"}, {\"id\": \"2\", \"name\":\"Bbb\"}]
+      NSString * memberships = [data valueForKeyPath: @"membership"];
+      
+      if (![memberships isKindOfClass:[NSNull class]]) {
+        NSString *fullname;
+        NSData *jsonData = [memberships dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *e = nil;
+        NSMutableArray *jsonArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&e];                
+        NSArray *from = [callInvite.from componentsSeparatedByString:@"_"]; // split("_");        
+        NSString *type = [[from[0] componentsSeparatedByString:@":"][1] lowercaseString]; // split(":");
+        int id = [from[1] integerValue];
+        
+        if (!jsonArray) {
+          NSLog(@"twilio: Error parsing JSON: %@", e);
+        } else {
+            for (NSDictionary *membership in jsonArray) {
+              NSDictionary *item = [membership valueForKeyPath: type];
+              int _id = [[item objectForKey: @"id"]intValue];
+              NSDictionary *user = [item valueForKeyPath: @"user"];              
+              // if equals to the one who is calling
+              if (_id == id) {
+                fullname = [user objectForKey: @"full_name"];
+              }
+            }
+        }          
+        [self reportIncomingCallFrom:fullname withUUID:callInvite.uuid];
+      } else {
+        [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
+      }        
+    } else {
+      NSLog(@"twilio: JSON Parsing Error: %@", error);
+      [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
+    }
+  }];
 }
 
 - (void)callInviteCanceled:(TVOCallInvite *)callInvite {
