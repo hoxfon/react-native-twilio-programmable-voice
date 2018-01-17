@@ -4,6 +4,7 @@
 
 #import "RNTwilioVoice.h"
 #import <React/RCTLog.h>
+#import <React/RCTAsyncLocalStorage.h>
 
 @import AVFoundation;
 @import PushKit;

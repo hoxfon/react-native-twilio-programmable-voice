@@ -3,7 +3,7 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.0.0-beta24 (bundled within this library)
+- Android 2.0.2 (bundled within this library)
 - iOS 2.0.0-beta15 (specified by the app's own podfile)
 
 ## Breaking changes in v3.0.0
@@ -125,7 +125,7 @@ It contains keys and settings for all your applications under Firebase. This lib
 buildscript {
   ...
   dependencies {
-    classpath 'com.google.gms:google-services:3.0.0'
+    classpath 'com.google.gms:google-services:3.1.2'
   }
 }
 
