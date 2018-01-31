@@ -133,7 +133,7 @@ public class CallNotificationManager {
                         .setCategory(NotificationCompat.CATEGORY_CALL)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle("Llamada entrante")
-                        .setContentText(callInvite.getFrom() + " está llamando")
+                        .setContentText(this.getFrom(callInvite) + " está llamando")
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
@@ -210,7 +210,7 @@ public class CallNotificationManager {
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .setSmallIcon(R.drawable.ic_call_missed_white_24dp)
                         .setContentTitle("Llamada perdida")
-                        .setContentText(callInvite.getFrom() + " llamó")
+                        .setContentText(this.getFrom(callInvite) + " llamó")
                         .setAutoCancel(true)
                         .setShowWhen(true)
                         .setExtras(extras)
@@ -225,7 +225,7 @@ public class CallNotificationManager {
         } else {
             inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " llamadas perdidas");
         }
-        inboxStyle.addLine("de: " +callInvite.getFrom());
+        inboxStyle.addLine("de: " + this.getFrom(callInvite));
         sharedPrefEditor.putInt(MISSED_CALLS_GROUP, missedCalls);
         sharedPrefEditor.commit();
 
@@ -324,5 +324,13 @@ public class CallNotificationManager {
     public void removeHangupNotification(ReactApplicationContext context) {
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(HANGUP_NOTIFICATION_ID);
+    }
+
+    public String getFrom(CallInvite callInvite) {
+        if (callInvite.getFrom().contains("client:")) {
+            return "Seguridad";
+        } else {
+            return "Visitante";
+        }
     }
 }
