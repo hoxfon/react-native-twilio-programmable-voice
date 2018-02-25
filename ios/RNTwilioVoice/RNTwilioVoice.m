@@ -417,13 +417,13 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didActivateAudioSession");
 
-  [[TwilioVoice sharedInstance] startAudioDevice];
+  [TwilioVoice startAudio];
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didDeactivateAudioSession");
 
-  [[TwilioVoice sharedInstance] audioSessionDeactivated];
+  [TwilioVoice stopAudio];
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {
@@ -471,7 +471,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
   NSLog(@"provider:performEndCallAction");
 
-  [[TwilioVoice sharedInstance] stopAudioDevice];
+  [[TwilioVoice sharedInstance] stopAudio];
 
   if (self.callInvite && self.callInvite.state == TVOCallInviteStatePending) {
     [self sendEventWithName:@"callRejected" body:@"callRejected"];
