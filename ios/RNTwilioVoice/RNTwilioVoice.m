@@ -533,6 +533,9 @@ RCT_REMAP_METHOD(getActiveCall,
     return;
   }
 
+  UIDevice* device = [UIDevice currentDevice];
+  device.proximityMonitoringEnabled = NO;
+
   CXEndCallAction *endCallAction = [[CXEndCallAction alloc] initWithCallUUID:uuid];
   CXTransaction *transaction = [[CXTransaction alloc] initWithAction:endCallAction];
 
