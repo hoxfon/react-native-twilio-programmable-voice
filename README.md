@@ -4,7 +4,7 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 # Twilio Programmable Voice SDK
 
 - Android 2.0.2 (bundled within this library)
-- iOS 2.0.0-beta20 (specified by the app's own podfile)
+- iOS 2.0.0-beta21 (specified by the app's own podfile)
 
 ## Breaking changes in v3.0.0
 
@@ -91,7 +91,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '=2.0.0-beta20'
+    pod 'TwilioVoice', '=2.0.0-beta21'
     ...
 end
 

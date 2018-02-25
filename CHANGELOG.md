@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.12.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta21
+- iOS: handle events when a call is put on hold
+
 ## 3.11.0
 - iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta20
 

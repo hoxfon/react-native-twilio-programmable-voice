@@ -449,6 +449,8 @@ RCT_REMAP_METHOD(getActiveCall,
   //      `provider:performAnswerCallAction:` per the WWDC examples.
   // [TwilioVoice configureAudioSession];
 
+  NSAssert([self.callInvite.uuid isEqual:action.callUUID], @"We only support one Invite at a time.");
+
   [self performAnswerVoiceCallWithUUID:action.callUUID completion:^(BOOL success) {
     if (success) {
       [action fulfill];
@@ -476,6 +478,15 @@ RCT_REMAP_METHOD(getActiveCall,
   [action fulfill];
 }
 
+- (void)provider:(CXProvider *)provider performSetHeldCallAction:(CXSetHeldCallAction *)action {
+  if (self.call && self.call.state == TVOCallStateConnected) {
+    [self.call setOnHold:action.isOnHold];
+    [action fulfill];
+  } else {
+    [action fail];
+  }
+}
+
 #pragma mark - CallKit Actions
 - (void)performStartCallActionWithUUID:(NSUUID *)uuid handle:(NSString *)handle {
   if (uuid == nil || handle == nil) {
@@ -495,7 +506,7 @@ RCT_REMAP_METHOD(getActiveCall,
       CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
       callUpdate.remoteHandle = callHandle;
       callUpdate.supportsDTMF = YES;
-      callUpdate.supportsHolding = NO;
+      callUpdate.supportsHolding = YES;
       callUpdate.supportsGrouping = NO;
       callUpdate.supportsUngrouping = NO;
       callUpdate.hasVideo = NO;
@@ -511,7 +522,7 @@ RCT_REMAP_METHOD(getActiveCall,
   CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
   callUpdate.remoteHandle = callHandle;
   callUpdate.supportsDTMF = YES;
-  callUpdate.supportsHolding = NO;
+  callUpdate.supportsHolding = YES;
   callUpdate.supportsGrouping = NO;
   callUpdate.supportsUngrouping = NO;
   callUpdate.hasVideo = NO;
@@ -554,13 +565,8 @@ RCT_REMAP_METHOD(getActiveCall,
 
     self.call = [TwilioVoice call:[self fetchAccessToken]
                                             params:_callParams
+                                              uuid:uuid
                                           delegate:self];
-
-    if (!self.call) {
-        completionHandler(NO);
-    } else {
-        self.call.uuid = uuid;
-    }
 
     self.callKitCompletionCallback = completionHandler;
 }
@@ -569,14 +575,7 @@ RCT_REMAP_METHOD(getActiveCall,
                             completion:(void(^)(BOOL success))completionHandler {
 
     self.call = [self.callInvite acceptWithDelegate:self];
-    if (!self.call) {
-        completionHandler(NO);
-    } else {
-        self.call.uuid = uuid;
-    }
-
     self.callInvite = nil;
-
     self.callKitCompletionCallback = completionHandler;
 }
 
