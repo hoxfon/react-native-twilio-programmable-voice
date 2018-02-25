@@ -263,8 +263,15 @@ RCT_REMAP_METHOD(getActiveCall,
 
 #pragma mark - TVONotificationDelegate
 - (void)callInviteReceived:(TVOCallInvite *)callInvite {
-  NSLog(@"callInviteReceived");
+    if (callInvite.state == TVOCallInviteStatePending) {
+      [self handleCallInviteReceived:callInvite];
+    } else if (callInvite.state == TVOCallInviteStateCanceled) {
+      [self handleCallInviteCanceled:callInvite];
+    }
+}
 
+- (void)handleCallInviteReceived:(TVOCallInvite *)callInvite {
+  NSLog(@"callInviteReceived:");
   if (self.callInvite && self.callInvite == TVOCallInviteStatePending) {
     NSLog(@"Already a pending incoming call invite.");
     NSLog(@"  >> Ignoring call from %@", callInvite.from);
@@ -280,7 +287,7 @@ RCT_REMAP_METHOD(getActiveCall,
   [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
 }
 
-- (void)callInviteCanceled:(TVOCallInvite *)callInvite {
+- (void)handleCallInviteCanceled:(TVOCallInvite *)callInvite {
   NSLog(@"callInviteCanceled");
 
   [self performEndCallActionWithUUID:callInvite.uuid];
