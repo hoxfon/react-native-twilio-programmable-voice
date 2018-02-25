@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.11.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta20
+
 ## 3.10.0
 - fix crash on Oreo abandonAudioFocusRequest()
 
