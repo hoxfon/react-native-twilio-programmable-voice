@@ -134,8 +134,7 @@ RCT_EXPORT_METHOD(unregister){
                                                completion:^(NSError * _Nullable error) {
                                                  if (error) {
                                                    NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
-                                                 }
-                                                 else {
+                                                 } else {
                                                    NSLog(@"Successfully unregistered for VoIP push notifications.");
                                                  }
                                                }];
@@ -222,8 +221,7 @@ RCT_REMAP_METHOD(getActiveCall,
                                                    [params setObject:[error localizedDescription] forKey:@"err"];
 
                                                    [self sendEventWithName:@"deviceNotReady" body:params];
-                                                 }
-                                                 else {
+                                                 } else {
                                                    NSLog(@"Successfully registered for VoIP push notifications.");
                                                    [self sendEventWithName:@"deviceReady" body:nil];
                                                  }
@@ -242,8 +240,7 @@ RCT_REMAP_METHOD(getActiveCall,
                                                  completion:^(NSError * _Nullable error) {
                                                    if (error) {
                                                      NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
-                                                   }
-                                                   else {
+                                                   } else {
                                                      NSLog(@"Successfully unregistered for VoIP push notifications.");
                                                    }
                                                  }];
@@ -525,8 +522,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
       // RCP: Workaround per https://forums.developer.apple.com/message/169511
       [TwilioVoice configureAudioSession];
-    }
-    else {
+    } else {
       NSLog(@"Failed to report incoming call successfully: %@.", [error localizedDescription]);
     }
   }];
@@ -543,8 +539,7 @@ RCT_REMAP_METHOD(getActiveCall,
   [self.callKitCallController requestTransaction:transaction completion:^(NSError *error) {
     if (error) {
       NSLog(@"EndCallAction transaction request failed: %@", [error localizedDescription]);
-    }
-    else {
+    } else {
       NSLog(@"EndCallAction transaction request successful");
     }
   }];
