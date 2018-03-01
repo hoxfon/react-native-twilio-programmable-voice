@@ -115,7 +115,7 @@ RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
 }
 
 RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
-  [self routeAudioToSpeaker:speaker];
+  [self toggleAudioRoute:speaker];
 }
 
 RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
@@ -378,28 +378,29 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 #pragma mark - AVAudioSession
-- (void)routeAudioToSpeaker: (BOOL *)speaker {
+- (void)toggleAudioRoute: (BOOL *)toSpeaker {
+  // The mode set by the Voice SDK is "VoiceChat" so the default audio route is the built-in receiver.
+  // Use port override to switch the route.
   NSError *error = nil;
-  NSLog(@"routeAudioToSpeaker");
+  NSLog(@"toggleAudioRoute");
 
-  if (speaker) {
-    if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
-                                          withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
-                                                error:&error]) {
+  if (toSpeaker) {
+    if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
+                                                            error:&error]) {
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
     }
   } else {
-    if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
-                                                error:&error]) {
+    if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideNone
+                                                            error:&error]) {
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
     }
-
   }
 }
 
 #pragma mark - CXProviderDelegate
 - (void)providerDidReset:(CXProvider *)provider {
   NSLog(@"providerDidReset");
+  TwilioVoice.audioEnabled = YES;
 }
 
 - (void)providerDidBegin:(CXProvider *)provider {
@@ -408,14 +409,12 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didActivateAudioSession");
-
-  [TwilioVoice startAudio];
+  TwilioVoice.audioEnabled = YES;
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didDeactivateAudioSession");
-
-  [TwilioVoice stopAudio];
+  TwilioVoice.audioEnabled = NO;
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {
@@ -426,6 +425,7 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"provider:performStartCallAction");
 
   [TwilioVoice configureAudioSession];
+  TwilioVoice.audioEnabled = NO;
 
   [self.callKitProvider reportOutgoingCallWithUUID:action.callUUID startedConnectingAtDate:[NSDate date]];
 
@@ -451,6 +451,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
   NSAssert([self.callInvite.uuid isEqual:action.callUUID], @"We only support one Invite at a time.");
 
+  TwilioVoice.audioEnabled = NO;
   [self performAnswerVoiceCallWithUUID:action.callUUID completion:^(BOOL success) {
     if (success) {
       [action fulfill];
@@ -465,7 +466,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
   NSLog(@"provider:performEndCallAction");
 
-  [TwilioVoice stopAudio];
+  TwilioVoice.audioEnabled = NO;
 
   if (self.callInvite && self.callInvite.state == TVOCallInviteStatePending) {
     [self sendEventWithName:@"callRejected" body:@"callRejected"];
