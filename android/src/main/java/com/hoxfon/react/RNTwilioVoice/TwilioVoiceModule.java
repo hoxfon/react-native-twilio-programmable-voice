@@ -616,10 +616,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public void ignore() {
         callAccepted = false;
         SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+        WritableMap params = Arguments.createMap();
         if (activeCallInvite != null){
+            params.putString("call_sid",   activeCallInvite.getCallSid());
+            params.putString("call_from",  activeCallInvite.getFrom());
+            params.putString("call_to",    activeCallInvite.getTo());
+            params.putString("call_state", activeCallInvite.getState().name());
             clearIncomingNotification(activeCallInvite);
         }
-        eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
+        eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
     }
 
     @ReactMethod
