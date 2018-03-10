@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.13.1
+- Android: Twilio Voice SDK 2.0.4
+
 ## 3.13.0
 - iOS: the library is compatible with Twilio Voice SDK 2.0.2
 
