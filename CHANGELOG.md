@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.14.0
+- Android: start up the app in fullscreen for incoming calls
+- Android: pass call params to disconnect event when ignoring a call
+- Android: pass call params to disconnect event when rejecting a call
+
 ## 3.13.1
 - Android: Twilio Voice SDK 2.0.4
 
