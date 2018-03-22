@@ -301,6 +301,8 @@ public class CallNotificationManager {
 
         notification.addAction(0, "HANG UP", pendingHangupIntent);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        //Creating a channel for call in progress notification
+        initIncomingCallChannel(notificationManager);
         notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
     }
 
