@@ -1,5 +1,33 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.14.0
+- Android: start up the app in fullscreen for incoming calls
+- Android: pass call params to disconnect event when ignoring a call
+- Android: pass call params to disconnect event when rejecting a call
+
+## 3.13.1
+- Android: Twilio Voice SDK 2.0.4
+
+## 3.13.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.2
+
+## 3.12.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta21
+- iOS: handle events when a call is put on hold
+
+## 3.11.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta20
+
+## 3.10.0
+- fix crash on Oreo abandonAudioFocusRequest()
+
+## 3.9.0
+- update com.google.gms:google-services to 3.1.2
+- use latest API 26 support library
+
+## 3.8.0
+- Android: Twilio Voice SDK 2.0.2
+
 ## 3.7.0
 - Android: use proximity sensor to lock screen during calls
 - Android: send event to JavaScript for headset plugged in
