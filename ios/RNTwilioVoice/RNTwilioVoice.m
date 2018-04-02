@@ -16,6 +16,7 @@
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
 @property (nonatomic, strong) TVOCallInvite *callInvite;
 @property (nonatomic, strong) TVOCall *call;
+@property (nonatomic, strong) void(^callKitCompletionCallback)(BOOL);
 @property (nonatomic, strong) CXProvider *callKitProvider;
 @property (nonatomic, strong) CXCallController *callKitCallController;
 @end
@@ -42,7 +43,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady"];
+  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
 }
 
 @synthesize bridge = _bridge;
@@ -82,7 +83,6 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
     NSLog(@"CallKit Initialized");
 
     self.callKitCallController = [[CXCallController alloc] init];
-    [self sendEventWithName:@"deviceReady" body:nil];
   }
 }
 
@@ -237,6 +237,7 @@ RCT_REMAP_METHOD(getActiveCall,
                                                    [self sendEventWithName:@"deviceNotReady" body:params];
                                                  } else {
                                                    NSLog(@"Successfully registered for VoIP push notifications.");
+                                                   [self sendEventWithName:@"deviceReady" body:nil];
                                                  }
                                                }];
   }
@@ -333,6 +334,9 @@ RCT_REMAP_METHOD(getActiveCall,
 #pragma mark - TVOCallDelegate
 - (void)callDidConnect:(TVOCall *)call {
   self.call = call;
+  self.callKitCompletionCallback(YES);
+  self.callKitCompletionCallback = nil;
+
   NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
   [callParams setObject:call.sid forKey:@"call_sid"];
   if (call.state == TVOCallStateConnecting) {
@@ -388,6 +392,7 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
+  // OLD Noam code: https://github.com/Soluto/react-native-twilio-programmable-voice/commit/681f13e3e4f596a74d2c0d7f84c13886429fe255#diff-e67091c1701490f5b837506d8029fe69
   // if (self.call.state == TVOCallStateConnected) {
   //   [self performEndCallActionWithUUID:call.uuid];
   // }
@@ -443,19 +448,34 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"provider:performStartCallAction");
 
   [TwilioVoice configureAudioSession];
-  self.call = [TwilioVoice call:[self fetchAccessToken]
-                                            params:_callParams
-                                              uuid:uuid
-                                          delegate:self];
+  // Noam code
+  // self.call = [TwilioVoice call:[self fetchAccessToken]
+  //                                           params:_callParams
+  //                                             uuid:uuid
+  //                                         delegate:self];
   TwilioVoice.audioEnabled = NO;
 
-  if (!self.call) {
-    [action fail];
-  } else {
-    self.call.uuid = action.callUUID;
+  [self.callKitProvider reportOutgoingCallWithUUID:action.callUUID startedConnectingAtDate:[NSDate date]];
 
-    [action fulfillWithDateStarted:[NSDate date]];
-  }
+  __weak typeof(self) weakSelf = self;
+  [self performVoiceCallWithUUID:action.callUUID client:nil completion:^(BOOL success) {
+    __strong typeof(self) strongSelf = weakSelf;
+    if (success) {
+      [strongSelf.callKitProvider reportOutgoingCallWithUUID:action.callUUID connectedAtDate:[NSDate date]];
+      [action fulfill];
+    } else {
+      [action fail];
+    }
+  }];
+
+  // OLD Noam code: https://github.com/Soluto/react-native-twilio-programmable-voice/commit/681f13e3e4f596a74d2c0d7f84c13886429fe255#diff-e67091c1701490f5b837506d8029fe69
+  // if (!self.call) {
+  //   [action fail];
+  // } else {
+  //   self.call.uuid = action.callUUID;
+
+  //   [action fulfillWithDateStarted:[NSDate date]];
+  // }
 }
 
 - (void)provider:(CXProvider *)provider performAnswerCallAction:(CXAnswerCallAction *)action {
