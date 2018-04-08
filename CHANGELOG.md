@@ -1,5 +1,12 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.16.0
+- Android: Twilio Voice SDK 2.0.5
+
+## 3.15.0
+- init notifications channel before showing call in progress notification
+- add cocoapods support to install iOS native package
+
 ## 3.14.0
 - Android: start up the app in fullscreen for incoming calls
 - Android: pass call params to disconnect event when ignoring a call
