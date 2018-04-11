@@ -183,6 +183,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @Override
     public void onHostDestroy() {
+        disconnect();
+        callNotificationManager.removeHangupNotification(getReactApplicationContext());
         unsetAudioFocus();
     }
 
