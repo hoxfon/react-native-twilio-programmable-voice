@@ -58,13 +58,13 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
   _token = token;
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:@"applicationWillTerminate" object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
   [self initPushRegistry];
 }
 
 RCT_EXPORT_METHOD(initWithAccessTokenUrl:(NSString *)tokenUrl) {
   _tokenUrl = tokenUrl;
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:@"applicationWillTerminate" object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
   [self initPushRegistry];
 }
 
