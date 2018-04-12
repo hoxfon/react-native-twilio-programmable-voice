@@ -52,15 +52,19 @@ RCT_EXPORT_MODULE()
   if (self.callKitProvider) {
     [self.callKitProvider invalidate];
   }
+
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
   _token = token;
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
   [self initPushRegistry];
 }
 
 RCT_EXPORT_METHOD(initWithAccessTokenUrl:(NSString *)tokenUrl) {
   _tokenUrl = tokenUrl;
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
   [self initPushRegistry];
 }
 
@@ -622,6 +626,15 @@ RCT_REMAP_METHOD(getActiveCall,
     self.call = [self.callInvite acceptWithDelegate:self];
     self.callInvite = nil;
     self.callKitCompletionCallback = completionHandler;
+}
+
+- (void)handleAppTerminateNotification {
+  NSLog(@"handleAppTerminateNotification called");
+
+  if (self.call) {
+    NSLog(@"handleAppTerminateNotification disconnecting active call");
+    [self.call disconnect];
+  }
 }
 
 @end
