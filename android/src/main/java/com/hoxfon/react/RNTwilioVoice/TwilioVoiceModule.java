@@ -3,7 +3,6 @@ package com.hoxfon.react.RNTwilioVoice;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
-import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,7 +15,6 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 
-import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -108,9 +106,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private CallInvite activeCallInvite;
     private Call activeCall;
-    private PowerManager.WakeLock wakeLock;
-
-    private KeyguardManager keyguardManager;
 
     // this variable determines when to create missed calls notifications
     private Boolean callAccepted = false;
@@ -149,13 +144,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
          * Needed for setting/abandoning audio focus during a call
          */
         audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
-
-        PowerManager powerManager;
-
-        powerManager = (PowerManager) reactContext.getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, TAG);
-
-        keyguardManager = (KeyguardManager) reactContext.getSystemService(Context.KEYGUARD_SERVICE);
 
         /*
          * Ensure the microphone permission is enabled
@@ -231,9 +219,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 proximityManager.startProximitySensor();
                 headsetManager.startWiredHeadsetEvent(getReactApplicationContext());
 
-                if (wakeLock.isHeld()) {
-                    wakeLock.release();
-                }
                 WritableMap params = Arguments.createMap();
                 if (call != null) {
                     params.putString("call_sid",   call.getSid());
@@ -262,9 +247,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "call disconnected");
-                }
-                if (wakeLock.isHeld()) {
-                    wakeLock.release();
                 }
 
                 WritableMap params = Arguments.createMap();
@@ -407,10 +389,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
                 SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
-                KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(TAG);
-                lock.disableKeyguard();
-                wakeLock.acquire();
-
                 if (getReactApplicationContext().getCurrentActivity() != null) {
                     Window window = getReactApplicationContext().getCurrentActivity().getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -433,19 +411,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
 
             } else {
-                KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(TAG);
-                lock.reenableKeyguard();
-
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING");
                 }
                 // this block is executed when the callInvite is cancelled and:
                 //   - the call is answered (activeCall != null)
                 //   - the call is rejected
-
-                if (wakeLock.isHeld()) {
-                    wakeLock.release();
-                }
 
                 SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
 
