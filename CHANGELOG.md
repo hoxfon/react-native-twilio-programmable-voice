@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.17.0
+- disconnect any existing calls when the app is terminated
+- Android: Twilio Voice SDK 2.0.6
+- iOS: Twilio Voice SDK 2.0.4
+
 ## 3.16.0
 - Android: Twilio Voice SDK 2.0.5
 
