@@ -415,7 +415,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     Window window = getReactApplicationContext().getCurrentActivity().getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                     );
                 }
                 // send a JS event ONLY if the app's importance is FOREGROUND or SERVICE
