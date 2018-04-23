@@ -166,8 +166,6 @@ In your `AndroidManifest.xml`
 
 ```xml
     .....
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
 
