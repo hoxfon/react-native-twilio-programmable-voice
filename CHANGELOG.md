@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.18.0
+- avoid keeping the screen on when a call is received with a locked device
+- remove PowerManager wakelock pattern
+
 ## 3.17.0
 - disconnect any existing calls when the app is terminated
 - Android: Twilio Voice SDK 2.0.6
