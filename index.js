@@ -28,7 +28,10 @@ const Twilio = {
     // the initialization succeeded
     async initWithToken(token) {
         if (typeof token !== 'string') {
-            return { initialized: false, err: 'Invalid token, token must be a string' }
+            return {
+                initialized: false,
+                err:         'Invalid token, token must be a string'
+            }
         };
 
         const result = await TwilioVoice.initWithAccessToken(token)
