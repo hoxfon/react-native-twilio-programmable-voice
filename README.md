@@ -223,7 +223,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                 new MainReactPackage(),
-                new TwilioVoicePackage() // <---- Add the Package
+                new TwilioVoicePackage() // <---- Add the Package(you can also put false if you wish to handle mic permissions yourself)
             );
         }
     };
