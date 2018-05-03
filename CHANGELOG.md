@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.18.1
+- Validate token type before calling native module
+
 ## 3.18.0
 - avoid keeping the screen on when a call is received with a locked device
 - remove PowerManager wakelock pattern
