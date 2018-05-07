@@ -492,15 +492,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (accessToken.equals("")) {
             promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
             return;
-        }
-
-        if(!checkPermissionForMicrophone()){
-            requestPermissionForMicrophone();
-            if(!checkPermissionForMicrophone())
-            {
-                promise.reject(new AssertionException("Can't init without mic permission"));
-            }
-        }
+        }        
+        
+        if(!checkPermissionForMicrophone()) {
+            promise.reject(new AssertionException("Can't init without microphone permission"));
+        }        
 
         TwilioVoiceModule.this.accessToken = accessToken;
         if (BuildConfig.DEBUG) {
