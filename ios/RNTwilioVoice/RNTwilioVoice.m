@@ -632,7 +632,7 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"handleAppTerminateNotification called");
 
   if (self.call) {
-    NSLog(@"handleAppTerminateNotification disconnecting active call");
+    NSLog(@"handleAppTerminateNotification disconnecting an active call");
     [self.call disconnect];
   }
 }
