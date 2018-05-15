@@ -3,8 +3,8 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.0.2 (bundled within this library)
-- iOS 2.0.0-beta15 (specified by the app's own podfile)
+- Android 2.0.6 (bundled within this library)
+- iOS 2.0.4 (specified by the app's own podfile)
 
 ## Breaking changes in v3.0.0
 
@@ -76,7 +76,7 @@ npm install react-native-twilio-programmable-voice --save
 react-native link react-native-twilio-programmable-voice
 ```
 
-### iOS Installation
+### iOS Installation - when projects made with react-native init
 After you have linked the library with `react-native link react-native-twilio-programmable-voice`
 check that `libRNTwilioVoice.a` is present under YOUR_TARGET > Build Phases > Link Binaries With Libraries. If it is not present you can add it using the + sign at the bottom of that list.
 
@@ -84,14 +84,13 @@ Edit your `Podfile` to include TwilioVoice framework
 
 ```
 source 'https://github.com/cocoapods/specs'
-source 'https://github.com/twilio/cocoapod-specs'
 
 # min version for TwilioVoice to work
 platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '=2.0.0-beta15'
+    pod 'TwilioVoice', '~> 2.0.0'
     ...
 end
 
@@ -99,6 +98,25 @@ end
 
 run `pod install` from inside your project `ios` directory
 
+### iOS Installation - when projects made without react-native init
+Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
+
+```
+source 'https://github.com/cocoapods/specs'
+
+# min version for TwilioVoice to work
+platform :ios, '8.1'
+
+target <YOUR_TARGET> do
+    ...
+    pod 'TwilioVoice', '~> 2.0.0'
+    pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
+    ...
+end
+
+```
+
+run `pod install` from inside your project `ios` directory
 
 ### CallKit
 
@@ -148,8 +166,6 @@ In your `AndroidManifest.xml`
 
 ```xml
     .....
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
 

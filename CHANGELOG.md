@@ -1,5 +1,42 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.18.1
+- Validate token type before calling native module
+
+## 3.18.0
+- avoid keeping the screen on when a call is received with a locked device
+- remove PowerManager wakelock pattern
+
+## 3.17.0
+- disconnect any existing calls when the app is terminated
+- Android: Twilio Voice SDK 2.0.6
+- iOS: Twilio Voice SDK 2.0.4
+
+## 3.16.0
+- Android: Twilio Voice SDK 2.0.5
+
+## 3.15.0
+- init notifications channel before showing call in progress notification
+- add cocoapods support to install iOS native package
+
+## 3.14.0
+- Android: start up the app in fullscreen for incoming calls
+- Android: pass call params to disconnect event when ignoring a call
+- Android: pass call params to disconnect event when rejecting a call
+
+## 3.13.1
+- Android: Twilio Voice SDK 2.0.4
+
+## 3.13.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.2
+
+## 3.12.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta21
+- iOS: handle events when a call is put on hold
+
+## 3.11.0
+- iOS: the library is compatible with Twilio Voice SDK 2.0.0-beta20
+
 ## 3.10.0
 - fix crash on Oreo abandonAudioFocusRequest()
 

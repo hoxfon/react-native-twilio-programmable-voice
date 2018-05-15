@@ -135,7 +135,7 @@ public class CallNotificationManager {
         /*
          * Create the notification shown in the notification drawer
          */
-        initIncomingCallChannel(notificationManager);
+        initCallNotificationsChannel(notificationManager);
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
@@ -182,7 +182,7 @@ public class CallNotificationManager {
         TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+callInvite.getCallSid(), notificationId);
     }
 
-    public void initIncomingCallChannel(NotificationManager notificationManager) {
+    public void initCallNotificationsChannel(NotificationManager notificationManager) {
         if (Build.VERSION.SDK_INT < 26) {
             return;
         }
@@ -301,6 +301,8 @@ public class CallNotificationManager {
 
         notification.addAction(0, "HANG UP", pendingHangupIntent);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        // Create notifications channel (required for API > 25)
+        initCallNotificationsChannel(notificationManager);
         notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
     }
 
