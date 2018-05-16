@@ -373,7 +373,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         // Ignored, required to implement ActivityEventListener for RN 0.33
     }
 
-    private void handleIncomingCallIntent(Intent intent) {
+    public void handleIncomingCallIntent(Intent intent) {
         if (intent == null || intent.getAction() == null) {
             Log.e(TAG, "handleIncomingCallIntent intent is null");
             return;
