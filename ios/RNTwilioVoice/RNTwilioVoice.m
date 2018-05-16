@@ -103,7 +103,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
     [self.call disconnect];
   } else {
     NSUUID *uuid = [NSUUID UUID];
-    NSString *handle = [params valueForKey:@"To"];
+    NSString *handle = [params valueForKey:@"Fullname"];
     _callParams = [[NSMutableDictionary alloc] initWithDictionary:params];
     [self performStartCallActionWithUUID:uuid handle:handle];
   }
@@ -309,7 +309,6 @@ RCT_REMAP_METHOD(getActiveCall,
         }
     };
    
-    // RCTAsyncLocalStorage *storage = [RCTAsyncLocalStorage new];
     RCTAsyncLocalStorage *storage = [[RCTAsyncLocalStorage alloc] init];
     
     dispatch_async(storage.methodQueue, ^{
@@ -320,16 +319,6 @@ RCT_REMAP_METHOD(getActiveCall,
             NSLog(@"twilio: %@", exception.reason);
         }
     });
-    
-    /* dispatch_async(storage.methodQueue, ^{
-        if ([storage respondsToSelector:@selector(getAllKeys:)]) {
-            [storage performSelector:@selector(getAllKeys:) withObject:^(NSArray* response){
-                NSLog(@"twilio: Contents: %@",response);
-            }];
-        } else {
-            NSLog(@"twilio: storage does not respond to selector `getAllKeys:`");
-        }
-    }); */
 }
 
 #pragma mark - TVONotificationDelegate
