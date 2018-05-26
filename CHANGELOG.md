@@ -1,5 +1,9 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.19.0
+- upgrade com.twilio:voice-android to 2.0.7
+- upgrade firebase-messaging to 17.+
+
 ## 3.18.1
 - Validate token type before calling native module
 
