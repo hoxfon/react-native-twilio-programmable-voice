@@ -223,7 +223,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                 new MainReactPackage(),
-                new TwilioVoicePackage() // <---- Add the Package(you can also put false if you wish to handle mic permissions yourself)
+                new TwilioVoicePackage()         // <---- Add the Package : by default it will ask microphone permissions
+                // new TwilioVoicePackage(false) // <---- pass false to handle microphone permissions in your application
             );
         }
     };
@@ -374,7 +375,6 @@ TwilioVoice.getActiveCall()
             _deviceDidReceiveIncoming(incomingCall)
         }
     })
-
 ```
 
 ## Twilio Voice SDK reference
