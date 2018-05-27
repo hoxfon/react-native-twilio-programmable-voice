@@ -24,7 +24,7 @@ Before you start, I strongly suggest that you read the list of Twilio changes fr
 These are all the changes required:
 
 - remove all the GCM related code from your `AndroidManifest.xml` and add the following code to receive `FCM` notifications
-(I wasn't succesful in keeping react-native-fcm working at the same time. If you know how please open an issue to share).
+(I wasn't successful in keeping react-native-fcm working at the same time. If you know how please open an issue to share).
 
 ```xml
     .....
@@ -50,7 +50,7 @@ These are all the changes required:
     <!-- Twilio Voice -->
 ```
 
-- log into your Firebase console. Naviagete to: Project settings > CLOUD MESSANGING. Copy your `Server key`
+- log into your Firebase console. Navigate to: Project settings > CLOUD MESSAGING. Copy your `Server key`
 - in Twilio console add a new Push Credential, type `FCM`, fcm secret Firebase FCM `Server key`
 - include in your project `google-services.json`; if you have not include it yet
 - rename getIncomingCall() to getActiveCall()
