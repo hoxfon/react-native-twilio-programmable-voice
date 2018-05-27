@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.20.1
+- iOS: fix crash when callSid is nil for CallInviteCanceled
+
 ## 3.20.0
 - Android: option to opt out microphone permission request
 
