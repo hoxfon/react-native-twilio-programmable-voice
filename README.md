@@ -153,9 +153,6 @@ dependencies {
     ...
 
     compile project(':react-native-twilio-programmable-voice')
-    compile ('com.google.android.gms:play-services-gcm:10.+') {
-        force = true;
-    }
 }
 
 // this plugin looks for google-services.json in your project
