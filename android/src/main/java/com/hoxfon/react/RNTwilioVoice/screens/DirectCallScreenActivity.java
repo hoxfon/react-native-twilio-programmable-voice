@@ -1,0 +1,99 @@
+package com.hoxfon.react.RNTwilioVoice.screens;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import com.facebook.react.ReactActivity;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
+import com.hoxfon.react.RNTwilioVoice.R;
+import com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule;
+
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
+
+/**
+ * Created by estebanabait on 6/6/18.
+ */
+
+public class DirectCallScreenActivity extends ReactActivity {
+
+  public static String TAG = "RNTwilioVoice.DirectCallScreen";
+  private DirectCallScreenActivity.DirectCallBroadcastReceiver directCallBroadcastReceiver;
+  private boolean isReceiverRegistered = false;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    getWindow().addFlags(
+        WindowManager.LayoutParams.FLAG_FULLSCREEN
+            | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+    );
+
+    setContentView(R.layout.activity_direct_call);
+
+    final ReactContext reactContext = getReactInstanceManager().getCurrentReactContext();
+
+    directCallBroadcastReceiver = new DirectCallScreenActivity.DirectCallBroadcastReceiver();
+    registerReceiver();
+
+    Button disconnectCallBtn = (Button) findViewById(R.id.disconnect_call_btn);
+    disconnectCallBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent intent = new Intent(ACTION_HANGUP_CALL);
+        LocalBroadcastManager.getInstance(reactContext).sendBroadcast(intent);
+        finish();
+      }
+    });
+  }
+
+  @Override protected void onPause() {
+    super.onPause();
+    if (isReceiverRegistered) {
+      LocalBroadcastManager.getInstance(
+          getReactInstanceManager().getCurrentReactContext()
+      ).unregisterReceiver(directCallBroadcastReceiver);
+    }
+  }
+
+  private class DirectCallBroadcastReceiver extends BroadcastReceiver {
+
+    @Override public void onReceive(Context context, Intent intent) {
+
+      String action = intent.getAction();
+      Log.d(TAG, "ACTION RECEIVED " + action);
+      if (action.equals(ACTION_DISCONNECTED_CALL)) {
+        finish();
+      }
+
+    }
+  }
+
+  /**
+   * Register the Voice broadcast receiver
+   */
+  private void registerReceiver() {
+
+    if (!isReceiverRegistered) {
+      IntentFilter intentFilter = new IntentFilter();
+      intentFilter.addAction(ACTION_DISCONNECTED_CALL);
+
+      LocalBroadcastManager.getInstance(getReactInstanceManager().getCurrentReactContext())
+          .registerReceiver(directCallBroadcastReceiver, intentFilter);
+
+      isReceiverRegistered = true;
+    }
+  }
+
+}
