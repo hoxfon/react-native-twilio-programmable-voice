@@ -51,6 +51,8 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Bundle data: " + remoteMessage.getData());
         }
 
+        Log.d(TAG, "Incoming notification: " + remoteMessage.getData());
+
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Map<String, String> data = remoteMessage.getData();
