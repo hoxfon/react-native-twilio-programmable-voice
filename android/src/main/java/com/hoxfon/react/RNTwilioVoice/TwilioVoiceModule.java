@@ -31,6 +31,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.hoxfon.react.RNTwilioVoice.screens.AutomaticCallScreenActivity;
 import com.hoxfon.react.RNTwilioVoice.screens.DirectCallScreenActivity;
 import com.hoxfon.react.RNTwilioVoice.screens.UnlockScreenActivity;
 import com.twilio.voice.Call;
@@ -72,6 +73,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String ACTION_HANGUP_CALL   = "com.hoxfon.react.TwilioVoice.HANGUP_CALL";
     public static final String ACTION_DISCONNECTED_CALL  = "com.hoxfon.react.TwilioVoice.DISCONNECTED_CALL";
     public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "com.hoxfon.react.TwilioVoice.CLEAR_MISSED_CALLS_COUNT";
+    public static final String ACTION_ALLOW_VISITOR = "com.hoxfon.react.TwilioVoice.ALLOW_VISITOR";
+    public static final String ACTION_REJECT_VISITOR = "com.hoxfon.react.TwilioVoice.REJECT_VISITOR";
 
     public static final String CALL_SID_KEY = "CALL_SID";
     public static final String INCOMING_NOTIFICATION_PREFIX = "Incoming_";
@@ -282,6 +285,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             intentFilter.addAction(ACTION_ACCEPTED_CALL);
             intentFilter.addAction(ACTION_REJECTED_CALL);
             intentFilter.addAction(ACTION_HANGUP_CALL);
+            intentFilter.addAction(ACTION_ALLOW_VISITOR);
+            intentFilter.addAction(ACTION_REJECT_VISITOR);
             LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(
                 voiceBroadcastReceiver, intentFilter);
             isReceiverRegistered = true;
@@ -411,6 +416,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 sharedPrefEditor.commit();
             } else if (action.equals(ACTION_HANGUP_CALL)) {
                 disconnect();
+            } else if (action.equals(ACTION_ALLOW_VISITOR)) {
+                sendDigits("1");
+            } else if (action.equals(ACTION_REJECT_VISITOR)) {
+                sendDigits("2");
             } else {
                 Log.e(TAG, "received broadcast unhandled action " + action);
             }
@@ -468,6 +477,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             String from = activeCallInvite.getFrom();
             if (from != null && from.toLowerCase().contains("client:")) {
                 spawnActivity(getCurrentActivity(), DirectCallScreenActivity.class);
+            } else if (from != null) {
+                spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class);
             }
         } else {
             if (BuildConfig.DEBUG) {
