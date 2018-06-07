@@ -137,13 +137,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
          * Needed for setting/abandoning audio focus during a call
          */
         audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
-
-        /*
-         * Ensure the microphone permission is enabled
-         */
-        //if (shouldAskForMicPermission && !checkPermissionForMicrophone()) {
-        //    requestPermissionForMicrophone();
-        //}
     }
 
     @Override
@@ -431,10 +424,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             return;
         }
 
-        if(!checkPermissionForMicrophone()) {
-            promise.reject(new AssertionException("Can't init without microphone permission"));
-        }
-
         TwilioVoiceModule.this.accessToken = accessToken;
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "initWithAccessToken ACTION_FCM_TOKEN");
@@ -570,18 +559,4 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
     }
 
-    private boolean checkPermissionForMicrophone() {
-        int resultMic = ContextCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        return resultMic == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestPermissionForMicrophone() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
-            //            Snackbar.make(coordinatorLayout,
-            //                    "Microphone permissions needed. Please allow in your application settings.",
-            //                    SNACKBAR_DURATION).show();
-        } else {
-            ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
-        }
-    }
 }
