@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/RelativeLayout01"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/background"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    >
   <LinearLayout
+      android:id="@+id/headerContainer"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
@@ -36,30 +38,41 @@
         />
   </LinearLayout>
   <LinearLayout
+      android:id="@+id/actionsContainer"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:gravity="bottom|center"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:gravity="center"
       android:orientation="vertical"
       >
     <Button
-        android:id="@+id/allow_visitor_btn"
+        android:id="@+id/speaker_btn"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:drawablePadding="5pt"
+        android:drawableTop="@drawable/speaker_off"
+        android:paddingBottom="30pt"
+        android:text="Altavoz"
+        android:textColor="@android:color/white"
+        />
+    <Button
+        android:id="@+id/allow_visitor_btn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5pt"
         android:layout_marginLeft="10pt"
         android:layout_marginRight="10pt"
-        android:background="@color/white"
-        android:text="1. Permitir el ingreso"
-        android:textColor="@color/iris"
+        android:background="@drawable/accept_visitor_btn"
         />
     <Button
         android:id="@+id/reject_visitor_btn"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@android:color/transparent"
-        android:text="2. Rechazar el ingreso"
-        android:textColor="@color/white"
+        android:layout_marginBottom="5pt"
+        android:layout_marginEnd="10pt"
+        android:layout_marginLeft="10pt"
+        android:background="@drawable/reject_visitor_btn"
         />
   </LinearLayout>
 </RelativeLayout>

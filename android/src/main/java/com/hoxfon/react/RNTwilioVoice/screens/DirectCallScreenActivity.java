@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -11,13 +12,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import com.facebook.react.ReactActivity;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.hoxfon.react.RNTwilioVoice.R;
-import com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_OFF;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_ON;
 
 /**
  * Created by estebanabait on 6/6/18.
@@ -28,6 +29,7 @@ public class DirectCallScreenActivity extends ReactActivity {
   public static String TAG = "RNTwilioVoice.DirectCallScreen";
   private DirectCallScreenActivity.DirectCallBroadcastReceiver directCallBroadcastReceiver;
   private boolean isReceiverRegistered = false;
+  private boolean isSpeakerOn = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,23 @@ public class DirectCallScreenActivity extends ReactActivity {
 
     directCallBroadcastReceiver = new DirectCallScreenActivity.DirectCallBroadcastReceiver();
     registerReceiver();
+
+    Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
+    speakerBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        String action;
+        toggleSpeaker();
+        if (isSpeakerOn()) {
+          action = ACTION_SPEAKER_ON;
+        } else {
+          action = ACTION_SPEAKER_OFF;
+        }
+        updateSpeakerButton();
+        Intent intent = new Intent(action);
+        LocalBroadcastManager.getInstance(reactContext).sendBroadcast(intent);
+      }
+    });
 
     Button disconnectCallBtn = (Button) findViewById(R.id.disconnect_call_btn);
     disconnectCallBtn.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +113,31 @@ public class DirectCallScreenActivity extends ReactActivity {
 
       isReceiverRegistered = true;
     }
+  }
+
+  private void toggleSpeaker() {
+    this.isSpeakerOn = !this.isSpeakerOn;
+  }
+
+  private boolean isSpeakerOn() {
+    return this.isSpeakerOn;
+  }
+
+  private void updateSpeakerButton() {
+    Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
+    int resourceId;
+    if (isSpeakerOn()) {
+      resourceId = R.drawable.speaker_on;
+    } else {
+      resourceId = R.drawable.speaker_off;
+    }
+    Drawable top = getResources().getDrawable(resourceId);
+    speakerBtn.setCompoundDrawablesWithIntrinsicBounds(
+        null,
+        top,
+        null,
+        null
+    );
   }
 
 }

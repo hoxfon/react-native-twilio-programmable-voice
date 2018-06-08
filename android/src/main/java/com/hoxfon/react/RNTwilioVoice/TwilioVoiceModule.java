@@ -75,6 +75,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "com.hoxfon.react.TwilioVoice.CLEAR_MISSED_CALLS_COUNT";
     public static final String ACTION_ALLOW_VISITOR = "com.hoxfon.react.TwilioVoice.ALLOW_VISITOR";
     public static final String ACTION_REJECT_VISITOR = "com.hoxfon.react.TwilioVoice.REJECT_VISITOR";
+    public static final String ACTION_SPEAKER_ON = "com.hoxfon.react.TwilioVoice.SPEAKER_ON";
+    public static final String ACTION_SPEAKER_OFF = "com.hoxfon.react.TwilioVoice.SPEAKER_OFF";
 
     public static final String CALL_SID_KEY = "CALL_SID";
     public static final String INCOMING_NOTIFICATION_PREFIX = "Incoming_";
@@ -287,6 +289,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             intentFilter.addAction(ACTION_HANGUP_CALL);
             intentFilter.addAction(ACTION_ALLOW_VISITOR);
             intentFilter.addAction(ACTION_REJECT_VISITOR);
+            intentFilter.addAction(ACTION_SPEAKER_ON);
+            intentFilter.addAction(ACTION_SPEAKER_OFF);
             LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(
                 voiceBroadcastReceiver, intentFilter);
             isReceiverRegistered = true;
@@ -425,6 +429,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 sendDigits("1");
             } else if (action.equals(ACTION_REJECT_VISITOR)) {
                 sendDigits("2");
+            } else if (action.equals(ACTION_SPEAKER_ON)) {
+                setSpeakerPhone(true);
+            } else if (action.equals(ACTION_SPEAKER_OFF)) {
+                setSpeakerPhone(false);
             } else {
                 Log.e(TAG, "received broadcast unhandled action " + action);
             }
@@ -435,7 +443,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public void initWithAccessToken(final String accessToken, Promise promise) {
         Log.d(TAG, "INIT ACCESS WITH TOKEN");
 
-        if (accessToken.equals("")) {
+        if (accessToken == null || accessToken.equals("")) {
             Log.e(TAG, "Invalid access token");
             promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
             return;
