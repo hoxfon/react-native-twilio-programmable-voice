@@ -339,6 +339,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             return;
         }
 
+        if (!checkPermissionForMicrophone()) {
+            Log.e(TAG, "Permissions for microphone have been disabled");
+            return;
+        }
+
         if (intent.getAction().equals(ACTION_INCOMING_CALL)) {
             activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
 
@@ -428,8 +433,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void initWithAccessToken(final String accessToken, Promise promise) {
+        Log.d(TAG, "INIT ACCESS WITH TOKEN");
+
         if (accessToken.equals("")) {
+            Log.e(TAG, "Invalid access token");
             promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
+            return;
+        }
+
+        if(!checkPermissionForMicrophone()) {
+            Log.e(TAG, "Can't init without microphone permission");
+            promise.reject(new AssertionException("Can't init without microphone permission"));
             return;
         }
 
@@ -457,11 +471,16 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private void registerForCallInvites() {
         FirebaseApp.initializeApp(getReactApplicationContext());
         final String fcmToken = FirebaseInstanceId.getInstance().getToken();
+
+        Log.d(TAG, "FCM Token: " + fcmToken);
+
         if (fcmToken != null) {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "Registering with FCM");
             }
             Voice.register(getReactApplicationContext(), accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
+        } else {
+            Log.e(TAG, "Empty FCM token");
         }
     }
 
@@ -518,6 +537,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         // TODO check whether it is necessary to call setAudioFocus again
         //        setAudioFocus();
         audioManager.setSpeakerphoneOn(value);
+    }
+
+    private boolean checkPermissionForMicrophone() {
+        int resultMic = ContextCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.RECORD_AUDIO);
+        return resultMic == PackageManager.PERMISSION_GRANTED;
     }
 
     private void setAudioFocus() {

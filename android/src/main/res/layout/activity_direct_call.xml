@@ -15,6 +15,7 @@
         android:layout_margin="10pt"
         android:layout_marginTop="20pt"
         android:gravity="center_horizontal"
+        android:paddingTop="20pt"
         android:text="LLAMADA DE VOZ DE KEENVIL"
         android:textAlignment="center"
         android:textColor="@color/white"
@@ -30,8 +31,8 @@
         android:text="SEGURIDAD"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textStyle="bold"
         android:textSize="14pt"
+        android:textStyle="bold"
         />
   </LinearLayout>
   <LinearLayout

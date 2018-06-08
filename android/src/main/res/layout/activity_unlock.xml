@@ -1,46 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/RelativeLayout01"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout01"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/background"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-  <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_margin="10pt"
-      android:layout_marginTop="20pt"
-      android:gravity="center_horizontal"
-      android:text="LLAMADA DE VOZ DE KEENVIL"
-      android:textAlignment="center"
-      android:textColor="@color/white"
-      android:textSize="8pt"
-      />
+    android:paddingTop="40pt"
+    >
   <LinearLayout
+      android:id="@+id/container"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:gravity="bottom|center"
       android:orientation="vertical"
-      android:paddingBottom="20pt"
       >
-    <Button
-        android:id="@+id/accept_call_btn"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5pt"
-        android:layout_marginLeft="10pt"
-        android:layout_marginRight="10pt"
-        android:background="@color/white"
-        android:text="Aceptar"
-        android:textColor="@color/iris"
-        />
-    <Button
-        android:id="@+id/reject_call_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Rechazar"
+        android:gravity="center_horizontal"
+        android:text="LLAMADA DE VOZ DE KEENVIL"
+        android:textAlignment="center"
         android:textColor="@color/white"
-        android:background="@android:color/transparent"
+        android:textSize="8pt"
         />
+    <RelativeLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="20pt"
+        android:paddingLeft="20pt"
+        android:paddingRight="20pt"
+        >
+
+      <Button
+          android:id="@+id/reject_call_btn"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:background="@android:color/transparent"
+          android:drawablePadding="5pt"
+          android:drawableTop="@drawable/reject_call_btn"
+          android:text="Rechazar"
+          android:textColor="@android:color/white"
+          />
+      <Button
+          android:id="@+id/accept_call_btn"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:layout_alignParentEnd="true"
+          android:layout_alignParentRight="true"
+          android:background="@android:color/transparent"
+          android:drawablePadding="5pt"
+          android:drawableTop="@drawable/accept_call_btn"
+          android:text="Aceptar"
+          android:textColor="@android:color/white"
+          />
+    </RelativeLayout>
   </LinearLayout>
 </RelativeLayout>

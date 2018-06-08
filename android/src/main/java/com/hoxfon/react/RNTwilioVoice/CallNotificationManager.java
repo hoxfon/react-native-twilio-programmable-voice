@@ -151,7 +151,7 @@ public class CallNotificationManager {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-            .setSmallIcon(R.drawable.ic_call_missed_white_24dp)
+            .setSmallIcon(R.drawable.ic_call_black_24dp)
             .setContentTitle("Llamada perdida")
             .setContentText("Keenvil")
             .setAutoCancel(true)
