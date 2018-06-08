@@ -14,6 +14,7 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -84,6 +85,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final int MISSED_CALLS_NOTIFICATION_ID = 1;
     public static final int HANGUP_NOTIFICATION_ID = 11;
     public static final int CLEAR_MISSED_CALLS_NOTIFICATION_ID = 21;
+
+    private String savedDigit = null;
 
     public static final String PREFERENCE_KEY = "com.hoxfon.react.TwilioVoice.PREFERENCE_FILE_KEY";
 
@@ -213,12 +216,19 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (call != null) {
                     activeCall = call;
                 }
+
+                if (savedDigit != null) {
+                    sendDigits(savedDigit);
+                    savedDigit = null;
+                }
             }
 
             @Override
             public void onDisconnected(Call call, CallException error) {
                 unsetAudioFocus();
                 callAccepted = false;
+
+                Log.d(TAG, "Call has been disconnected");
 
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "call disconnected");
@@ -348,10 +358,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             return;
         }
 
-        if (intent.getAction().equals(ACTION_INCOMING_CALL)) {
+        if (intent.getAction().equals(ACTION_INCOMING_CALL) && !callAccepted) {
             activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
 
-            if (activeCallInvite != null && (activeCallInvite.getState() == CallInvite.State.PENDING)) {
+            if (activeCallInvite != null
+                && (activeCallInvite.getState() == CallInvite.State.PENDING)) {
                 callAccepted = false;
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "handleIncomingCallIntent state = PENDING");
@@ -536,8 +547,13 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     public void sendDigits(String digits) {
+        Log.d(TAG, "Digits to send " + digits);
         if (activeCall != null) {
+            Log.d(TAG, "Send digits" + digits);
             activeCall.sendDigits(digits);
+        } else if (activeCallInvite != null) {
+            Log.d(TAG, "Save digits " + digits);
+            savedDigit = digits;
         }
     }
 
