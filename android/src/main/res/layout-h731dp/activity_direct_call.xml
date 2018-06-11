@@ -8,16 +8,15 @@
   <LinearLayout
       android:id="@+id/headerContainer"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:orientation="vertical"
       >
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10pt"
         android:layout_marginTop="20pt"
         android:gravity="center_horizontal"
-        android:paddingTop="20pt"
+        android:paddingTop="10pt"
         android:text="LLAMADA DE VOZ DE KEENVIL"
         android:textAlignment="center"
         android:textColor="@color/white"
@@ -27,7 +26,6 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10pt"
         android:layout_marginTop="20pt"
         android:gravity="center_horizontal"
         android:text="SEGURIDAD"
@@ -37,6 +35,13 @@
         android:textStyle="bold"
         />
   </LinearLayout>
+  <ImageView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/headerContainer"
+      android:src="@drawable/guard_icon"
+      android:contentDescription="Keenvil Seguridad"
+      />
   <LinearLayout
       android:id="@+id/actionsContainer"
       android:layout_width="match_parent"
@@ -44,7 +49,7 @@
       android:layout_alignParentBottom="true"
       android:gravity="center"
       android:orientation="vertical"
-      android:paddingBottom="20pt"
+      android:paddingBottom="10pt"
       >
     <Button
         android:id="@+id/speaker_btn"
