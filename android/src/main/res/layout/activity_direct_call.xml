@@ -52,7 +52,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
         android:drawablePadding="5pt"
-        android:drawableTop="@drawable/speaker_off"
+        android:drawableTop="@drawable/speaker_on"
         android:paddingBottom="10pt"
         android:text="Altavoz"
         android:textColor="@android:color/white"

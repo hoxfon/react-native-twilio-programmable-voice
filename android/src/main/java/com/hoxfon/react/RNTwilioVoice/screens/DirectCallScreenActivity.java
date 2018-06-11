@@ -127,9 +127,9 @@ public class DirectCallScreenActivity extends ReactActivity {
     Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
     int resourceId;
     if (isSpeakerOn()) {
-      resourceId = R.drawable.speaker_on;
-    } else {
       resourceId = R.drawable.speaker_off;
+    } else {
+      resourceId = R.drawable.speaker_on;
     }
     Drawable top = getResources().getDrawable(resourceId);
     speakerBtn.setCompoundDrawablesWithIntrinsicBounds(
