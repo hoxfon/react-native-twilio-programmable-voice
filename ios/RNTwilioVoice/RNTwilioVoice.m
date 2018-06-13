@@ -93,8 +93,6 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
 RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
   NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
 
-  //  [TwilioVoice setLogLevel:TVOLogLevelVerbose];
-
   UIDevice* device = [UIDevice currentDevice];
   device.proximityMonitoringEnabled = YES;
 
