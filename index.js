@@ -1,8 +1,11 @@
 import {
     NativeModules,
     NativeEventEmitter,
-    Platform
+    Platform,
 } from 'react-native'
+
+const ANDROID = 'android'
+const IOS = 'ios'
 
 const TwilioVoice = NativeModules.RNTwilioVoice
 
@@ -19,11 +22,30 @@ const _eventHandlers = {
 }
 
 const Twilio = {
-    initWithToken(token) {
-        return TwilioVoice.initWithAccessToken(token)
+    // initialize the library with Twilio access token
+    // return {initialized: true} when the initialization started
+    // Listen to deviceReady and deviceNotReady events to see whether
+    // the initialization succeeded
+    async initWithToken(token) {
+        if (typeof token !== 'string') {
+            return {
+                initialized: false,
+                err:         'Invalid token, token must be a string'
+            }
+        };
+
+        const result = await TwilioVoice.initWithAccessToken(token)
+        // native react promise present only for Android
+        // iOS initWithAccessToken doesn't return
+        if (Platform.OS === IOS) {
+            return {
+                initialized: true,
+            }
+        }
+        return result
     },
     initWithTokenUrl(url) {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === IOS) {
             TwilioVoice.initWithAccessTokenUrl(url)
         }
     },
@@ -34,19 +56,19 @@ const Twilio = {
         TwilioVoice.disconnect()
     },
     accept() {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === IOS) {
             return
         }
         TwilioVoice.accept()
     },
     reject() {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === IOS) {
             return
         }
         TwilioVoice.reject()
     },
     ignore() {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === IOS) {
             return
         }
         TwilioVoice.ignore()
@@ -61,23 +83,20 @@ const Twilio = {
         TwilioVoice.sendDigits(digits)
     },
     requestPermissions(senderId) {
-        if (Platform.OS === 'android') {
+        if (Platform.OS === ANDROID) {
             TwilioVoice.requestPermissions(senderId)
         }
     },
     getActiveCall() {
-        if (Platform.OS === 'ios') {
-            return
-        }
         return TwilioVoice.getActiveCall()
     },
     configureCallKit(params = {}) {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === IOS) {
             TwilioVoice.configureCallKit(params)
         }
     },
     unregister() {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === IOS) {
             TwilioVoice.unregister()
         }
     },
