@@ -440,9 +440,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 disconnect();
             } else if (action.equals(ACTION_ALLOW_VISITOR)) {
                 sendDigits("1");
-            } else if (action.equals(ACTION_REJECT_VISITOR)) {
-                sendDigits("2");
             } else if (action.equals(ACTION_REQUEST_CALL)) {
+                sendDigits("2");
+            } else if (action.equals(ACTION_REJECT_VISITOR)) {
                 sendDigits("3");
             } else if (action.equals(ACTION_SPEAKER_ON)) {
                 setSpeakerPhone(true);
