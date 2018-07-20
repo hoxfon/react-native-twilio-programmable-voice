@@ -76,6 +76,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "com.hoxfon.react.TwilioVoice.CLEAR_MISSED_CALLS_COUNT";
     public static final String ACTION_ALLOW_VISITOR = "com.hoxfon.react.TwilioVoice.ALLOW_VISITOR";
     public static final String ACTION_REJECT_VISITOR = "com.hoxfon.react.TwilioVoice.REJECT_VISITOR";
+    public static final String ACTION_REQUEST_CALL = "com.hoxfon.react.TwilioVoice.REQUEST_CALL";
     public static final String ACTION_SPEAKER_ON = "com.hoxfon.react.TwilioVoice.SPEAKER_ON";
     public static final String ACTION_SPEAKER_OFF = "com.hoxfon.react.TwilioVoice.SPEAKER_OFF";
 
@@ -299,6 +300,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             intentFilter.addAction(ACTION_HANGUP_CALL);
             intentFilter.addAction(ACTION_ALLOW_VISITOR);
             intentFilter.addAction(ACTION_REJECT_VISITOR);
+            intentFilter.addAction(ACTION_REQUEST_CALL);
             intentFilter.addAction(ACTION_SPEAKER_ON);
             intentFilter.addAction(ACTION_SPEAKER_OFF);
             LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(
@@ -440,6 +442,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 sendDigits("1");
             } else if (action.equals(ACTION_REJECT_VISITOR)) {
                 sendDigits("2");
+            } else if (action.equals(ACTION_REQUEST_CALL)) {
+                sendDigits("3");
             } else if (action.equals(ACTION_SPEAKER_ON)) {
                 setSpeakerPhone(true);
             } else if (action.equals(ACTION_SPEAKER_OFF)) {
