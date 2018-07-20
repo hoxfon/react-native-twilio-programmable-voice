@@ -6,73 +6,82 @@
     android:background="@drawable/background"
     >
   <LinearLayout
-      android:id="@+id/headerContainer"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:orientation="vertical"
-      >
+    android:id="@+id/headerContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10pt"
-        android:layout_marginTop="20pt"
-        android:gravity="center_horizontal"
-        android:paddingTop="20pt"
-        android:text="LLAMADA DE VOZ DE KEENVIL"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="8pt"
-        />
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10pt"
-        android:layout_marginTop="20pt"
-        android:gravity="center_horizontal"
-        android:text="Tienes una visita!"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="14pt"
-        android:textStyle="bold"
-        />
-  </LinearLayout>
-  <LinearLayout
-      android:id="@+id/actionsContainer"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true"
-      android:gravity="center"
-      android:orientation="vertical"
-      >
+      android:layout_margin="10pt"
+      android:layout_marginTop="20pt"
+      android:gravity="center_horizontal"
+      android:paddingTop="20pt"
+      android:text="LLAMADA DE VOZ DE KEENVIL"
+      android:textAlignment="center"
+      android:textColor="@color/white"
+      android:textSize="8pt"
+      />
+    <TextView
+      android:id="@+id/textView"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_margin="10pt"
+      android:layout_marginTop="20pt"
+      android:gravity="center_horizontal"
+      android:text="Tienes una visita!"
+      android:textAlignment="center"
+      android:textColor="@color/white"
+      android:textSize="14pt"
+      android:textStyle="bold"
+      />
+  </LinearLayout>
+  <LinearLayout
+    android:id="@+id/actionsContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    >
     <Button
-        android:id="@+id/speaker_btn"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:drawablePadding="5pt"
-        android:drawableTop="@drawable/speaker_on"
-        android:paddingBottom="30pt"
-        android:text="Altavoz"
-        android:textColor="@android:color/white"
-        />
+      android:id="@+id/speaker_btn"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@android:color/transparent"
+      android:drawablePadding="5pt"
+      android:drawableTop="@drawable/speaker_on"
+      android:paddingBottom="30pt"
+      android:text="Altavoz"
+      android:textColor="@android:color/white"
+      />
     <Button
-        android:id="@+id/allow_visitor_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5pt"
-        android:layout_marginLeft="10pt"
-        android:layout_marginRight="10pt"
-        android:background="@drawable/accept_visitor_btn"
-        />
+      android:id="@+id/allow_visitor_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="5pt"
+      android:layout_marginLeft="10pt"
+      android:layout_marginRight="10pt"
+      android:background="@drawable/accept_visitor_btn"
+      />
     <Button
-        android:id="@+id/reject_visitor_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5pt"
-        android:layout_marginEnd="10pt"
-        android:layout_marginLeft="10pt"
-        android:background="@drawable/reject_visitor_btn"
-        />
+      android:id="@+id/request_call_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="5pt"
+      android:layout_marginEnd="10pt"
+      android:layout_marginLeft="10pt"
+      android:background="@drawable/request_call_btn"
+      />
+    <Button
+      android:id="@+id/reject_visitor_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="5pt"
+      android:layout_marginEnd="10pt"
+      android:layout_marginLeft="10pt"
+      android:background="@drawable/reject_visitor_btn"
+      />
   </LinearLayout>
 </RelativeLayout>

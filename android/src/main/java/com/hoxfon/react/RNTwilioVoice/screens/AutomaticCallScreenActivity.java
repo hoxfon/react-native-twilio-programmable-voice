@@ -18,6 +18,7 @@ import com.hoxfon.react.RNTwilioVoice.R;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ALLOW_VISITOR;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_VISITOR;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REQUEST_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_OFF;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_ON;
 
@@ -81,6 +82,16 @@ public class AutomaticCallScreenActivity extends ReactActivity {
       @Override
       public void onClick(View view) {
         Intent intent = new Intent(ACTION_REJECT_VISITOR);
+        LocalBroadcastManager.getInstance(reactContext).sendBroadcast(intent);
+        finish();
+      }
+    });
+
+    Button callRequestBtn = (Button) findViewById(R.id.call_request_btn);
+    callRequestBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent intent = new Intent(ACTION_REQUEST_CALL);
         LocalBroadcastManager.getInstance(reactContext).sendBroadcast(intent);
         finish();
       }
