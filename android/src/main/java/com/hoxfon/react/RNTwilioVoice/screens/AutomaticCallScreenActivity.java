@@ -87,7 +87,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
       }
     });
 
-    Button callRequestBtn = (Button) findViewById(R.id.call_request_btn);
+    Button callRequestBtn = (Button) findViewById(R.id.request_call_btn);
     callRequestBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
