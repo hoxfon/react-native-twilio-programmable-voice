@@ -782,12 +782,13 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     private void requestPermissionForMicrophone() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
+        // https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/47
+        /* if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
 //            Snackbar.make(coordinatorLayout,
 //                    "Microphone permissions needed. Please allow in your application settings.",
 //                    SNACKBAR_DURATION).show();
         } else {
             ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
-        }
+        } */
     }
 }
