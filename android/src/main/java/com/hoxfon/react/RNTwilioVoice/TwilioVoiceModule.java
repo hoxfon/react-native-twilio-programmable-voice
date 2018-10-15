@@ -23,11 +23,14 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
+import com.facebook.react.bridge.AssertionException;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReadableMap;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -114,7 +117,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public HeadsetManager headsetManager;
     public EventManager eventManager;
 
-    public TwilioVoiceModule(ReactApplicationContext reactContext) {
+    public TwilioVoiceModule(ReactApplicationContext reactContext,
+    boolean shouldAskForMicPermission) {
         super(reactContext);
         if (BuildConfig.DEBUG) {
             Voice.setLogLevel(LogLevel.DEBUG);
@@ -148,7 +152,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         /*
          * Ensure the microphone permission is enabled
          */
-        if (!checkPermissionForMicrophone()) {
+        if (shouldAskForMicPermission && !checkPermissionForMicrophone()) {
             requestPermissionForMicrophone();
         }
     }
@@ -490,7 +494,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (accessToken.equals("")) {
             promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
             return;
-        }
+        }        
+        
+        if(!checkPermissionForMicrophone()) {
+            promise.reject(new AssertionException("Can't init without microphone permission"));
+        }        
 
         TwilioVoiceModule.this.accessToken = accessToken;
         if (BuildConfig.DEBUG) {
@@ -626,11 +634,33 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (params.hasKey("ToName")) {
             toName = params.getString("ToName");
         }
-        // optional parameter that will be delivered to the server
-        if (params.hasKey("CallerId")) {
-            twiMLParams.put("CallerId", params.getString("CallerId"));
+
+        twiMLParams.clear();
+
+        ReadableMapKeySetIterator iterator = params.keySetIterator();
+        while (iterator.hasNextKey()) {
+            String key = iterator.nextKey();
+            ReadableType readableType = params.getType(key);
+            switch (readableType) {
+                case Null:
+                    twiMLParams.put(key, "");
+                    break;
+                case Boolean:
+                    twiMLParams.put(key, String.valueOf(params.getBoolean(key)));
+                    break;
+                case Number:
+                    // Can be int or double.
+                    twiMLParams.put(key, String.valueOf(params.getDouble(key)));
+                    break;
+                case String:
+                    twiMLParams.put(key, params.getString(key));
+                    break;
+                default:
+                    Log.d(TAG, "Could not convert with key: " + key + ".");
+                    break;
+            }
         }
-        twiMLParams.put("To", params.getString("To"));
+
         activeCall = Voice.call(getReactApplicationContext(), accessToken, twiMLParams, callListener);
     }
 

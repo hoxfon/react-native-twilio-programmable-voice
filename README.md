@@ -3,7 +3,7 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.0.6 (bundled within this library)
+- Android 2.0.7 (bundled within this library)
 - iOS 2.0.4 (specified by the app's own podfile)
 
 ## Breaking changes in v3.0.0
@@ -24,7 +24,7 @@ Before you start, I strongly suggest that you read the list of Twilio changes fr
 These are all the changes required:
 
 - remove all the GCM related code from your `AndroidManifest.xml` and add the following code to receive `FCM` notifications
-(I wasn't succesful in keeping react-native-fcm working at the same time. If you know how please open an issue to share).
+(I wasn't successful in keeping react-native-fcm working at the same time. If you know how please open an issue to share).
 
 ```xml
     .....
@@ -50,7 +50,7 @@ These are all the changes required:
     <!-- Twilio Voice -->
 ```
 
-- log into your Firebase console. Naviagete to: Project settings > CLOUD MESSANGING. Copy your `Server key`
+- log into your Firebase console. Navigate to: Project settings > CLOUD MESSAGING. Copy your `Server key`
 - in Twilio console add a new Push Credential, type `FCM`, fcm secret Firebase FCM `Server key`
 - include in your project `google-services.json`; if you have not include it yet
 - rename getIncomingCall() to getActiveCall()
@@ -153,9 +153,6 @@ dependencies {
     ...
 
     compile project(':react-native-twilio-programmable-voice')
-    compile ('com.google.android.gms:play-services-gcm:10.+') {
-        force = true;
-    }
 }
 
 // this plugin looks for google-services.json in your project
@@ -223,7 +220,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                 new MainReactPackage(),
-                new TwilioVoicePackage() // <---- Add the Package
+                new TwilioVoicePackage()         // <---- Add the Package : by default it will ask microphone permissions
+                // new TwilioVoicePackage(false) // <---- pass false to handle microphone permissions in your application
             );
         }
     };
@@ -374,7 +372,6 @@ TwilioVoice.getActiveCall()
             _deviceDidReceiveIncoming(incomingCall)
         }
     })
-
 ```
 
 ## Twilio Voice SDK reference

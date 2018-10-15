@@ -388,7 +388,9 @@ RCT_REMAP_METHOD(getActiveCall,
   [self performEndCallActionWithUUID:callInvite.uuid];
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  [params setObject:self.callInvite.callSid forKey:@"call_sid"];
+  if (self.callInvite.callSid){
+    [params setObject:self.callInvite.callSid forKey:@"call_sid"];
+  }
 
   if (self.callInvite.from){
     [params setObject:self.callInvite.from forKey:@"from"];
