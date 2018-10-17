@@ -5,15 +5,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.ReactContext;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import com.hoxfon.react.RNTwilioVoice.R;
+import com.hoxfon.react.RNTwilioVoice.network.VisitorClient;
+import com.hoxfon.react.RNTwilioVoice.models.Visitor;
+import java.io.InputStream;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ALLOW_VISITOR;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
@@ -21,6 +35,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_VIS
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REQUEST_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_OFF;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_ON;
+
 
 /**
  * Created by estebanabait on 6/7/18.
@@ -31,6 +46,16 @@ public class AutomaticCallScreenActivity extends ReactActivity {
   private AutomaticCallScreenActivity.AutomaticCallBroadcastReceiver automaticCallBroadcastReceiver;
   private boolean isReceiverRegistered = false;
   private boolean isSpeakerOn = false;
+
+  private VisitorClient visitorService;
+
+  /**
+   * Collects all subscriptions to unsubscribe later
+   */
+  private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+  private CardView visitorProfile;
+  private int shortAnimationDuration;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +68,27 @@ public class AutomaticCallScreenActivity extends ReactActivity {
             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
     );
 
+    visitorService = new VisitorClient();
+
     setContentView(R.layout.activity_automatic_call);
 
     final ReactContext reactContext = getReactInstanceManager().getCurrentReactContext();
 
     automaticCallBroadcastReceiver = new AutomaticCallScreenActivity.AutomaticCallBroadcastReceiver();
     registerReceiver();
+    String callSid = getIntent().getStringExtra("CALL_SID");
+    String token = getIntent().getStringExtra("SESSION_TOKEN");
+    
+    visitorProfile = (CardView) findViewById(R.id.visitor_profile);
+
+    // set invisible when started. We'll animate it when the data is ready.
+    visitorProfile.setVisibility(View.GONE);
+    
+    //Retrieve default system animation duration.
+    shortAnimationDuration = getResources().getInteger(
+      android.R.integer.config_shortAnimTime);
+      
+    requestVisitorProfile(token, callSid);
 
     Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
     speakerBtn.setOnClickListener(new View.OnClickListener() {
@@ -116,8 +156,89 @@ public class AutomaticCallScreenActivity extends ReactActivity {
       if (action.equals(ACTION_DISCONNECTED_CALL)) {
         finish();
       }
-
     }
+  }
+
+  private void requestVisitorProfile(final String token, final String callSid) {
+
+    compositeDisposable.add(visitorService.getVisitorInfo(token, callSid)
+      .subscribeOn(Schedulers.io()) // "work" on io thread
+      .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
+      .subscribe(new Consumer<Visitor>() {
+        @Override
+        public void accept(final Visitor visitor) throws Exception {
+            ImageView visitorAvatar = (ImageView) findViewById(R.id.visitor_avatar);
+            ImageDownloader imageDownLoader = new ImageDownloader(visitorAvatar);
+            imageDownLoader.execute("http://assets.qa.keenvil.com/" + visitor.getVisitorAvatarUri());
+            displayVisitorCard(visitor);
+        }
+      })
+    );
+  }
+
+  private void displayVisitorCard(final Visitor visitor) {
+
+    Log.d(TAG, "displayVisitorCard");
+    TextView visitorName = (TextView) findViewById(R.id.visitor_name);
+    visitorName.setText(visitor.getVisitorFullName());
+
+    Log.d(TAG, String.format("displayVisitorCard Name Added: [%s]", visitor.getVisitorFullName()));
+
+    String type = visitor.getProviderType() != null ? visitor.getProviderType()
+    : getRelationshipName(visitor.getRelationship());
+    TextView visitorType = (TextView) findViewById(R.id.visitor_type);
+    visitorType.setText(type);
+
+    Log.d(TAG, String.format("displayVisitorCard Type Added: [%s]", type));
+
+    Uri uri = Uri.parse("http://assets.qa.keenvil.com/" + visitor.getVisitorAvatarUri());
+    ImageView visitorAvatar = (ImageView) findViewById(R.id.visitor_avatar);
+    visitorAvatar.setImageURI(uri);
+
+    Log.d(TAG, String.format("displayVisitorCard Avatar Added: [%s]", uri));
+  }
+
+  private class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+    ImageView bmImage;
+
+    public ImageDownloader(ImageView bmImage) {
+        this.bmImage = bmImage;
+    }
+
+    protected Bitmap doInBackground(String... urls) {
+        String url = urls[0];
+        Bitmap bitmap = null;
+        try {
+            InputStream in = new java.net.URL(url).openStream();
+            bitmap = BitmapFactory.decodeStream(in);
+        } catch (Exception e) {
+            Log.e("MyApp", e.getMessage());
+        }
+        return bitmap;
+    }
+
+    protected void onPostExecute(Bitmap result) {
+        bmImage.setImageBitmap(result);
+
+    visitorProfile.setAlpha(0f);
+    visitorProfile.setVisibility(View.VISIBLE);
+
+    //Fade the Visitor Profile Card in.
+    visitorProfile.animate()
+      .alpha(1f)
+      .setDuration(shortAnimationDuration)
+      .setListener(null);
+    }
+}
+
+  private String getRelationshipName(String relationship) {
+    switch(relationship) {
+      case "FAMILY" :   return "Familiar / Amigo";
+      case "DELIVERY":  return "Delivery";
+      case "SERVICE":   return "Service";
+      case "EMPLOYEE":  return "Empleado";
+    }
+    return "";
   }
 
   /**
@@ -148,9 +269,9 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
     int resourceId;
     if (isSpeakerOn()) {
-      resourceId = R.drawable.speaker_off;
-    } else {
       resourceId = R.drawable.speaker_on;
+    } else {
+      resourceId = R.drawable.speaker_off;
     }
     Drawable top = getResources().getDrawable(resourceId);
     speakerBtn.setCompoundDrawablesWithIntrinsicBounds(
@@ -159,5 +280,11 @@ public class AutomaticCallScreenActivity extends ReactActivity {
         null,
         null
     );
+  }
+
+  @Override
+  protected void onDestroy() {
+    compositeDisposable.clear();
+    super.onDestroy();
   }
 }

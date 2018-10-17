@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -30,6 +31,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.storage.AsyncLocalStorageUtil;
+import com.facebook.react.modules.storage.ReactDatabaseSupplier;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.hoxfon.react.RNTwilioVoice.screens.AutomaticCallScreenActivity;
@@ -44,6 +47,8 @@ import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_NOT_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_READY;
@@ -325,6 +330,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         parent.startActivity(intent);
     }
 
+    private void spawnActivity(Activity parent, Class childActivityClass, Map<String, String> data) {
+        Intent intent = new Intent(parent, childActivityClass);
+        Log.d(TAG, String.format("SpawnActivity Intent %s", intent));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            intent.putExtra(entry.getKey(), entry.getValue());
+        }
+        Log.d(TAG, "SpawnActivity Extra Data Added");
+        parent.startActivity(intent);
+    }
+
     private void showUnlockScreen() {
         final Activity activity = getCurrentActivity();
 
@@ -514,13 +530,29 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "accept() activeCallInvite.getState() PENDING");
             }
+            Log.i(TAG, "accept() activeCallInvite.getState() PENDING");
             activeCallInvite.accept(getReactApplicationContext(), callListener);
 
             String from = activeCallInvite.getFrom();
             if (from != null && from.toLowerCase().contains("client:")) {
                 spawnActivity(getCurrentActivity(), DirectCallScreenActivity.class);
             } else if (from != null) {
-                spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class);
+                Log.i(TAG, "accept() Automatic Call");
+
+                SQLiteDatabase readableDatabase = ReactDatabaseSupplier.getInstance(getReactApplicationContext()).getReadableDatabase();
+                String session = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenvilsession");
+                try {
+                    JSONObject sessionObject = new JSONObject(session);
+                    HashMap<String, String> data = new HashMap<String, String>();
+                    data.put("CALL_SID", activeCallInvite.getCallSid());
+                    Log.i(TAG, String.format("Call Sid: [%s]", activeCallInvite.getCallSid()));
+                    data.put("SESSION_TOKEN", sessionObject.getString("token"));
+                    Log.i(TAG, String.format("Auth token: [%s]", sessionObject.getString("token")));
+                    Log.i(TAG, "accept() Extra Info Added");
+                    spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class, data);
+                } catch (JSONException ex) {
+                    //Do nothing...
+                }
             }
         } else {
             if (BuildConfig.DEBUG) {
