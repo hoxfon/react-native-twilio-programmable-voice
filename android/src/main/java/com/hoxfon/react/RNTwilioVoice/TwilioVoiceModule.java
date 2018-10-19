@@ -120,7 +120,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private ReactContext reactContext;
 
-    public TwilioVoiceModule(ReactApplicationContext reactContext, boolean shouldAskForMicPermission) {
+    public TwilioVoiceModule(ReactApplicationContext reactContext, 
+            boolean shouldAskForMicPermission, String baseUrl, String s3Url) {
         super(reactContext);
         if (BuildConfig.DEBUG) {
             Voice.setLogLevel(LogLevel.DEBUG);
@@ -135,6 +136,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
         eventManager = new EventManager(reactContext);
         callNotificationManager = new CallNotificationManager();
+
+        SharedPreferences sharedPref = getReactApplicationContext().getSharedPreferences("com.hoxfon.react.RNTwilioVoice.config", Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+        sharedPrefEditor.putString("BASE_URL", baseUrl);
+        sharedPrefEditor.putString("S3_URL", s3Url);
+        sharedPrefEditor.commit();
 
         notificationManager = (android.app.NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -530,29 +537,32 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "accept() activeCallInvite.getState() PENDING");
             }
-            Log.i(TAG, "accept() activeCallInvite.getState() PENDING");
             activeCallInvite.accept(getReactApplicationContext(), callListener);
 
             String from = activeCallInvite.getFrom();
             if (from != null && from.toLowerCase().contains("client:")) {
                 spawnActivity(getCurrentActivity(), DirectCallScreenActivity.class);
             } else if (from != null) {
-                Log.i(TAG, "accept() Automatic Call");
+                Log.d(TAG, "accept() Automatic Call");
 
                 SQLiteDatabase readableDatabase = ReactDatabaseSupplier.getInstance(getReactApplicationContext()).getReadableDatabase();
                 String session = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenvilsession");
+                String user = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenviluser");
+                HashMap<String, String> data = new HashMap<String, String>();
+                
                 try {
                     JSONObject sessionObject = new JSONObject(session);
-                    HashMap<String, String> data = new HashMap<String, String>();
+                    JSONObject userObject = new JSONObject(user);
                     data.put("CALL_SID", activeCallInvite.getCallSid());
-                    Log.i(TAG, String.format("Call Sid: [%s]", activeCallInvite.getCallSid()));
+                    Log.d(TAG, String.format("Call Sid: [%s]", activeCallInvite.getCallSid()));
                     data.put("SESSION_TOKEN", sessionObject.getString("token"));
-                    Log.i(TAG, String.format("Auth token: [%s]", sessionObject.getString("token")));
-                    Log.i(TAG, "accept() Extra Info Added");
-                    spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class, data);
+                    Log.d(TAG, String.format("Auth token: [%s]", sessionObject.getString("token")));
+                    Log.d(TAG, "accept() Extra Info Added");
+
                 } catch (JSONException ex) {
-                    //Do nothing...
+                    //Do nothing and spawn the activity with no data.
                 }
+                spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class, data);
             }
         } else {
             if (BuildConfig.DEBUG) {

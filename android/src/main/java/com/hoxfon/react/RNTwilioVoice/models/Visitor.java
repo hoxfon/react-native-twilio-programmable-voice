@@ -4,16 +4,8 @@ public class Visitor {
 
   Visitor() {}
 
-  public Long getId() {
-    return id;
-  }
-
-  public String getInvitation() {
-    return invitation;
-  }
-
-  public String getVisitorFullName() {
-    return visitorFullName;
+  public String getVisitorName() {
+    return visitorName;
   }
 
   public String getVisitorAvatarUri() {
@@ -32,11 +24,7 @@ public class Visitor {
     return relationship;
   }
 
-  private Long id;
-
-  private String invitation;
-
-  private String visitorFullName;
+  private String visitorName;
 
   private String visitorAvatarUri;
 

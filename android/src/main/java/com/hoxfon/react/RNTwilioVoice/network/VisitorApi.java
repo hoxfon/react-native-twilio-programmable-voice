@@ -10,9 +10,9 @@ import com.hoxfon.react.RNTwilioVoice.models.Visitor;
 public interface VisitorApi {
 
   @Headers("content-type: application/json")
-  @GET("visitors/access/call/{callId}")
+  @GET("call/{callId}")
   Observable<Visitor> getVisitorProfile(
-    @Header("X-Authorization") final String token, 
+    @Header("X-Authorization") final String token,
     @Path("callId") final String callId);
 
 }

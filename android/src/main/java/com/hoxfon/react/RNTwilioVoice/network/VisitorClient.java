@@ -1,5 +1,6 @@
 package com.hoxfon.react.RNTwilioVoice.network;
 
+import android.support.v4.BuildConfig;
 import android.util.Log;
 import java.io.IOException;
 import retrofit2.Retrofit;
@@ -15,9 +16,13 @@ public class VisitorClient {
 
   public static String TAG = "RNTwilioVoice";
 
-  public VisitorClient() {
+  public VisitorClient(String baseUrl) {
+
+    baseUrl += "/mailman/";
+
+    Log.d(TAG, String.format("VisitorClient Created: [%s]", baseUrl));
     Retrofit retrofit = new Retrofit.Builder()
-      .baseUrl("http://api.qa.keenvil.com:8080/guard/c/santacatalina/")
+      .baseUrl(baseUrl)
       .addConverterFactory(GsonConverterFactory.create())
       .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
       .build();
@@ -28,7 +33,7 @@ public class VisitorClient {
   public Observable<Visitor> getVisitorInfo(
       final String token, final String callSid) {
 
-    Log.d(TAG, "VisitorCLient.getVisitorInfo called");
+    Log.d(TAG, String.format("VisitorClient.getVisitorInfo called with token [%s] and call ID [%s]", token, callSid));
     return api.getVisitorProfile(token, callSid);
   }
 }

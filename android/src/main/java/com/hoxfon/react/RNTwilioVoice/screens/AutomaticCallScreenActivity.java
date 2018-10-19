@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,6 +24,8 @@ import com.facebook.react.bridge.ReactContext;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import com.hoxfon.react.RNTwilioVoice.R;
 import com.hoxfon.react.RNTwilioVoice.network.VisitorClient;
@@ -56,6 +59,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
   private CardView visitorProfile;
   private int shortAnimationDuration;
+  private String s3Url;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -68,16 +72,18 @@ public class AutomaticCallScreenActivity extends ReactActivity {
             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
     );
 
-    visitorService = new VisitorClient();
-
     setContentView(R.layout.activity_automatic_call);
 
     final ReactContext reactContext = getReactInstanceManager().getCurrentReactContext();
 
+    SharedPreferences sharedPref = reactContext.getSharedPreferences("com.hoxfon.react.RNTwilioVoice.config", MODE_PRIVATE);
+    String baseUrl = sharedPref.getString("BASE_URL", "");
+    s3Url = sharedPref.getString("S3_URL", "");
+
+    visitorService = new VisitorClient(baseUrl);
+
     automaticCallBroadcastReceiver = new AutomaticCallScreenActivity.AutomaticCallBroadcastReceiver();
     registerReceiver();
-    String callSid = getIntent().getStringExtra("CALL_SID");
-    String token = getIntent().getStringExtra("SESSION_TOKEN");
     
     visitorProfile = (CardView) findViewById(R.id.visitor_profile);
 
@@ -87,6 +93,10 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     //Retrieve default system animation duration.
     shortAnimationDuration = getResources().getInteger(
       android.R.integer.config_shortAnimTime);
+
+    String callSid = getIntent().getStringExtra("CALL_SID");
+    String token = getIntent().getStringExtra("SESSION_TOKEN");
+    String community = getIntent().getStringExtra("ACTIVE_COMMUNITY");
       
     requestVisitorProfile(token, callSid);
 
@@ -159,18 +169,30 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     }
   }
 
-  private void requestVisitorProfile(final String token, final String callSid) {
+  private void requestVisitorProfile(final String token,
+      final String callSid) {
 
     compositeDisposable.add(visitorService.getVisitorInfo(token, callSid)
       .subscribeOn(Schedulers.io()) // "work" on io thread
       .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
-      .subscribe(new Consumer<Visitor>() {
+      .subscribeWith(new DisposableObserver<Visitor>() {
         @Override
-        public void accept(final Visitor visitor) throws Exception {
+        public void onNext(final Visitor visitor) {
+            Log.d(TAG, "Accept Visitor Information");
             ImageView visitorAvatar = (ImageView) findViewById(R.id.visitor_avatar);
             ImageDownloader imageDownLoader = new ImageDownloader(visitorAvatar);
-            imageDownLoader.execute("http://assets.qa.keenvil.com/" + visitor.getVisitorAvatarUri());
+            imageDownLoader.execute(String.format("%s/%s", s3Url, visitor.getVisitorAvatarUri()));
             displayVisitorCard(visitor);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+          Log.e(TAG, "Error on request", e);
+        }
+
+        @Override
+        public void onComplete() {
+
         }
       })
     );
@@ -180,9 +202,9 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
     Log.d(TAG, "displayVisitorCard");
     TextView visitorName = (TextView) findViewById(R.id.visitor_name);
-    visitorName.setText(visitor.getVisitorFullName());
+    visitorName.setText(visitor.getVisitorName());
 
-    Log.d(TAG, String.format("displayVisitorCard Name Added: [%s]", visitor.getVisitorFullName()));
+    Log.d(TAG, String.format("displayVisitorCard Name Added: [%s]", visitor.getVisitorName()));
 
     String type = visitor.getProviderType() != null ? visitor.getProviderType()
     : getRelationshipName(visitor.getRelationship());
