@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -30,6 +31,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.storage.AsyncLocalStorageUtil;
+import com.facebook.react.modules.storage.ReactDatabaseSupplier;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.hoxfon.react.RNTwilioVoice.screens.AutomaticCallScreenActivity;
@@ -44,6 +47,8 @@ import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_NOT_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_READY;
@@ -115,7 +120,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private ReactContext reactContext;
 
-    public TwilioVoiceModule(ReactApplicationContext reactContext, boolean shouldAskForMicPermission) {
+    public TwilioVoiceModule(ReactApplicationContext reactContext, 
+            boolean shouldAskForMicPermission, String baseUrl, String s3Url) {
         super(reactContext);
         if (BuildConfig.DEBUG) {
             Voice.setLogLevel(LogLevel.DEBUG);
@@ -130,6 +136,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
         eventManager = new EventManager(reactContext);
         callNotificationManager = new CallNotificationManager();
+
+        SharedPreferences sharedPref = getReactApplicationContext().getSharedPreferences("com.hoxfon.react.RNTwilioVoice.config", Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+        sharedPrefEditor.putString("BASE_URL", baseUrl);
+        sharedPrefEditor.putString("S3_URL", s3Url);
+        sharedPrefEditor.commit();
 
         notificationManager = (android.app.NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -322,6 +334,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private void spawnActivity(Activity parent, Class childActivityClass) {
         Intent intent = new Intent(parent, childActivityClass);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        parent.startActivity(intent);
+    }
+
+    private void spawnActivity(Activity parent, Class childActivityClass, Map<String, String> data) {
+        Intent intent = new Intent(parent, childActivityClass);
+        Log.d(TAG, String.format("SpawnActivity Intent %s", intent));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            intent.putExtra(entry.getKey(), entry.getValue());
+        }
+        Log.d(TAG, "SpawnActivity Extra Data Added");
         parent.startActivity(intent);
     }
 
@@ -520,7 +543,26 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (from != null && from.toLowerCase().contains("client:")) {
                 spawnActivity(getCurrentActivity(), DirectCallScreenActivity.class);
             } else if (from != null) {
-                spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class);
+                Log.d(TAG, "accept() Automatic Call");
+
+                SQLiteDatabase readableDatabase = ReactDatabaseSupplier.getInstance(getReactApplicationContext()).getReadableDatabase();
+                String session = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenvilsession");
+                String user = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenviluser");
+                HashMap<String, String> data = new HashMap<String, String>();
+                
+                try {
+                    JSONObject sessionObject = new JSONObject(session);
+                    JSONObject userObject = new JSONObject(user);
+                    data.put("CALL_SID", activeCallInvite.getCallSid());
+                    Log.d(TAG, String.format("Call Sid: [%s]", activeCallInvite.getCallSid()));
+                    data.put("SESSION_TOKEN", sessionObject.getString("token"));
+                    Log.d(TAG, String.format("Auth token: [%s]", sessionObject.getString("token")));
+                    Log.d(TAG, "accept() Extra Info Added");
+
+                } catch (JSONException ex) {
+                    //Do nothing and spawn the activity with no data.
+                }
+                spawnActivity(getCurrentActivity(), AutomaticCallScreenActivity.class, data);
             }
         } else {
             if (BuildConfig.DEBUG) {
