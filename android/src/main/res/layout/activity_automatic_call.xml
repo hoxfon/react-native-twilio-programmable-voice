@@ -59,9 +59,9 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_below="@+id/visitor_name"
-          android:layout_marginTop="10pt"
-          android:layout_gravity="bottom"
+          android:layout_marginTop="2pt"
           android:maxLines="1"
+          android:gravity="center_horizontal"
           android:textAlignment="center"
           android:textColor="@color/darkGrey"
           android:textSize="14dp" />
@@ -72,8 +72,8 @@
       android:id="@+id/actionsContainer"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:gravity="center_horizontal"
       android:layout_alignParentBottom="true"
-      android:gravity="center"
       android:orientation="vertical">
 
     <Button
@@ -83,6 +83,7 @@
         android:background="@android:color/transparent"
         android:drawableTop="@drawable/speaker_off"
         android:layout_marginBottom="5pt"
+        android:gravity="center_horizontal"
         android:textColor="@android:color/white" />
 
     <Button
@@ -90,6 +91,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5pt"
+        android:gravity="center_horizontal"
         android:background="@drawable/accept_visitor_btn" />
 
     <Button
@@ -97,6 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5pt"
+        android:gravity="center_horizontal"
         android:background="@drawable/request_call_btn" />
 
     <Button
@@ -104,6 +107,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5pt"
+        android:gravity="center_horizontal"
         android:background="@drawable/reject_visitor_btn" />
   </LinearLayout>
 </RelativeLayout>
