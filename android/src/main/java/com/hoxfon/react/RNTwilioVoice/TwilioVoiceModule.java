@@ -544,6 +544,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 spawnActivity(getCurrentActivity(), DirectCallScreenActivity.class);
             } else if (from != null) {
                 Log.d(TAG, "accept() Automatic Call");
+                setSpeakerPhone(false);
 
                 SQLiteDatabase readableDatabase = ReactDatabaseSupplier.getInstance(getReactApplicationContext()).getReadableDatabase();
                 String session = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenvilsession");
