@@ -68,8 +68,14 @@ public class UnlockScreenActivity extends ReactActivity {
     });
   }
 
-  @Override protected void onPause() {
-    super.onPause();
+  @Override protected void onDestroy() {
+    super.onDestroy();
+
+    if (isReceiverRegistered) {
+      LocalBroadcastManager.getInstance(
+          getReactInstanceManager().getCurrentReactContext()
+      ).unregisterReceiver(unlockScreenBroadcastReceiver);
+    }
   }
 
   private class UnlockScreenBroadcastReceiver extends BroadcastReceiver {
