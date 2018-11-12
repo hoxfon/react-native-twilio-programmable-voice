@@ -25,7 +25,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECTED_C
 
 public class UnlockScreenActivity extends ReactActivity {
 
-  public static String TAG = "RNTwilioVoice";
+  public static String TAG = "RNTwilioVoice.unlockScreenActivity";
   private UnlockScreenActivity.UnlockScreenBroadcastReceiver unlockScreenBroadcastReceiver;
   private boolean isReceiverRegistered = false;
 
@@ -44,6 +44,7 @@ public class UnlockScreenActivity extends ReactActivity {
 
     final ReactContext reactContext = getReactInstanceManager().getCurrentReactContext();
     unlockScreenBroadcastReceiver = new UnlockScreenActivity.UnlockScreenBroadcastReceiver();
+    Log.d(TAG, "Register Receiver ");
     registerReceiver();
 
     Button acceptCallBtn = (Button) findViewById(R.id.accept_call_btn);
@@ -67,8 +68,9 @@ public class UnlockScreenActivity extends ReactActivity {
     });
   }
 
-  @Override protected void onPause() {
-    super.onPause();
+  @Override protected void onDestroy() {
+    super.onDestroy();
+
     if (isReceiverRegistered) {
       LocalBroadcastManager.getInstance(
           getReactInstanceManager().getCurrentReactContext()
