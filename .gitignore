@@ -55,3 +55,4 @@ xcuserdata
 *.ipa
 
 ios/Pods
+node_modules
