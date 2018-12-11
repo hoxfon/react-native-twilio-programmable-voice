@@ -29,6 +29,8 @@ import com.facebook.react.bridge.ReadableMap;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -632,11 +634,33 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (params.hasKey("ToName")) {
             toName = params.getString("ToName");
         }
-        // optional parameter that will be delivered to the server
-        if (params.hasKey("CallerId")) {
-            twiMLParams.put("CallerId", params.getString("CallerId"));
+
+        twiMLParams.clear();
+
+        ReadableMapKeySetIterator iterator = params.keySetIterator();
+        while (iterator.hasNextKey()) {
+            String key = iterator.nextKey();
+            ReadableType readableType = params.getType(key);
+            switch (readableType) {
+                case Null:
+                    twiMLParams.put(key, "");
+                    break;
+                case Boolean:
+                    twiMLParams.put(key, String.valueOf(params.getBoolean(key)));
+                    break;
+                case Number:
+                    // Can be int or double.
+                    twiMLParams.put(key, String.valueOf(params.getDouble(key)));
+                    break;
+                case String:
+                    twiMLParams.put(key, params.getString(key));
+                    break;
+                default:
+                    Log.d(TAG, "Could not convert with key: " + key + ".");
+                    break;
+            }
         }
-        twiMLParams.put("To", params.getString("To"));
+
         activeCall = Voice.call(getReactApplicationContext(), accessToken, twiMLParams, callListener);
     }
 
