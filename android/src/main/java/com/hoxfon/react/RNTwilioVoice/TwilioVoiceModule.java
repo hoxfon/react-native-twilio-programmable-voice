@@ -15,6 +15,7 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -38,8 +39,10 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
-import com.google.firebase.FirebaseApp;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
@@ -494,15 +497,16 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (accessToken.equals("")) {
             promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
             return;
-        }        
-        
+        }
+
         if(!checkPermissionForMicrophone()) {
             promise.reject(new AssertionException("Can't init without microphone permission"));
-        }        
+            return;
+        }
 
         TwilioVoiceModule.this.accessToken = accessToken;
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "initWithAccessToken ACTION_FCM_TOKEN");
+            Log.d(TAG, "initWithAccessToken");
         }
         registerForCallInvites();
         WritableMap params = Arguments.createMap();
@@ -533,20 +537,28 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
      * If a valid google-services.json has not been provided or the FirebaseInstanceId has not been
      * initialized the fcmToken will be null.
      *
-     * In the case where the FirebaseInstanceId has not yet been initialized the
-     * VoiceFirebaseInstanceIDService.onTokenRefresh should result in a LocalBroadcast to this
-     * activity which will attempt registerForCallInvites again.
-     *
      */
     private void registerForCallInvites() {
-        FirebaseApp.initializeApp(getReactApplicationContext());
-        final String fcmToken = FirebaseInstanceId.getInstance().getToken();
-        if (fcmToken != null) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Registering with FCM");
-            }
-            Voice.register(getReactApplicationContext(), accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
-        }
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String fcmToken = task.getResult().getToken();
+                        if (fcmToken != null) {
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "Registering with FCM");
+                            }
+                            Voice.register(getReactApplicationContext(), accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
+                        }
+                    }
+                });
+
     }
 
     @ReactMethod
@@ -778,14 +790,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     private void requestPermissionForMicrophone() {
-        if (getCurrentActivity() != null) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
-    //            Snackbar.make(coordinatorLayout,
-    //                    "Microphone permissions needed. Please allow in your application settings.",
-    //                    SNACKBAR_DURATION).show();
-            } else {
-                ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
-            }
+        if (getCurrentActivity() == null) {
+            return;
+        }
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
+//            Snackbar.make(coordinatorLayout,
+//                    "Microphone permissions needed. Please allow in your application settings.",
+//                    SNACKBAR_DURATION).show();
+        } else {
+            ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
         }
     }
 }

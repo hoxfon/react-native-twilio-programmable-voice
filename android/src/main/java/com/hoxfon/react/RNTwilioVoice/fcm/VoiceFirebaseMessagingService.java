@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 
 import android.app.ActivityManager;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,6 +27,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_FCM_TOKEN;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
@@ -41,6 +41,15 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     public void onCreate() {
         super.onCreate();
         callNotificationManager = new CallNotificationManager();
+    }
+
+    @Override
+    public void onNewToken(String token) {
+        Log.d(TAG, "Refreshed token: " + token);
+
+        // Notify Activity of FCM token
+        Intent intent = new Intent(ACTION_FCM_TOKEN);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     /**
