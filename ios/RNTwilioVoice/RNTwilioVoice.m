@@ -298,11 +298,11 @@ RCT_REMAP_METHOD(getActiveCall,
     [params setObject:self.callInvite.callSid forKey:@"call_sid"];
   }
 
-  if (self.callInvite.from){
-    [params setObject:self.callInvite.from forKey:@"from"];
+  if (self.callInvite.from) {
+    [params setObject:self.callInvite.from forKey:@"call_from"];
   }
-  if (self.callInvite.to){
-    [params setObject:self.callInvite.to forKey:@"to"];
+  if (self.callInvite.to) {
+    [params setObject:self.callInvite.to forKey:@"call_to"];
   }
   if (self.callInvite.state == TVOCallInviteStateCanceled) {
     [params setObject:StateDisconnected forKey:@"call_state"];
@@ -332,11 +332,11 @@ RCT_REMAP_METHOD(getActiveCall,
     [callParams setObject:StateConnected forKey:@"call_state"];
   }
 
-  if (call.from){
-    [callParams setObject:call.from forKey:@"from"];
+  if (call.from) {
+    [callParams setObject:call.from forKey:@"call_from"];
   }
-  if (call.to){
-    [callParams setObject:call.to forKey:@"to"];
+  if (call.to) {
+    [callParams setObject:call.to forKey:@"call_to"];
   }
   [self sendEventWithName:@"connectionDidConnect" body:callParams];
 }
@@ -362,12 +362,11 @@ RCT_REMAP_METHOD(getActiveCall,
     if (error.localizedFailureReason) {
       errMsg = [error localizedFailureReason];
     }
-    [params setObject:errMsg forKey:@"error"];
+    [params setObject:errMsg forKey:@"err"];
   }
   if (self.call.sid) {
     [params setObject:self.call.sid forKey:@"call_sid"];
   }
-  if (self.call.to){
     [params setObject:self.call.to forKey:@"call_to"];
   }
   if (self.call.from){
