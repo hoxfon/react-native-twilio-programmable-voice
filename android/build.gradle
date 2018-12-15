@@ -44,7 +44,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.twilio:voice-android:2.0.7'
+    compile 'com.twilio:voice-android:2.0.9'
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.facebook.react:react-native:+'
     compile 'com.google.firebase:firebase-messaging:17.+'
