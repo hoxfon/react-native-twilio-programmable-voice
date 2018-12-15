@@ -122,14 +122,14 @@ RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
   [self toggleAudioRoute:speaker];
 }
 
-RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
+RCT_EXPORT_METHOD(sendDigits: (NSString *)digits) {
   if (self.call && self.call.state == TVOCallStateConnected) {
     NSLog(@"SendDigits %@", digits);
     [self.call sendDigits:digits];
   }
 }
 
-RCT_EXPORT_METHOD(unregister){
+RCT_EXPORT_METHOD(unregister) {
   NSLog(@"unregister");
   NSString *accessToken = [self fetchAccessToken];
 
@@ -148,16 +148,16 @@ RCT_EXPORT_METHOD(unregister){
 
 RCT_REMAP_METHOD(getActiveCall,
                  resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject){
+                 rejecter:(RCTPromiseRejectBlock)reject) {
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   if (self.callInvite) {
-    if (self.callInvite.callSid){
+    if (self.callInvite.callSid) {
       [params setObject:self.callInvite.callSid forKey:@"call_sid"];
     }
-    if (self.callInvite.from){
+    if (self.callInvite.from) {
       [params setObject:self.callInvite.from forKey:@"from"];
     }
-    if (self.callInvite.to){
+    if (self.callInvite.to) {
       [params setObject:self.callInvite.to forKey:@"to"];
     }
     if (self.callInvite.state == TVOCallInviteStatePending) {
@@ -172,10 +172,10 @@ RCT_REMAP_METHOD(getActiveCall,
     if (self.call.sid) {
       [params setObject:self.call.sid forKey:@"call_sid"];
     }
-    if (self.call.to){
+    if (self.call.to) {
       [params setObject:self.call.to forKey:@"call_to"];
     }
-    if (self.call.from){
+    if (self.call.from) {
       [params setObject:self.call.from forKey:@"call_from"];
     }
     if (self.call.state == TVOCallStateConnected) {
@@ -299,7 +299,7 @@ RCT_REMAP_METHOD(getActiveCall,
   [self performEndCallActionWithUUID:callInvite.uuid];
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  if (self.callInvite.callSid){
+  if (self.callInvite.callSid) {
     [params setObject:self.callInvite.callSid forKey:@"call_sid"];
   }
 
@@ -372,9 +372,10 @@ RCT_REMAP_METHOD(getActiveCall,
   if (self.call.sid) {
     [params setObject:self.call.sid forKey:@"call_sid"];
   }
+  if (self.call.to) {
     [params setObject:self.call.to forKey:@"call_to"];
   }
-  if (self.call.from){
+  if (self.call.from) {
     [params setObject:self.call.from forKey:@"call_from"];
   }
   if (self.call.state == TVOCallStateDisconnected) {
