@@ -3,41 +3,15 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.0.7 (bundled within this library)
-- iOS 2.0.4 (specified by the app's own podfile)
+- Android 2.0.9 (bundled within this library)
+- iOS 2.0.7 (specified by the app's own podfile)
 
-## Breaking changes in v3.0.0
 
-- initWitToken returns an object with a property `initialized` instead of `initilized`
-- iOS event `connectionDidConnect` returns the same properties as Android
-move property `to` => `call_to`
-move property `from` => `call_from`
 
-## Migrating Android from v1 to v2 (incoming call use FCM)
+## Breaking changes in v4.0.0
 
-You will need to make changes both on your Twilio account using Twilio Web Console and on your react native app.
-Twilio Programmable Voice Android SDK uses `FCM` since version 2.0.0.beta5.
-
-Before you start, I strongly suggest that you read the list of Twilio changes from Android SDK v2.0.0 beta4 to beta5:
-[Twilio example App: Migrating from GCM to FCM](https://github.com/twilio/voice-quickstart-android/blob/d7d4f0658e145eb94ab8f5e34f6fd17314e7ab17/README.md#migrating-from-gcm-to-fcm)
-
-These are all the changes required:
-
-- remove all the GCM related code from your `AndroidManifest.xml` and add the following code to receive `FCM` notifications
-(I wasn't successful in keeping react-native-fcm working at the same time. If you know how please open an issue to share).
-
+- Android: remove the following block from your application's `AndroidManifest.xml`
 ```xml
-    .....
-
-    <!-- Twilio Voice -->
-    <!-- [START fcm_listener] -->
-    <service
-        android:name="com.hoxfon.react.TwilioVoice.fcm.VoiceFirebaseMessagingService">
-        <intent-filter>
-            <action android:name="com.google.firebase.MESSAGING_EVENT" />
-        </intent-filter>
-    </service>
-    <!-- [END fcm_listener] -->
     <!-- [START instanceId_listener] -->
     <service
         android:name="com.hoxfon.react.TwilioVoice.fcm.VoiceFirebaseInstanceIDService"
@@ -47,15 +21,20 @@ These are all the changes required:
         </intent-filter>
     </service>
     <!-- [END instanceId_listener] -->
-    <!-- Twilio Voice -->
 ```
 
-- log into your Firebase console. Navigate to: Project settings > CLOUD MESSAGING. Copy your `Server key`
-- in Twilio console add a new Push Credential, type `FCM`, fcm secret Firebase FCM `Server key`
-- include in your project `google-services.json`; if you have not include it yet
-- rename getIncomingCall() to getActiveCall()
+- iOS: params changes for `connectionDidConnect` and `connectionDidDisconnect`
 
-If something doesn't work as expected or you want to make a request open an issue.
+    to => call_to
+    from => call_from
+    error => err
+
+## Breaking changes in v3.0.0
+
+- initWitToken returns an object with a property `initialized` instead of `initilized`
+- iOS event `connectionDidConnect` returns the same properties as Android
+move property `to` => `call_to`
+move property `from` => `call_from`
 
 ## Help wanted!
 
@@ -220,8 +199,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                 new MainReactPackage(),
-                new TwilioVoicePackage()         // <---- Add the Package : by default it will ask microphone permissions
-                // new TwilioVoicePackage(false) // <---- pass false to handle microphone permissions in your application
+                new TwilioVoicePackage()         // <---- Add the package
+                // new TwilioVoicePackage(false) // <---- pass false if you don't want to ask for microphone permissions
             );
         }
     };
