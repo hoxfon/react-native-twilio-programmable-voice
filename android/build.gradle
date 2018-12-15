@@ -47,6 +47,6 @@ dependencies {
     compile 'com.twilio:voice-android:2.0.9'
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.facebook.react:react-native:+'
-    compile 'com.google.firebase:firebase-messaging:17.+'
+    compile 'com.google.firebase:firebase-messaging:17.3.4'
     testCompile 'junit:junit:4.12'
 }
