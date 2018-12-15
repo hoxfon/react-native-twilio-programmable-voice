@@ -99,7 +99,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
   device.proximityMonitoringEnabled = YES;
 
   if (self.call && self.call.state == TVOCallStateConnected) {
-    [self.call disconnect];
+    [self performEndCallActionWithUUID:self.call.uuid];
   } else {
     NSUUID *uuid = [NSUUID UUID];
     NSString *handle = [params valueForKey:@"To"];
@@ -357,7 +357,6 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)call:(TVOCall *)call didDisconnectWithError:(NSError *)error {
   NSLog(@"Call disconnected with error: %@", error);
 
-  [self performEndCallActionWithUUID:call.uuid];
   [self callDisconnected:error];
 }
 
