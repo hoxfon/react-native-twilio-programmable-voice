@@ -17,10 +17,8 @@ public class SoundPoolManager {
     private Ringtone ringtone = null;
     private SoundPool soundPool;
     private int disconnectSoundId;
-    private AudioManager audioManager;
 
     private SoundPoolManager(Context context) {
-        audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         Uri ringtoneSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         ringtone = RingtoneManager.getRingtone(context, ringtoneSound);
         int maxStreams = 1;
