@@ -18,15 +18,9 @@ public class SoundPoolManager {
     private SoundPool soundPool;
     private int disconnectSoundId;
     private AudioManager audioManager;
-    private float actualVolume;
-    private float maxVolume;
-    private float volume;
 
     private SoundPoolManager(Context context) {
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
-        //actualVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        //maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        //volume = actualVolume / maxVolume;
         Uri ringtoneSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         ringtone = RingtoneManager.getRingtone(context, ringtoneSound);
         int maxStreams = 1;
