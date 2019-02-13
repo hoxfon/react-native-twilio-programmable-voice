@@ -19,6 +19,7 @@
 @property (nonatomic, strong) void(^callKitCompletionCallback)(BOOL);
 @property (nonatomic, strong) CXProvider *callKitProvider;
 @property (nonatomic, strong) CXCallController *callKitCallController;
+@property (nonatomic, strong) void(^incomingPushCompletionCallback)(void);
 @end
 
 @implementation RNTwilioVoice {
@@ -251,13 +252,23 @@ RCT_REMAP_METHOD(getActiveCall,
   }
 }
 
-- (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type {
+- (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type withCompletionHandler:(void (^)(void))completion {
   NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
+  
+  // Save for later when the notification is properly handled.
+  self.incomingPushCompletionCallback = completion;
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     [TwilioVoice handleNotification:payload.dictionaryPayload
                            delegate:self];
   }
+}
+
+- (void)incomingPushHandled {
+    if (self.incomingPushCompletionCallback) {
+        self.incomingPushCompletionCallback();
+        self.incomingPushCompletionCallback = nil;
+    }
 }
 
 #pragma mark - TVONotificationDelegate
@@ -274,10 +285,12 @@ RCT_REMAP_METHOD(getActiveCall,
   if (self.callInvite && self.callInvite == TVOCallInviteStatePending) {
     NSLog(@"Already a pending incoming call invite.");
     NSLog(@"  >> Ignoring call from %@", callInvite.from);
+    [self incomingPushHandled];
     return;
   } else if (self.call) {
     NSLog(@"Already an active call.");
     NSLog(@"  >> Ignoring call from %@", callInvite.from);
+    [self incomingPushHandled];
     return;
   }
 
@@ -310,6 +323,8 @@ RCT_REMAP_METHOD(getActiveCall,
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
   self.callInvite = nil;
+
+  [self incomingPushHandled];
 }
 
 - (void)notificationError:(NSError *)error {
@@ -575,6 +590,9 @@ RCT_REMAP_METHOD(getActiveCall,
       NSLog(@"EndCallAction transaction request successful");
     }
   }];
+  
+  [self incomingPushHandled];
+
 }
 
 - (void)performVoiceCallWithUUID:(NSUUID *)uuid
