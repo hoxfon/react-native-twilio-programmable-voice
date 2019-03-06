@@ -43,7 +43,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
+  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady", @"deviceDidReceiveIncoming"];
 }
 
 @synthesize bridge = _bridge;
@@ -227,7 +227,14 @@ RCT_REMAP_METHOD(getActiveCall,
                                                    [self sendEventWithName:@"deviceNotReady" body:params];
                                                  } else {
                                                    NSLog(@"Successfully registered for VoIP push notifications.");
-                                                   [self sendEventWithName:@"deviceReady" body:nil];
+                                                   NSMutableString *hexString = [NSMutableString string];
+                                                   NSUInteger voipTokenLength = credentials.token.length;
+                                                   const unsigned char *bytes = credentials.token.bytes;
+                                                   for (NSUInteger i = 0; i < voipTokenLength; i++) {
+                                                     [hexString appendFormat:@"%02x", bytes[i]];
+                                                   }
+
+                                                   [self sendEventWithName:@"deviceReady" body:[hexString copy]];
                                                  }
                                                }];
   }
@@ -257,6 +264,7 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
+    [self sendEventWithName:@"deviceDidReceiveIncoming" body:payload.dictionaryPayload];
     [TwilioVoice handleNotification:payload.dictionaryPayload
                                             delegate:self];
   }
