@@ -3,6 +3,8 @@ package com.hoxfon.react.RNTwilioVoice.fcm;
 import android.annotation.TargetApi;
 
 import android.app.ActivityManager;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
@@ -36,6 +38,11 @@ import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
     private CallNotificationManager callNotificationManager;
+    private FirebaseMessagingService service;
+
+    public VoiceFirebaseMessagingService(FirebaseMessagingService service) {
+        this.service = service != null ? service : this;
+    }
 
     @Override
     public void onCreate() {
@@ -62,7 +69,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
-            Voice.handleMessage(this, data, new MessageListener() {
+            Voice.handleMessage(service, data, new MessageListener() {
 
                 @Override
                 public void onCallInvite(final CallInvite callInvite) {
@@ -74,7 +81,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     handler.post(new Runnable() {
                         public void run() {
                             // Construct and load our normal React JS code bundle
-                            ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                            ReactInstanceManager mReactInstanceManager = ((ReactApplication) service.getApplication()).getReactNativeHost().getReactInstanceManager();
                             ReactContext context = mReactInstanceManager.getCurrentReactContext();
                             // If it's constructed, send a notification
                             if (context != null) {
@@ -126,6 +133,11 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.e(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            Intent notificationEvent = new Intent("notifications-remote-notification");
+            notificationEvent.putExtra("notification", remoteMessage);
+
+            // Broadcast it to the (foreground) RN Application
+            LocalBroadcastManager.getInstance(this).sendBroadcast(notificationEvent);
         }
     }
 
