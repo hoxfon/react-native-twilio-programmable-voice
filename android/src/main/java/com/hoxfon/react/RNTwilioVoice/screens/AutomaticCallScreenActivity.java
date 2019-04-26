@@ -84,12 +84,12 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
     automaticCallBroadcastReceiver = new AutomaticCallScreenActivity.AutomaticCallBroadcastReceiver();
     registerReceiver();
-    
+
     visitorProfile = (CardView) findViewById(R.id.visitor_profile);
 
     // set invisible when started. We'll animate it when the data is ready.
     visitorProfile.setVisibility(View.GONE);
-    
+
     //Retrieve default system animation duration.
     shortAnimationDuration = getResources().getInteger(
       android.R.integer.config_shortAnimTime);
@@ -97,7 +97,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     String callSid = getIntent().getStringExtra("CALL_SID");
     String token = getIntent().getStringExtra("SESSION_TOKEN");
     String community = getIntent().getStringExtra("ACTIVE_COMMUNITY");
-      
+
     requestVisitorProfile(token, callSid);
 
     Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
@@ -213,7 +213,9 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
     Log.d(TAG, String.format("displayVisitorCard Type Added: [%s]", type));
 
-    Uri uri = Uri.parse("http://assets.qa.keenvil.com/" + visitor.getVisitorAvatarUri());
+    Uri uri = Uri.parse(
+      String.format("%s/%s", s3Url, visitor.getVisitorAvatarUri())
+    );
     ImageView visitorAvatar = (ImageView) findViewById(R.id.visitor_avatar);
     visitorAvatar.setImageURI(uri);
 
