@@ -120,7 +120,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     private ReactContext reactContext;
 
-    public TwilioVoiceModule(ReactApplicationContext reactContext, 
+    public TwilioVoiceModule(ReactApplicationContext reactContext,
             boolean shouldAskForMicPermission, String baseUrl, String s3Url) {
         super(reactContext);
         if (BuildConfig.DEBUG) {
@@ -547,13 +547,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 setSpeakerPhone(false);
 
                 SQLiteDatabase readableDatabase = ReactDatabaseSupplier.getInstance(getReactApplicationContext()).getReadableDatabase();
-                String session = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenvilsession");
-                String user = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "Keenviluser");
+                String keenvilData = AsyncLocalStorageUtil.getItemImpl(readableDatabase, "persist:Keenvil");
                 HashMap<String, String> data = new HashMap<String, String>();
-                
+
                 try {
-                    JSONObject sessionObject = new JSONObject(session);
-                    JSONObject userObject = new JSONObject(user);
+                    JSONObject keenvilDataObject = new JSONObject(keenvilData);
+                    String sessionData = keenvilDataObject.getString("session");
+                    Log.d(TAG, "Session data " + sessionData);
+                    JSONObject sessionObject = new JSONObject(sessionData);
                     data.put("CALL_SID", activeCallInvite.getCallSid());
                     Log.d(TAG, String.format("Call Sid: [%s]", activeCallInvite.getCallSid()));
                     data.put("SESSION_TOKEN", sessionObject.getString("token"));
