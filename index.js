@@ -99,7 +99,8 @@ const Twilio = {
         if (Platform.OS === IOS) {
             TwilioVoice.unregister()
         } else {
-            TwilioVoice.unregisterWithAccessToken(token);
+            const result = await TwilioVoice.unregisterWithAccessToken(token);
+            return result;
         }
     },
     addEventListener(type, handler) {
