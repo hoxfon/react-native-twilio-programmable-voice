@@ -95,9 +95,11 @@ const Twilio = {
             TwilioVoice.configureCallKit(params)
         }
     },
-    unregister() {
+    unregister(token) {
         if (Platform.OS === IOS) {
             TwilioVoice.unregister()
+        } else {
+            TwilioVoice.unregisterWithAccessToken(token);
         }
     },
     addEventListener(type, handler) {

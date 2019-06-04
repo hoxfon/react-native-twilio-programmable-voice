@@ -44,6 +44,7 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.LogLevel;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
+import com.twilio.voice.UnregistrationListener;
 import com.twilio.voice.Voice;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,6 +109,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     static Map<String, Integer> callNotificationMap;
 
     private RegistrationListener registrationListener = registrationListener();
+    private UnregistrationListener unregistrationListener = unregistrationListener();
     public Call.Listener callListener = callListener();
 
     public static CallInvite activeCallInvite;
@@ -214,6 +216,26 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
         };
     }
+
+    private UnregistrationListener unregistrationListener() {
+        return new UnregistrationListener() {
+            @Override
+            public void onUnregistered(String accessToken, String fcmToken) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Successfully unregistered FCM");
+                }
+            }
+
+            @Override
+            public void onError(RegistrationException error, String accessToken, String fcmToken) {
+                Log.e(TAG, String.format("Unregistration Error: %d, %s", error.getErrorCode(), error.getMessage()));
+                WritableMap params = Arguments.createMap();
+                params.putString("err", error.getMessage());
+                eventManager.sendEvent(EVENT_DEVICE_NOT_READY, params);
+            }
+        };
+    }
+
 
     private Call.Listener callListener() {
         return new Call.Listener() {
@@ -500,6 +522,28 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         registerForCallInvites();
         WritableMap params = Arguments.createMap();
         params.putBoolean("initialized", true);
+        promise.resolve(params);
+    }
+
+    @ReactMethod
+    public void unregisterWithAccessToken(final String accessToken, Promise promise) {
+        Log.d(TAG, "UNREGISTER WITH TOKEN");
+
+        if (accessToken == null || accessToken.equals("")) {
+            Log.e(TAG, "Invalid access token");
+            promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
+            return;
+        }
+        
+        final String fcmToken = FirebaseInstanceId.getInstance().getToken();
+        Voice.unregister(getReactApplicationContext(), accessToken, Voice.RegistrationChannel.FCM, fcmToken, unregistrationListener);
+
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "unregisterWithAccessToken ACTION_FCM_TOKEN");
+        }
+
+        WritableMap params = Arguments.createMap();
+        params.putBoolean("unregistered", true);
         promise.resolve(params);
     }
 
