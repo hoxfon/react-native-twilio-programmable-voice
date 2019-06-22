@@ -13,9 +13,6 @@ public class EventManager {
 
     private ReactApplicationContext mContext;
 
-    public static final String EVENT_PROXIMITY = "proximity";
-    public static final String EVENT_WIRED_HEADSET = "wiredHeadset";
-
     public static final String EVENT_DEVICE_READY = "deviceReady";
     public static final String EVENT_DEVICE_NOT_READY = "deviceNotReady";
     public static final String EVENT_CONNECTION_DID_CONNECT = "connectionDidConnect";

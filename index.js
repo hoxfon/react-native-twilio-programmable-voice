@@ -26,15 +26,22 @@ const Twilio = {
     // return {initialized: true} when the initialization started
     // Listen to deviceReady and deviceNotReady events to see whether
     // the initialization succeeded
-    async initWithToken(token) {
-        if (typeof token !== 'string') {
+    async initWithToken(voipToken, pushToken) {
+        if (typeof voipToken !== 'string') {
             return {
                 initialized: false,
                 err:         'Invalid token, token must be a string'
             }
         };
 
-        const result = await TwilioVoice.initWithAccessToken(token)
+        if (typeof pushToken !== 'string') {
+            return {
+                initialized: false,
+                err:         'Invalid push token must be a string'
+            }
+        };
+
+        const result = await TwilioVoice.initWithAccessToken(voipToken, pushToken)
         // native react promise present only for Android
         // iOS initWithAccessToken doesn't return
         if (Platform.OS === IOS) {
