@@ -56,6 +56,9 @@ const Twilio = {
             TwilioVoice.initWithAccessTokenUrl(url)
         }
     },
+    handleCallInvite(params = {}) {
+        TwilioVoice.handleCallInvite(params)
+    },
     connect(params = {}) {
         TwilioVoice.connect(params)
     },
