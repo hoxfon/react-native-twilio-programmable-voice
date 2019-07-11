@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hoxfon.react.RNTwilioVoice">
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <application>
+        <service android:name=".CallForegroundService">
+        </service>
+    </application>
 </manifest>

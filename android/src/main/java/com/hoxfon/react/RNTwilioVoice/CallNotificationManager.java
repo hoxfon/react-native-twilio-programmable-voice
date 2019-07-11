@@ -264,7 +264,7 @@ public class CallNotificationManager {
         notificationManager.notify(MISSED_CALLS_NOTIFICATION_ID, notification.build());
     }
 
-    public void createHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
+    public Notification getHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
         PendingIntent pendingHangupIntent = PendingIntent.getBroadcast(
                 context,
                 0,
@@ -303,7 +303,12 @@ public class CallNotificationManager {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // Create notifications channel (required for API > 25)
         initCallNotificationsChannel(notificationManager);
-        notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
+        return notification.build();
+    }
+
+    public void notify(Context context, int notificationId, Notification notification) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(notificationId, notification);
     }
 
     public void removeIncomingCallNotification(ReactApplicationContext context,

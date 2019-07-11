@@ -1,6 +1,6 @@
 {
   "name": "@npmsoluto/react-native-twilio-programmable-voice",
-  "version": "3.18.0",
+  "version": "3.18.1",
   "description": "React Native wrapper for Twilio Programmable Voice SDK",
   "main": "index.js",
   "scripts": {

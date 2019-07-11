@@ -3,6 +3,7 @@ package com.hoxfon.react.RNTwilioVoice;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -48,6 +49,7 @@ import com.twilio.voice.Voice;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.hoxfon.react.RNTwilioVoice.CallForegroundService.NOTIFICATION_KEY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_CONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_DISCONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEIVE_INCOMING;
@@ -172,8 +174,30 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @Override
     public void onHostDestroy() {
         disconnect();
-        callNotificationManager.removeHangupNotification(getReactApplicationContext());
+        removeHangupForegroundNotification();
         unsetAudioFocus();
+    }
+
+    private void NotifyHangupCallForegroundNotification(String caller, String sid) {
+        Notification callNotification = callNotificationManager.getHangupLocalNotification(getReactApplicationContext(),
+                sid, caller);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            callNotificationManager.notify(getReactApplicationContext(), HANGUP_NOTIFICATION_ID, callNotification);
+        } else {
+            Intent connectVoiceIntent = new Intent(getReactApplicationContext(), CallForegroundService.class);
+            connectVoiceIntent.putExtra(NOTIFICATION_KEY, callNotification);
+            getReactApplicationContext().startForegroundService(connectVoiceIntent);
+            Log.d(TAG, "Started foreground service for voip call");
+        }
+    }
+
+    private void removeHangupForegroundNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getReactApplicationContext().stopService(new Intent(getReactApplicationContext(), CallForegroundService.class));
+        }
+        else {
+            callNotificationManager.removeHangupNotification(getReactApplicationContext());
+        }
     }
 
     @Override
@@ -233,8 +257,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                         caller = toNumber;
                     }
                     activeCall = call;
-                    callNotificationManager.createHangupLocalNotification(getReactApplicationContext(),
-                            call.getSid(), caller);
+                    NotifyHangupCallForegroundNotification(caller, call.getSid());
                 }
                 eventManager.sendEvent(EVENT_CONNECTION_DID_CONNECT, params);
             }
@@ -268,7 +291,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     activeCall = null;
                 }
                 eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
-                callNotificationManager.removeHangupNotification(getReactApplicationContext());
+
+                removeHangupForegroundNotification();
                 toNumber = "";
                 toName = "";
             }
@@ -299,7 +323,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     activeCall = null;
                 }
                 eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
-                callNotificationManager.removeHangupNotification(getReactApplicationContext());
+                removeHangupForegroundNotification();
                 toNumber = "";
                 toName = "";
             }
@@ -372,7 +396,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     // removed @Override temporarily just to get it working on different versions of RN
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Ignored, required to implement ActivityEventListener for RN 0.33
     }
 
@@ -392,8 +416,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
                 SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
-                if (getReactApplicationContext().getCurrentActivity() != null) {
-                    Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+                if (getCurrentActivity() != null) {
+                    Window window = getCurrentActivity().getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                     );
@@ -564,9 +588,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 params.putString("call_from",  activeCallInvite.getFrom());
                 params.putString("call_to",    activeCallInvite.getTo());
                 params.putString("call_state", activeCallInvite.getState().name());
-                callNotificationManager.createHangupLocalNotification(getReactApplicationContext(),
-                        activeCallInvite.getCallSid(),
-                        activeCallInvite.getFrom());
+
+                NotifyHangupCallForegroundNotification(activeCallInvite.getFrom(), activeCallInvite.getCallSid());
+
                 eventManager.sendEvent(EVENT_CONNECTION_DID_CONNECT, params);
             }
         } else {
