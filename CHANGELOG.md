@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.21.1
+- Android: fix crash when asking for microphone permission before an activity is displayed
+
 ## 3.21.0
 - Android: allow to pass arbitrary parameters to call voice.call() as it is on iOS
 
