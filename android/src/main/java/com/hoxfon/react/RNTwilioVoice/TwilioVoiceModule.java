@@ -247,8 +247,13 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
 
             @Override
-            public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
+            public void onReconnecting(Call call, CallException callException) {
                 Log.d(TAG, "onReconnecting");
+            }
+
+            @Override
+            public void onReconnected(Call call) {
+                Log.d(TAG, "onReconnected");
             }
 
             @Override

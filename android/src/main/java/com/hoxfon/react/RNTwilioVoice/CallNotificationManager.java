@@ -312,7 +312,7 @@ public class CallNotificationManager {
         Log.d(TAG, "removeIncomingCallNotification");
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (callInvite != null && callInvite.getState() == CallInvite.State.PENDING) {
+            if (callInvite != null) {
                 /*
                  * If the incoming call message was cancelled then remove the notification by matching
                  * it with the call sid from the list of notifications in the notification drawer.
