@@ -125,8 +125,8 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                 }
 
                 @Override
-                    void onCancelledCallInvite(CancelledCallInvite callInvite) {
-                    VoiceFirebaseMessagingService.this.cancelNotification(cancelledCallInvite);
+                public void onCancelledCallInvite(CancelledCallInvite cancelledCallInvite) {
+                    VoiceFirebaseMessagingService.this.cancelNotification((ReactApplicationContext)context, cancelledCallInvite);
                     VoiceFirebaseMessagingService.this.sendCancelledCallInviteToActivity(
                         cancelledCallInvite);
                 }
@@ -160,8 +160,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             CallInvite callInvite,
             int notificationId
     ) {
-        Intent intent = new Intent(this, VoiceActivity.class);
-        intent.setAction(VoiceActivity.ACTION_INCOMING_CALL);
+        Intent intent = new Intent(ACTION_INCOMING_CALL);
         intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(INCOMING_CALL_INVITE, callInvite);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -179,9 +178,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         callNotificationManager.createIncomingCallNotification(context, callInvite, notificationId, launchIntent);
     }
 
-    private void cancelNotification(CancelledCallInvite cancelledCallInvite) {
+    private void cancelNotification(ReactApplicationContext context, CancelledCallInvite cancelledCallInvite) {
         SoundPoolManager.getInstance((this)).stopRinging();
-        callNotificationManager.removeIncomingCallNotification(context, callInvite, 0);
+        callNotificationManager.removeIncomingCallNotification(context, cancelledCallInvite, 0);
     }
 
 }
