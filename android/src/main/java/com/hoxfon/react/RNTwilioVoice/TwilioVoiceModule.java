@@ -574,7 +574,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "Registering with FCM");
             }
-            Voice.register(getReactApplicationContext(), accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
+            Voice.register(accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
         }
     }
 

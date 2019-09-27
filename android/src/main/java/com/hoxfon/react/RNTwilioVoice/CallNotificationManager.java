@@ -21,6 +21,7 @@ import android.view.WindowManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.twilio.voice.CallInvite;
+import com.twilio.voice.CancelledCallInvite;
 
 import java.util.List;
 
@@ -307,7 +308,7 @@ public class CallNotificationManager {
     }
 
     public void removeIncomingCallNotification(ReactApplicationContext context,
-                                               CallInvite callInvite,
+                                               CancelledCallInvite callInvite,
                                                int notificationId) {
         Log.d(TAG, "removeIncomingCallNotification");
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
