@@ -117,6 +117,11 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                 }
 
                 @Override
+                    void onCancelledCallInvite(CancelledCallInvite callInvite) {
+                    // Hide notification
+                }
+
+                @Override
                 public void onError(MessageException messageException) {
                     Log.e(TAG, "Error handling FCM message" + messageException.toString());
                 }

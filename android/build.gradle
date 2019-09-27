@@ -3,9 +3,10 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:3.3.0'
         classpath 'com.google.gms:google-services:3.1.2'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -44,7 +45,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.twilio:voice-android:2.0.7'
+    implementation 'com.twilio:voice-android:4+'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.google.firebase:firebase-messaging:17.+'
