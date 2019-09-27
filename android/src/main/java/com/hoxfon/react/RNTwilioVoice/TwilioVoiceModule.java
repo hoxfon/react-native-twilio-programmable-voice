@@ -79,6 +79,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String CANCELLED_CALL_INVITE         = "CANCELLED_CALL_INVITE";
 
     public static final String ACTION_INCOMING_CALL = "com.hoxfon.react.TwilioVoice.INCOMING_CALL";
+    public static final String ACTION_CANCEL_CALL   = "com.hoxfon.react.TwilioVoice.CANCEL_CALL";
     public static final String ACTION_FCM_TOKEN     = "com.hoxfon.react.TwilioVoice.ACTION_FCM_TOKEN";
     public static final String ACTION_MISSED_CALL   = "com.hoxfon.react.TwilioVoice.MISSED_CALL";
     public static final String ACTION_ANSWER_CALL   = "com.hoxfon.react.TwilioVoice.ANSWER_CALL";

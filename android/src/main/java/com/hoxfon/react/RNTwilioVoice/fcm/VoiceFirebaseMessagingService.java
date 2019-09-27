@@ -29,6 +29,7 @@ import java.util.Random;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CANCELLED_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
@@ -118,9 +119,16 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
                 @Override
                 public void onCancelledCallInvite(CancelledCallInvite cancelledCallInvite) {
-                    VoiceFirebaseMessagingService.this.cancelNotification((ReactApplicationContext)context, cancelledCallInvite);
-                    VoiceFirebaseMessagingService.this.sendCancelledCallInviteToActivity(
-                        cancelledCallInvite);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                            ReactContext context = mReactInstanceManager.getCurrentReactContext();
+                            VoiceFirebaseMessagingService.this.cancelNotification((ReactApplicationContext)context, cancelledCallInvite);
+                            VoiceFirebaseMessagingService.this.sendCancelledCallInviteToActivity(
+                                cancelledCallInvite);
+                        }
+                    });
                 }
             });
 
