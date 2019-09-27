@@ -673,7 +673,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
         }
 
-        activeCall = Voice.call(getReactApplicationContext(), accessToken, twiMLParams, callListener);
+        activeCall = Voice.connect(getReactApplicationContext(), accessToken, twiMLParams, callListener);
     }
 
     @ReactMethod

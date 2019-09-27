@@ -254,7 +254,7 @@ TwilioVoice.addEventListener('connectionDidConnect', function(data) {
     // Android
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RECONNECTING' | 'DISCONNECTED' | 'CANCELLED',
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
@@ -274,7 +274,7 @@ TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
     //   | Android
     //     {
     //         call_sid: string,  // Twilio call sid
-    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RECONNECTING' | 'DISCONNECTED' | 'CANCELLED',
     //         call_from: string, // "+441234567890"
     //         call_to: string,   // "client:bob"
     //         err?: string,
@@ -298,7 +298,7 @@ TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
 TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RECONNECTING' | 'DISCONNECTED' | 'CANCELLED',
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
