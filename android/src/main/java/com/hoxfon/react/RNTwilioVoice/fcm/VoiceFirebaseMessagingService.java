@@ -20,7 +20,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.hoxfon.react.RNTwilioVoice.BuildConfig;
 import com.hoxfon.react.RNTwilioVoice.CallNotificationManager;
 import com.twilio.voice.CallInvite;
-import com.twilio.voice.MessageException;
+import com.twilio.voice.CancelledCallInvite
 import com.twilio.voice.MessageListener;
 import com.twilio.voice.Voice;
 
@@ -62,8 +62,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
-            Voice.handleMessage(this, data, new MessageListener() {
-
+            boolean valid = Voice.handleMessage(data, new MessageListener() {
                 @Override
                 public void onCallInvite(final CallInvite callInvite) {
 
@@ -121,8 +120,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     // Hide notification
                 }
 
-                @Override
-                public void onError(MessageException messageException) {
+                if (!valid) {
                     Log.e(TAG, "Error handling FCM message" + messageException.toString());
                 }
             });
