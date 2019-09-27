@@ -43,6 +43,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
+import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.LogLevel;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
@@ -240,6 +241,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                             call.getSid(), caller);
                 }
                 eventManager.sendEvent(EVENT_CONNECTION_DID_CONNECT, params);
+            }
+
+            @Override
+            public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
+                Log.d(TAG, "onReconnecting");
             }
 
             @Override
@@ -706,7 +712,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         if (activeCallInvite != null) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Active call invite found state = "+activeCallInvite.getState());
+                // Log.d(TAG, "Active call invite found state = "+activeCallInvite.getState());
             }
             WritableMap params = Arguments.createMap();
             params.putString("call_sid",   activeCallInvite.getCallSid());
