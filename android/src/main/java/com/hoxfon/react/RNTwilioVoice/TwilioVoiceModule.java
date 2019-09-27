@@ -443,54 +443,42 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     // params.putString("call_state", activeCallInvite.getState().name());
                     eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
                 }
-
-
             } else {
+
+            }
+        } else if (intent.getAction().equals(ACTION_CANCEL_CALL)) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING");
+            }
+            // this block is executed when the callInvite is cancelled and:
+            //   - the call is answered (activeCall != null)
+            //   - the call is rejected
+
+            SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+
+            if (BuildConfig.DEBUG) {
+                // Log.d(TAG, "activeCallInvite state = " + activeCallInvite.getState());
+            }
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "activeCallInvite was cancelled by " + activeCallInvite.getFrom());
+            }
+            if (!callAccepted) {
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "====> BEGIN handleIncomingCallIntent when activeCallInvite != PENDING");
+                    Log.d(TAG, "creating a missed call");
                 }
-                // this block is executed when the callInvite is cancelled and:
-                //   - the call is answered (activeCall != null)
-                //   - the call is rejected
-
-                SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
-
-                // the call is not active yet
-                if (activeCall == null) {
-
-                    if (activeCallInvite != null) {
-                        if (BuildConfig.DEBUG) {
-                            // Log.d(TAG, "activeCallInvite state = " + activeCallInvite.getState());
-                        }
-                        if (BuildConfig.DEBUG) {
-                            Log.d(TAG, "activeCallInvite was cancelled by " + activeCallInvite.getFrom());
-                        }
-                        if (!callAccepted) {
-                            if (BuildConfig.DEBUG) {
-                                // Log.d(TAG, "creating a missed call, activeCallInvite state: " + activeCallInvite.getState());
-                            }
-                            callNotificationManager.createMissedCallNotification(getReactApplicationContext(), activeCallInvite);
-                            int appImportance = callNotificationManager.getApplicationImportance(getReactApplicationContext());
-                            if (appImportance != RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
-                                WritableMap params = Arguments.createMap();
-                                params.putString("call_sid", activeCallInvite.getCallSid());
-                                params.putString("call_from", activeCallInvite.getFrom());
-                                params.putString("call_to", activeCallInvite.getTo());
-                                // params.putString("call_state", activeCallInvite.getState().name());
-                                eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
-                            }
-                        }
-                    }
-                    clearIncomingNotification(activeCallInvite);
-                } else {
-                    if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "activeCallInvite was answered. Call " + activeCall);
-                    }
-                }
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "====> END");
+                callNotificationManager.createMissedCallNotification(getReactApplicationContext(), activeCallInvite);
+                int appImportance = callNotificationManager.getApplicationImportance(getReactApplicationContext());
+                if (appImportance != RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+                    WritableMap params = Arguments.createMap();
+                    params.putString("call_sid", activeCallInvite.getCallSid());
+                    params.putString("call_from", activeCallInvite.getFrom());
+                    params.putString("call_to", activeCallInvite.getTo());
+                    // params.putString("call_state", activeCallInvite.getState().name());
+                    eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
                 }
             }
+            
+            clearIncomingNotification(activeCallInvite);
         } else if (intent.getAction().equals(ACTION_FCM_TOKEN)) {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "handleIncomingCallIntent ACTION_FCM_TOKEN");
