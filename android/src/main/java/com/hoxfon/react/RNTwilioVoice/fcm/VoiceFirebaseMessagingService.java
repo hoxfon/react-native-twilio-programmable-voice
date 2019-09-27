@@ -117,7 +117,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
                 @Override
                     void onCancelledCallInvite(CancelledCallInvite callInvite) {
-                    // Hide notification
+                    VoiceFirebaseMessagingService.this.cancelNotification(cancelledCallInvite);
+                    VoiceFirebaseMessagingService.this.sendCancelledCallInviteToActivity(
+                        cancelledCallInvite);
                 }
             });
 
@@ -149,7 +151,8 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             CallInvite callInvite,
             int notificationId
     ) {
-        Intent intent = new Intent(ACTION_INCOMING_CALL);
+        Intent intent = new Intent(this, VoiceActivity.class);
+        intent.setAction(VoiceActivity.ACTION_INCOMING_CALL);
         intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(INCOMING_CALL_INVITE, callInvite);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -164,11 +167,12 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                                   int notificationId,
                                   Intent launchIntent
     ) {
-        if (callInvite != null && callInvite.getState() == CallInvite.State.PENDING) {
-            callNotificationManager.createIncomingCallNotification(context, callInvite, notificationId, launchIntent);
-        } else {
-            SoundPoolManager.getInstance(context.getBaseContext()).stopRinging();
-            callNotificationManager.removeIncomingCallNotification(context, callInvite, 0);
-        }
+        callNotificationManager.createIncomingCallNotification(context, callInvite, notificationId, launchIntent);
     }
+
+    private void cancelNotification(CancelledCallInvite cancelledCallInvite) {
+        SoundPoolManager.getInstance((this)).stopRinging();
+        callNotificationManager.removeIncomingCallNotification(context, callInvite, 0);
+    }
+
 }
