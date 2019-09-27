@@ -134,7 +134,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             });
 
             if (!valid) {
-                Log.e(TAG, "Error handling FCM message" + messageException.toString());
+                Log.e(TAG, "Error handling FCM message");
             }
         }
 
