@@ -128,11 +128,11 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     void onCancelledCallInvite(CancelledCallInvite callInvite) {
                     // Hide notification
                 }
-
-                if (!valid) {
-                    Log.e(TAG, "Error handling FCM message" + messageException.toString());
-                }
             });
+
+            if (!valid) {
+                Log.e(TAG, "Error handling FCM message" + messageException.toString());
+            }
         }
 
         // Check if message contains a notification payload.
