@@ -587,7 +587,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                         }
                     }
                 });
-
     }
 
     @ReactMethod

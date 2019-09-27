@@ -30,6 +30,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_FCM_TOKEN;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CANCELLED_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
 import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 
@@ -164,6 +165,15 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(INCOMING_CALL_INVITE, callInvite);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    /*
+     * Send the CancelledCallInvite to the VoiceActivity
+     */
+    private void sendCancelledCallInviteToActivity(CancelledCallInvite cancelledCallInvite) {
+        Intent intent = new Intent(ACTION_CANCEL_CALL);
+        intent.putExtra(CANCELLED_CALL_INVITE, cancelledCallInvite);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     /*
