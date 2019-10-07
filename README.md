@@ -90,7 +90,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.0.0'
+    pod 'TwilioVoice', '~> 2.1.0'
     ...
 end
 
@@ -109,7 +109,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.0.0'
+    pod 'TwilioVoice', '~> 2.1.0'
     pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
     ...
 end
