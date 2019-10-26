@@ -28,11 +28,6 @@
     "type": "git",
     "url": "git+ssh://git@github.com:hoxfon/react-native-twilio-programmable-voice.git"
   },
-  "rnpm": {
-    "android": {
-      "packageInstance": "new TwilioVoicePackage()"
-    }
-  },
   "author": {
     "name": "Fabrizio Moscon"
   },
