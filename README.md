@@ -1,6 +1,11 @@
 # react-native-twilio-programmable-voice
 This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your ReactNatvie App. This module is not curated nor maintained, but inspired by Twilio.
 
+# Twilio Programmable Voice SDK
+
+- Android 2.0.0-beta15 (bundled within this library)
+- iOS 2.0.0-beta13 (specified by the app's own podfile)
+
 ## Migrating Android from v1 to v2 (incoming call use FCM)
 
 You will need to make changes both on your Twilio account using Twilio Web Console and on your react native app.
@@ -79,7 +84,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '=2.0.0-beta9'
+    pod 'TwilioVoice', '=2.0.0-beta13'
     ...
 end
 
@@ -267,7 +272,6 @@ TwilioVoice.sendDigits(digits)
 
 // should be called after the app is initialized
 // to catch incoming call when the app was in the background
-// Android Only
 TwilioVoice.getActiveCall()
     .then(incomingCall => {
         if (incomingCall){

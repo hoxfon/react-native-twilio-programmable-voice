@@ -88,14 +88,21 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
     NSLog(@"CallKit Initialized");
 
     self.callKitCallController = [[CXCallController alloc] init];
+<<<<<<< HEAD
+=======
+    [self sendEventWithName:@"deviceReady" body:nil];
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
   }
 }
 
 RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
   NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
+<<<<<<< HEAD
 
   UIDevice* device = [UIDevice currentDevice];
   device.proximityMonitoringEnabled = YES;
+=======
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
 
   if (self.call && self.call.state == TVOCallStateConnected) {
     [self.call disconnect];
@@ -254,9 +261,12 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type withCompletionHandler:(void (^)(void))completion {
   NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
+<<<<<<< HEAD
   
   // Save for later when the notification is properly handled.
   self.incomingPushCompletionCallback = completion;
+=======
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     [TwilioVoice handleNotification:payload.dictionaryPayload
@@ -354,6 +364,7 @@ RCT_REMAP_METHOD(getActiveCall,
   [self sendEventWithName:@"connectionDidConnect" body:callParams];
 }
 
+<<<<<<< HEAD
 - (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
   NSLog(@"Call failed to connect: %@", error);
 
@@ -378,6 +389,36 @@ RCT_REMAP_METHOD(getActiveCall,
     }
     [params setObject:errMsg forKey:@"error"];
   }
+=======
+- (void)callDidDisconnect:(TVOCall *)call {
+  NSLog(@"connectionDidDisconnect");
+
+  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+  [params setObject:self.call.sid forKey:@"call_sid"];
+  if (self.call.to){
+    [params setObject:self.call.to forKey:@"call_to"];
+  }
+  if (self.call.from){
+    [params setObject:self.call.from forKey:@"call_from"];
+  }
+  if (self.call.state == TVOCallStateDisconnected) {
+    [params setObject:StateDisconnected forKey:@"call_state"];
+  }
+  [self sendEventWithName:@"connectionDidDisconnect" body:params];
+  if (self.call.state == TVOCallStateConnected) {
+    [self performEndCallActionWithUUID:call.uuid];
+  }
+  self.call = nil;
+}
+
+- (void)call:(TVOCall *)call didFailWithError:(NSError *)error {
+  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+  NSString* errMsg = [error localizedDescription];
+  if (error.localizedFailureReason) {
+    errMsg = [error localizedFailureReason];
+  }
+  [params setObject:errMsg forKey:@"error"];
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
   if (self.call.sid) {
     [params setObject:self.call.sid forKey:@"call_sid"];
   }
@@ -392,6 +433,11 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
+<<<<<<< HEAD
+=======
+  [self performEndCallActionWithUUID:call.uuid];
+
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
   self.call = nil;
   self.callKitCompletionCallback = nil;
 }
@@ -401,11 +447,20 @@ RCT_REMAP_METHOD(getActiveCall,
   // The mode set by the Voice SDK is "VoiceChat" so the default audio route is the built-in receiver.
   // Use port override to switch the route.
   NSError *error = nil;
+<<<<<<< HEAD
   NSLog(@"toggleAudioRoute");
 
   if (toSpeaker) {
     if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
                                                             error:&error]) {
+=======
+  NSLog(@"routeAudioToSpeaker");
+
+  if (speaker) {
+    if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
+                                          withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
+                                                error:&error]) {
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
     }
   } else {
@@ -419,7 +474,10 @@ RCT_REMAP_METHOD(getActiveCall,
 #pragma mark - CXProviderDelegate
 - (void)providerDidReset:(CXProvider *)provider {
   NSLog(@"providerDidReset");
+<<<<<<< HEAD
   TwilioVoice.audioEnabled = YES;
+=======
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
 }
 
 - (void)providerDidBegin:(CXProvider *)provider {
@@ -428,12 +486,22 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didActivateAudioSession");
+<<<<<<< HEAD
   TwilioVoice.audioEnabled = YES;
+=======
+
+  [[TwilioVoice sharedInstance] startAudioDevice];
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didDeactivateAudioSession");
+<<<<<<< HEAD
   TwilioVoice.audioEnabled = NO;
+=======
+
+  [[TwilioVoice sharedInstance] audioSessionDeactivated];
+>>>>>>> e02e888acb0a60756a9ced33f9010436f8daf2bb
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {

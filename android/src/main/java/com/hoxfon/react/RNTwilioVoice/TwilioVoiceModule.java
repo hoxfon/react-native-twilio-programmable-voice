@@ -343,6 +343,49 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
     }
 
+//    private void unregisterReceiver() {
+//        if (isReceiverRegistered) {
+//            LocalBroadcastManager.getInstance(getReactApplicationContext()).unregisterReceiver(voiceBroadcastReceiver);
+//            isReceiverRegistered = false;
+//        }
+//    }
+//TODO Check where this should go.
+    private void registerActionReceiver() {
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_ANSWER_CALL);
+        intentFilter.addAction(ACTION_REJECT_CALL);
+        intentFilter.addAction(ACTION_HANGUP_CALL);
+        intentFilter.addAction(ACTION_CLEAR_MISSED_CALLS_COUNT);
+
+        getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch (action) {
+                    case ACTION_ANSWER_CALL:
+                        accept();
+                        break;
+                    case ACTION_REJECT_CALL:
+                        reject();
+                        break;
+                    case ACTION_HANGUP_CALL:
+                        disconnect();
+                        break;
+                    case ACTION_CLEAR_MISSED_CALLS_COUNT:
+                        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+                        sharedPrefEditor.putInt(MISSED_CALLS_GROUP, 0);
+                        sharedPrefEditor.commit();
+                }
+                // Dismiss the notification when the user tap on the relative notification action
+                // eventually the notification will be cleared anyway
+                // but in this way there is no UI lag
+                notificationManager.cancel(intent.getIntExtra(INCOMING_CALL_NOTIFICATION_ID, 0));
+            }
+        }, intentFilter);
+    }
+
     // removed @Override temporarily just to get it working on different versions of RN
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         onActivityResult(requestCode, resultCode, data);
@@ -622,7 +665,19 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
         if (activeCallInvite != null){
             activeCallInvite.reject(getReactApplicationContext());
+            clearIncomingNotification(activeCallInvite);
         }
+        sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
+    }
+
+    @ReactMethod
+    public void ignore() {
+        callAccepted = false;
+        SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+        if (activeCallInvite != null){
+            clearIncomingNotification(activeCallInvite);
+        }
+        sendEvent(EVENT_CONNECTION_DID_DISCONNECT, null);
     }
 
     public void disconnect() {
