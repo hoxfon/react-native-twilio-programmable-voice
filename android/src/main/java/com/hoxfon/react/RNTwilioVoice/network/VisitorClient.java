@@ -1,6 +1,5 @@
 package com.hoxfon.react.RNTwilioVoice.network;
 
-import android.support.v4.BuildConfig;
 import android.util.Log;
 import java.io.IOException;
 import retrofit2.Retrofit;
