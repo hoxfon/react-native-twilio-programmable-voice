@@ -428,7 +428,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didActivateAudioSession");
-  self.audioDevice.enabled = YES;
+  TwilioVoice.audioEnabled = YES
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
@@ -440,14 +440,11 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"provider:timedOutPerformingAction");
 }
 
-@property (nonatomic, strong) TVODefaultAudioDevice *audioDevice;
-
 - (void)provider:(CXProvider *)provider performStartCallAction:(CXStartCallAction *)action {
   NSLog(@"provider:performStartCallAction");
 
-  //[TwilioVoice configureAudioSession];
-  self.audioDevice.enabled = NO;
-  self.audioDevice.block();
+  [TwilioVoice configureAudioSession];
+  TwilioVoice.audioEnabled = NO;
 
   [self.callKitProvider reportOutgoingCallWithUUID:action.callUUID startedConnectingAtDate:[NSDate date]];
 
@@ -473,8 +470,8 @@ RCT_REMAP_METHOD(getActiveCall,
 
   NSAssert([self.callInvite.uuid isEqual:action.callUUID], @"We only support one Invite at a time.");
 
-  self.audioDevice.enabled = NO;
-  self.audioDevice.block();
+  TwilioVoice.audioEnabled = NO;
+
   [self performAnswerVoiceCallWithUUID:action.callUUID completion:^(BOOL success) {
     if (success) {
       [action fulfill];
@@ -489,7 +486,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
   NSLog(@"provider:performEndCallAction");
 
-  self.audioDevice.enabled = YES;
+  TwilioVoice.audioEnabled = YES
 
   if (self.callInvite && self.callInvite.state == TVOCallInviteStatePending) {
     [self sendEventWithName:@"callRejected" body:@"callRejected"];
