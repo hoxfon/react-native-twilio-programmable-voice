@@ -212,7 +212,11 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"pushRegistry:didUpdatePushCredentials:forType");
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
-    self.deviceTokenString = [credentials.token description];
+    const unsigned *tokenBytes = [credentials.token bytes];
+    self.deviceTokenString = [NSString stringWithFormat:@"<%08x %08x %08x %08x %08x %08x %08x %08x>", 
+                                                        ntohl(tokenBytes[0]), ntohl(tokenBytes[1]), ntohl(tokenBytes[2]),
+                                                        ntohl(tokenBytes[3]), ntohl(tokenBytes[4]), ntohl(tokenBytes[5]),
+                                                        ntohl(tokenBytes[6]), ntohl(tokenBytes[7])];
     NSString *accessToken = [self fetchAccessToken];
 
     [TwilioVoice registerWithAccessToken:accessToken
@@ -237,6 +241,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     NSString *accessToken = [self fetchAccessToken];
+
 
     [TwilioVoice unregisterWithAccessToken:accessToken
                                deviceToken:self.deviceTokenString
