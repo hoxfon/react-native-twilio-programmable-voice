@@ -428,7 +428,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didActivateAudioSession");
-  TwilioVoice.audioEnabled = YES;
+  TwilioVoice.audioEnabled = YES
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
@@ -471,6 +471,7 @@ RCT_REMAP_METHOD(getActiveCall,
   NSAssert([self.callInvite.uuid isEqual:action.callUUID], @"We only support one Invite at a time.");
 
   TwilioVoice.audioEnabled = NO;
+
   [self performAnswerVoiceCallWithUUID:action.callUUID completion:^(BOOL success) {
     if (success) {
       [action fulfill];
@@ -485,7 +486,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
   NSLog(@"provider:performEndCallAction");
 
-  TwilioVoice.audioEnabled = NO;
+  TwilioVoice.audioEnabled = YES
 
   if (self.callInvite && self.callInvite.state == TVOCallInviteStatePending) {
     [self sendEventWithName:@"callRejected" body:@"callRejected"];
