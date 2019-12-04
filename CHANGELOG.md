@@ -1,5 +1,8 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 3.21.2
+- Switch from rnpm to react-native.config.js
+
 ## 3.21.1
 - Android: fix crash when asking for microphone permission before an activity is displayed
 
