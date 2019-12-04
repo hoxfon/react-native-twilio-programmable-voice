@@ -3,10 +3,14 @@
 ## 4.0.0
 
 - Android
-    - update Firebase Messaging to 17.3.4 which simplifies how to obtain the FCM token
+  - update Firebase Messaging to 17.3.4 which simplifies how to obtain the FCM token
+  - Android X migration
+  - use gradle 5.4.1
+  - use API 28
+  - upgrade com.twilio:voice-android to 2.1.0
 - iOS
-    - convert params for connectionDidConnect to => call_to, from => call_from
-    - convert params for connectionDidDisconnect to => call_to, from => call_from, error => err
+  - convert params for connectionDidConnect to => call_to, from => call_from
+  - convert params for connectionDidDisconnect to => call_to, from => call_from, error => err
 
 ## 3.21.3
 
