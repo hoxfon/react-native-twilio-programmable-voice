@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.5.2'
         classpath 'com.google.gms:google-services:4.2.0'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -49,10 +49,10 @@ android {
 dependencies {
     def supportLibVersion = rootProject.hasProperty('supportLibVersion') ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
 
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.twilio:voice-android:2.0.9'
-    compile 'com.android.support:appcompat-v7:$supportLibVersion'
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.google.firebase:firebase-messaging:17.+'
-    testCompile 'junit:junit:4.12'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.twilio:voice-android:2.0.9'
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation 'com.facebook.react:react-native:+'
+    implementation 'com.google.firebase:firebase-messaging:17.+'
+    testImplementation 'junit:junit:4.12'
 }
