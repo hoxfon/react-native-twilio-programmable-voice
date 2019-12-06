@@ -275,7 +275,8 @@ RCT_REMAP_METHOD(getActiveCall,
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     [TwilioVoice handleNotification:payload.dictionaryPayload
-                           delegate:self];
+                           delegate:self
+                           delegateQueue:nil];
   }
 }
 
@@ -517,7 +518,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
   NSLog(@"provider:performEndCallAction");
 
-  TwilioVoice.audioEnabled = YES;
+  self.audioDevice.enabled = YES;
 
   if (self.callInvite) {
     [self sendEventWithName:@"callRejected" body:@"callRejected"];

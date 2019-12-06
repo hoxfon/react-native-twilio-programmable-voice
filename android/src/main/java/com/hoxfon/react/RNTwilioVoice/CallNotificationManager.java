@@ -21,6 +21,7 @@ import android.view.WindowManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.twilio.voice.CallInvite;
+import com.twilio.voice.CancelledCallInvite;
 
 import java.util.List;
 
@@ -191,4 +192,83 @@ public class CallNotificationManager {
     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     notificationManager.cancel(HANGUP_NOTIFICATION_ID);
   }
+
+  public void createHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
+    PendingIntent pendingHangupIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            new Intent(ACTION_HANGUP_CALL).putExtra(INCOMING_CALL_NOTIFICATION_ID, HANGUP_NOTIFICATION_ID),
+            PendingIntent.FLAG_UPDATE_CURRENT
+    );
+    Intent launchIntent = new Intent(context, getMainActivityClass(context));
+    launchIntent.setAction(ACTION_INCOMING_CALL)
+            .putExtra(INCOMING_CALL_NOTIFICATION_ID, HANGUP_NOTIFICATION_ID)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+    PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    /*
+     * Pass the notification id and call sid to use as an identifier to cancel the
+     * notification later
+     */
+    Bundle extras = new Bundle();
+    extras.putInt(INCOMING_CALL_NOTIFICATION_ID, HANGUP_NOTIFICATION_ID);
+    extras.putString(CALL_SID_KEY, callSid);
+    extras.putString(NOTIFICATION_TYPE, ACTION_HANGUP_CALL);
+
+    NotificationCompat.Builder notification = new NotificationCompat.Builder(context, VOICE_CHANNEL)
+            .setContentTitle("Llamada en Progreso")
+            .setContentText(caller)
+            .setSmallIcon(R.drawable.ic_call_white_24dp)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setOngoing(true)
+            .setUsesChronometer(true)
+            .setExtras(extras)
+            .setContentIntent(activityPendingIntent);
+
+    notification.addAction(0, "HANG UP", pendingHangupIntent);
+    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    // Create notifications channel (required for API > 25)
+    initCallNotificationsChannel(notificationManager);
+    notificationManager.notify(HANGUP_NOTIFICATION_ID, notification.build());
+}
+
+public void removeIncomingCallNotification(ReactApplicationContext context,
+                                           CancelledCallInvite callInvite,
+                                           int notificationId) {
+    Log.d(TAG, "removeIncomingCallNotification");
+    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (callInvite != null) {
+            /*
+             * If the incoming call message was cancelled then remove the notification by matching
+             * it with the call sid from the list of notifications in the notification drawer.
+             */
+            StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
+            for (StatusBarNotification statusBarNotification : activeNotifications) {
+                Notification notification = statusBarNotification.getNotification();
+                String notificationType = notification.extras.getString(NOTIFICATION_TYPE);
+                if (callInvite.getCallSid().equals(notification.extras.getString(CALL_SID_KEY)) &&
+                        notificationType != null && notificationType.equals(ACTION_INCOMING_CALL)) {
+                    notificationManager.cancel(notification.extras.getInt(INCOMING_CALL_NOTIFICATION_ID));
+                }
+            }
+        } else if (notificationId != 0) {
+            notificationManager.cancel(notificationId);
+        }
+    } else {
+        if (notificationId != 0) {
+            notificationManager.cancel(notificationId);
+        } else if (callInvite != null) {
+            String notificationKey = INCOMING_NOTIFICATION_PREFIX+callInvite.getCallSid();
+            if (TwilioVoiceModule.callNotificationMap.containsKey(notificationKey)) {
+                notificationId = TwilioVoiceModule.callNotificationMap.get(notificationKey);
+                notificationManager.cancel(notificationId);
+                TwilioVoiceModule.callNotificationMap.remove(notificationKey);
+            }
+        }
+    }
+}
 }
