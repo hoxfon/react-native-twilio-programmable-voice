@@ -1,6 +1,6 @@
 {
   "name": "react-native-twilio-programmable-voice",
-  "version": "3.3.2",
+  "version": "4.0.0",
   "description": "React Native wrapper for Twilio Programmable Voice SDK",
   "main": "index.js",
   "scripts": {
@@ -27,11 +27,6 @@
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:hoxfon/react-native-twilio-programmable-voice.git"
-  },
-  "rnpm": {
-    "android": {
-      "packageInstance": "new TwilioVoicePackage()"
-    }
   },
   "author": {
     "name": "Fabrizio Moscon"

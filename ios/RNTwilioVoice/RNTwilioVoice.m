@@ -20,6 +20,7 @@
 @property (nonatomic, strong) CXProvider *callKitProvider;
 @property (nonatomic, strong) CXCallController *callKitCallController;
 @property (nonatomic, strong) void(^incomingPushCompletionCallback)(void);
+@property (nonatomic, strong) TVODefaultAudioDevice *audioDevice;
 @end
 
 @implementation RNTwilioVoice {
@@ -34,6 +35,8 @@ NSString * const StateConnecting = @"CONNECTING";
 NSString * const StateConnected = @"CONNECTED";
 NSString * const StateDisconnected = @"DISCONNECTED";
 NSString * const StateRejected = @"REJECTED";
+
+//NSString * const microphone = AVAudioSessionOrientationFront;
 
 - (dispatch_queue_t)methodQueue
 {
@@ -88,6 +91,7 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
     NSLog(@"CallKit Initialized");
 
     self.callKitCallController = [[CXCallController alloc] init];
+    [self sendEventWithName:@"deviceReady" body:nil];
   }
 }
 
@@ -159,13 +163,19 @@ RCT_REMAP_METHOD(getActiveCall,
     if (self.callInvite.to){
       [params setObject:self.callInvite.to forKey:@"to"];
     }
-    if (self.callInvite.state == TVOCallInviteStatePending) {
-      [params setObject:StatePending forKey:@"call_state"];
-    } else if (self.callInvite.state == TVOCallInviteStateCanceled) {
-      [params setObject:StateDisconnected forKey:@"call_state"];
-    } else if (self.callInvite.state == TVOCallInviteStateRejected) {
-      [params setObject:StateRejected forKey:@"call_state"];
-    }
+    
+    [params setObject:StatePending forKey:@"call_state"];
+      //TODO Figure this out.
+      /*
+       if (self.callInvite.state == TVOCallInviteStatePending) {
+         
+       } else if (self.callInvite.state == TVOCallInviteStateCanceled) {
+         [params setObject:StateDisconnected forKey:@"call_state"];
+       } else if (self.callInvite.state == TVOCallInviteStateRejected) {
+         [params setObject:StateRejected forKey:@"call_state"];
+       }
+       */
+   
     resolve(params);
   } else if (self.call) {
     if (self.call.sid) {
@@ -265,7 +275,8 @@ RCT_REMAP_METHOD(getActiveCall,
 
   if ([type isEqualToString:PKPushTypeVoIP]) {
     [TwilioVoice handleNotification:payload.dictionaryPayload
-                           delegate:self];
+                           delegate:self
+                           delegateQueue:nil];
   }
 }
 
@@ -278,16 +289,16 @@ RCT_REMAP_METHOD(getActiveCall,
 
 #pragma mark - TVONotificationDelegate
 - (void)callInviteReceived:(TVOCallInvite *)callInvite {
-  if (callInvite.state == TVOCallInviteStatePending) {
-    [self handleCallInviteReceived:callInvite];
-  } else if (callInvite.state == TVOCallInviteStateCanceled) {
-    [self handleCallInviteCanceled:callInvite];
-  }
+  [self handleCallInviteReceived:callInvite];
+}
+
+- (void)cancelledCallInviteReceived:(TVOCancelledCallInvite *)cancelledCallInvite {
+  [self handleCallInviteCanceled:cancelledCallInvite];
 }
 
 - (void)handleCallInviteReceived:(TVOCallInvite *)callInvite {
   NSLog(@"callInviteReceived:");
-  if (self.callInvite && self.callInvite == TVOCallInviteStatePending) {
+  if (self.callInvite) {
     NSLog(@"Already a pending incoming call invite.");
     NSLog(@"  >> Ignoring call from %@", callInvite.from);
     [self incomingPushHandled];
@@ -304,10 +315,11 @@ RCT_REMAP_METHOD(getActiveCall,
   [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
 }
 
-- (void)handleCallInviteCanceled:(TVOCallInvite *)callInvite {
+- (void)handleCallInviteCanceled:(TVOCancelledCallInvite *)callInvite {
   NSLog(@"callInviteCanceled");
 
-  [self performEndCallActionWithUUID:callInvite.uuid];
+    //TODO figure this out
+  //[self performEndCallActionWithUUID:callInvite.uuid];
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   if (self.callInvite.callSid){
@@ -320,11 +332,8 @@ RCT_REMAP_METHOD(getActiveCall,
   if (self.callInvite.to){
     [params setObject:self.callInvite.to forKey:@"to"];
   }
-  if (self.callInvite.state == TVOCallInviteStateCanceled) {
-    [params setObject:StateDisconnected forKey:@"call_state"];
-  } else if (self.callInvite.state == TVOCallInviteStateRejected) {
-    [params setObject:StateRejected forKey:@"call_state"];
-  }
+  [params setObject:StateDisconnected forKey:@"call_state"];
+  
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
   self.callInvite = nil;
@@ -359,30 +368,34 @@ RCT_REMAP_METHOD(getActiveCall,
   [self sendEventWithName:@"connectionDidConnect" body:callParams];
 }
 
-- (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
-  NSLog(@"Call failed to connect: %@", error);
+- (void)callDidDisconnect:(TVOCall *)call {
+  NSLog(@"connectionDidDisconnect");
 
-  self.callKitCompletionCallback(NO);
-  [self performEndCallActionWithUUID:call.uuid];
-  [self callDisconnected:error];
-}
-
-- (void)call:(TVOCall *)call didDisconnectWithError:(NSError *)error {
-  NSLog(@"Call disconnected with error: %@", error);
-
-  [self performEndCallActionWithUUID:call.uuid];
-  [self callDisconnected:error];
-}
-
-- (void)callDisconnected:(NSError *)error {
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  if (error) {
-    NSString* errMsg = [error localizedDescription];
-    if (error.localizedFailureReason) {
-      errMsg = [error localizedFailureReason];
-    }
-    [params setObject:errMsg forKey:@"error"];
+  [params setObject:self.call.sid forKey:@"call_sid"];
+  if (self.call.to){
+    [params setObject:self.call.to forKey:@"call_to"];
   }
+  if (self.call.from){
+    [params setObject:self.call.from forKey:@"call_from"];
+  }
+  if (self.call.state == TVOCallStateDisconnected) {
+    [params setObject:StateDisconnected forKey:@"call_state"];
+  }
+  [self sendEventWithName:@"connectionDidDisconnect" body:params];
+  if (self.call.state == TVOCallStateConnected) {
+    [self performEndCallActionWithUUID:call.uuid];
+  }
+  self.call = nil;
+}
+
+- (void)call:(TVOCall *)call didFailWithError:(NSError *)error {
+  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+  NSString* errMsg = [error localizedDescription];
+  if (error.localizedFailureReason) {
+    errMsg = [error localizedFailureReason];
+  }
+  [params setObject:errMsg forKey:@"error"];
   if (self.call.sid) {
     [params setObject:self.call.sid forKey:@"call_sid"];
   }
@@ -397,6 +410,8 @@ RCT_REMAP_METHOD(getActiveCall,
   }
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
+  [self performEndCallActionWithUUID:call.uuid];
+
   self.call = nil;
   self.callKitCompletionCallback = nil;
 }
@@ -406,11 +421,12 @@ RCT_REMAP_METHOD(getActiveCall,
   // The mode set by the Voice SDK is "VoiceChat" so the default audio route is the built-in receiver.
   // Use port override to switch the route.
   NSError *error = nil;
-  NSLog(@"toggleAudioRoute");
+  NSLog(@"routeAudioToSpeaker");
 
   if (toSpeaker) {
-    if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
-                                                            error:&error]) {
+    if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
+                                          withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
+                                                error:&error]) {
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
     }
   } else {
@@ -424,7 +440,7 @@ RCT_REMAP_METHOD(getActiveCall,
 #pragma mark - CXProviderDelegate
 - (void)providerDidReset:(CXProvider *)provider {
   NSLog(@"providerDidReset");
-  TwilioVoice.audioEnabled = YES;
+  self.audioDevice.enabled = YES;
 }
 
 - (void)providerDidBegin:(CXProvider *)provider {
@@ -433,12 +449,13 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didActivateAudioSession");
-  TwilioVoice.audioEnabled = YES;
+  self.audioDevice.enabled = YES;
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
   NSLog(@"provider:didDeactivateAudioSession");
-  TwilioVoice.audioEnabled = NO;
+  self.audioDevice.enabled = NO;
+  self.audioDevice.block();
 }
 
 - (void)provider:(CXProvider *)provider timedOutPerformingAction:(CXAction *)action {
@@ -447,13 +464,18 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider performStartCallAction:(CXStartCallAction *)action {
   NSLog(@"provider:performStartCallAction");
-
-  [TwilioVoice configureAudioSession];
-  TwilioVoice.audioEnabled = NO;
+/*
+  
+  self.audioDevice.block = ^ {
+      kDefaultAVAudioSessionConfigurationBlock();
+      [weakSelf setMicrophoneInUse:microphone];
+  };*/
+  self.audioDevice.enabled = NO;
+  self.audioDevice.block();
 
   [self.callKitProvider reportOutgoingCallWithUUID:action.callUUID startedConnectingAtDate:[NSDate date]];
 
-  __weak typeof(self) weakSelf = self;
+  typeof(self) __weak weakSelf = self;
   [self performVoiceCallWithUUID:action.callUUID client:nil completion:^(BOOL success) {
     __strong typeof(self) strongSelf = weakSelf;
     if (success) {
@@ -471,11 +493,16 @@ RCT_REMAP_METHOD(getActiveCall,
   // RCP: Workaround from https://forums.developer.apple.com/message/169511 suggests configuring audio in the
   //      completion block of the `reportNewIncomingCallWithUUID:update:completion:` method instead of in
   //      `provider:performAnswerCallAction:` per the WWDC examples.
-  // [TwilioVoice configureAudioSession];
+  /*typeof(self) __weak weakSelf = self;
+  self.audioDevice.block = ^ {
+      kDefaultAVAudioSessionConfigurationBlock();
+      [weakSelf setMicrophoneInUse:microphone];
+  };*/
 
   NSAssert([self.callInvite.uuid isEqual:action.callUUID], @"We only support one Invite at a time.");
 
-  TwilioVoice.audioEnabled = NO;
+  self.audioDevice.enabled = NO;
+  self.audioDevice.block();
 
   [self performAnswerVoiceCallWithUUID:action.callUUID completion:^(BOOL success) {
     if (success) {
@@ -491,9 +518,9 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
   NSLog(@"provider:performEndCallAction");
 
-  TwilioVoice.audioEnabled = YES;
+  self.audioDevice.enabled = YES;
 
-  if (self.callInvite && self.callInvite.state == TVOCallInviteStatePending) {
+  if (self.callInvite) {
     [self sendEventWithName:@"callRejected" body:@"callRejected"];
     [self.callInvite reject];
     self.callInvite = nil;
@@ -571,7 +598,7 @@ RCT_REMAP_METHOD(getActiveCall,
       NSLog(@"Incoming call successfully reported");
 
       // RCP: Workaround per https://forums.developer.apple.com/message/169511
-      [TwilioVoice configureAudioSession];
+      //[TwilioVoice configureAudioSession];
     } else {
       NSLog(@"Failed to report incoming call successfully: %@.", [error localizedDescription]);
     }
@@ -604,11 +631,14 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)performVoiceCallWithUUID:(NSUUID *)uuid
                           client:(NSString *)client
                       completion:(void(^)(BOOL success))completionHandler {
+    
+  TVOConnectOptions *connectOptions = [TVOConnectOptions optionsWithAccessToken:[self fetchAccessToken]
+    block:^(TVOConnectOptionsBuilder *builder) {
+    builder.params = _callParams;
+    builder.uuid = uuid;
+  }];
 
-  self.call = [TwilioVoice call:[self fetchAccessToken]
-                         params:_callParams
-                           uuid:uuid
-                       delegate:self];
+  self.call = [TwilioVoice connectWithOptions:connectOptions delegate:self];
 
   self.callKitCompletionCallback = completionHandler;
 }
@@ -628,6 +658,73 @@ RCT_REMAP_METHOD(getActiveCall,
     NSLog(@"handleAppTerminateNotification disconnecting an active call");
     [self.call disconnect];
   }
+}
+
+- (void)setMicrophoneInUse:(NSString *)nextDataSource {
+    NSError *theError = nil;
+    BOOL result = YES;
+
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+
+    result = [session setActive:YES error:&theError];
+
+    // Get the set of available inputs. If there are no audio accessories attached, there will be
+    // only one available input -- the built in microphone.
+    NSArray *inputs = [session currentRoute].inputs;
+
+    // Locate the Port corresponding to the built-in microphone.
+    AVAudioSessionPortDescription *builtInMicPort = nil;
+    for (AVAudioSessionPortDescription *port in inputs) {
+        if ([port.portType isEqualToString:AVAudioSessionPortBuiltInMic]) {
+            builtInMicPort = port;
+            break;
+        }
+    }
+
+    if ([builtInMicPort.preferredDataSource.orientation isEqualToString:nextDataSource]) {
+        return;
+    }
+
+    // loop over the built-in mic's data sources and attempt to locate the specified microphone
+    AVAudioSessionDataSourceDescription *theDataSource = nil;
+    for (AVAudioSessionDataSourceDescription *source in builtInMicPort.dataSources) {
+        if ([source.orientation isEqual:nextDataSource]) {
+            theDataSource = source;
+            break;
+        }
+    } // end data source iteration
+
+    if (theDataSource) {
+        theError = nil;
+        if ([theDataSource.orientation isEqualToString:AVAudioSessionOrientationBack]) {
+            result = [theDataSource setPreferredPolarPattern:AVAudioSessionPolarPatternSubcardioid error:&theError];
+            if (!result) {
+                NSLog (@"Failed to set AVAudioSessionPolarPatternSubcardioid failed");
+            }
+        } else if ([theDataSource.orientation isEqualToString:AVAudioSessionOrientationFront]) {
+            result = [theDataSource setPreferredPolarPattern:AVAudioSessionPolarPatternCardioid error:&theError];
+            if (!result) {
+                NSLog (@"Failed to set AVAudioSessionPolarPatternCardioid failed");
+            }
+        }
+
+        // Set a preference for the front data source.
+        theError = nil;
+        result = [builtInMicPort setPreferredDataSource:theDataSource error:&theError];
+        if (!result) {
+            // an error occurred. Handle it!
+            NSLog(@"setPreferredDataSource failed");
+        }
+    }
+
+    // Make sure the built-in mic is selected for input. This will be a no-op if the built-in mic is
+    // already the current input Port.
+    theError = nil;
+    result = [session setPreferredInput:builtInMicPort error:&theError];
+    if (!result) {
+        // an error occurred. Handle it!
+        NSLog(@"setPreferredInput failed");
+    }
 }
 
 @end

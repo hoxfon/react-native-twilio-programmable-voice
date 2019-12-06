@@ -1,5 +1,54 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 2.8.0
+- iOS: prevent CallKit to be initialised more than once
+
+## 2.7.0
+- iOS: correct handling of calls disconnection
+
+## 2.6.0
+- iOS: implementing getActiveCall()
+
+## 2.5.2
+- iOS: initWithToken() now returns the same value as Android
+
+## 2.5.1
+- iOS: handle call failure and pass to JS the most descriptive error
+
+## 2.5.0
+- iOS: Twilio Voice SDK 2.0.0-beta13
+
+## 2.4.0
+- Android: Twilio Voice SDK 2.0.0-beta15
+- use buildToolsVersion "25.0.2"
+- use targetSdkVersion 25
+- fix registerActionReceiver() called twice
+- fix reject() intent not sending CONNECTION_STOP to JavaScript
+- fix ingore() not not sending CONNECTION_STOP to JavaScript when there is not activeInviteCall
+
+## 2.3.2
+- Android: Twilio Voice SDK 2.0.0-beta14
+
+## 2.3.1
+- iOS: call TwilioVoice audioSessionDeactivated on didDeactivateAudioSession
+- iOS: performEndCallActionWithUUID when call is disconnected from the app
+
+## 2.3.0
+- Android: Twilio Voice SDK 2.0.0-beta13
+- iOS:     Twilio Voice SDK 2.0.0-beta11
+
+## 2.2.0
+- iOS: Twilio Voice SDK 2.0.0-beta10
+
+## 2.1.0
+- Android: Twilio Voice SDK 2.0.0-beta11
+
+## 2.0.2
+- Android: fix library for RN 0.45.1
+
+## 2.0.1
+- ios: send connectionDidDisconnect when the call invite terminates
+
 ## 2.0.0
 - ios implemtation with CallKit
 
