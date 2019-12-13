@@ -1,5 +1,12 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 4.0.0
+- Android
+    - update Firebase Messaging to 17.3.4 which simplifies how to obtain the FCM token
+- iOS
+    - convert params for connectionDidConnect to => call_to, from => call_from
+    - convert params for connectionDidDisconnect to => call_to, from => call_from, error => err
+
 ## 3.21.1
 - Android: fix crash when asking for microphone permission before an activity is displayed
 
