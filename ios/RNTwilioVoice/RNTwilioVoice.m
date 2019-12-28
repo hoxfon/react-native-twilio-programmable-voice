@@ -339,9 +339,10 @@ withCompletionHandler:(void (^)(void))completion {
     NSLog(@"cancelledCallInviteReceived:");
 
     TVOCallInvite *callInvite;
-    for (TVOCallInvite *invite in self.activeCallInvites) {
-        if ([cancelledCallInvite.callSid isEqualToString:invite.callSid]) {
-            callInvite = invite;
+    for (NSString *activeCallInviteId in self.activeCallInvites) {
+        TVOCallInvite *activeCallInvite = [self.activeCallInvites objectForKey:activeCallInviteId];
+        if ([cancelledCallInvite.callSid isEqualToString:activeCallInvite.callSid]) {
+            callInvite = activeCallInvite;
             break;
         }
     }
