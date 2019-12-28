@@ -4,7 +4,7 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 # Twilio Programmable Voice SDK
 
 - Android 2.1.0 (bundled within this library)
-- iOS 2.1.0 (specified by the app's own podfile)
+- iOS 5.1.1 (specified by the app's own podfile; min. version 5.x)
 
 ## Breaking changes in v4.0.0
 
@@ -67,7 +67,7 @@ platform :ios, '8.1'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.1.0'
+    pod 'TwilioVoice', '~> 5.1.1'
     ...
 end
 
@@ -82,7 +82,7 @@ Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '9.0'
 
 target <YOUR_TARGET> do
     ...
