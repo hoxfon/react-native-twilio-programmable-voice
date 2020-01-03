@@ -63,7 +63,7 @@ Edit your `Podfile` to include TwilioVoice framework
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '10.0'
 
 target <YOUR_TARGET> do
     ...

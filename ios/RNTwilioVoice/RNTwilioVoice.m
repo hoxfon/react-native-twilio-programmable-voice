@@ -68,18 +68,17 @@ RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
   _token = token;
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
   [self initPushRegistry];
-  [self initRNTwilioVoice];
 }
 
 RCT_EXPORT_METHOD(initWithAccessTokenUrl:(NSString *)tokenUrl) {
   _tokenUrl = tokenUrl;
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
   [self initPushRegistry];
-  [self initRNTwilioVoice];
 }
 
 RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
   if (self.callKitCallController == nil) {
+    [self initRNTwilioVoice];
     _settings = [[NSMutableDictionary alloc] initWithDictionary:params];
     CXProviderConfiguration *configuration = [[CXProviderConfiguration alloc] initWithLocalizedName:params[@"appName"]];
     configuration.maximumCallGroups = 1;
@@ -124,11 +123,11 @@ RCT_EXPORT_METHOD(disconnect) {
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
   NSLog(@"Mute/UnMute call");
-  self.activeCall.muted = muted;
+  self.activeCall.muted = *(muted);
 }
 
 RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
-  [self toggleAudioRoute:speaker];
+  [self toggleAudioRoute:*speaker];
 }
 
 RCT_EXPORT_METHOD(sendDigits: (NSString *)digits) {
@@ -315,7 +314,7 @@ withCompletionHandler:(void (^)(void))completion {
 
     NSLog(@"callInviteReceived:");
 
-    NSString *from = @"Voice Bot";
+    NSString *from = @"Unknown";
     if (callInvite.from) {
         from = [callInvite.from stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     }

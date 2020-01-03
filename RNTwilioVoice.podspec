@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license      = spec['license']
   s.platform     = :ios, "10.0"
 
-  s.source_files = [ "ios/RNTwilioVoice/*.h", "ios/RNTwilioVoice/*.m"]
+  s.source_files = [ "ios/RNTwilioVoice/RNTwilioVoice.h", "ios/RNTwilioVoice/RNTwilioVoice.m"]
   s.source = {:path => "./RNTwilioVoice"}
 
   s.dependency "React"
