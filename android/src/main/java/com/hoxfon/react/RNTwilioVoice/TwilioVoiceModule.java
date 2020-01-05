@@ -578,7 +578,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             params.putString("call_sid", activeCallInvite.getCallSid());
             params.putString("call_from", activeCallInvite.getFrom());
             params.putString("call_to", activeCallInvite.getTo());
-            params.putString("call_state", "DISCONNECTED");
+            params.putString("call_state", "REJECTED");
             activeCallInvite.reject(getReactApplicationContext());
             clearIncomingNotification(activeCallInvite);
         }
