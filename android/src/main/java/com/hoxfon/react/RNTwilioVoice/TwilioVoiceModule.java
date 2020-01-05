@@ -464,9 +464,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     WritableMap params = Arguments.createMap();
                     params.putString("call_sid", activeCallInvite.getCallSid());
                     params.putString("call_from", activeCallInvite.getFrom());
-                    params.putString("call_to", activeCallInvite.getTo()); // this is not needed
-                    // TODO check if this is needed
-                    // params.putString("call_state", "PENDING");
+                    params.putString("call_to", activeCallInvite.getTo()); // TODO check if needed
                     eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
                 }
             } else {
