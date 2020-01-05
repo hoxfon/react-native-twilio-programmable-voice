@@ -63,11 +63,11 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.d(TAG, "Received onMessageReceived()");
-        Log.d(TAG, "Bundle data: " + remoteMessage.getData());
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
+
         if (BuildConfig.DEBUG) {
+            Log.d(TAG, "Received onMessageReceived()");
             Log.d(TAG, "Bundle data: " + remoteMessage.getData());
+            Log.d(TAG, "From: " + remoteMessage.getFrom());
         }
 
         // Check if message contains a data payload.
