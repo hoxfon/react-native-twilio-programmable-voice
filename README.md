@@ -45,7 +45,9 @@ ReactNative success is directly linked to its module ecosystem. One way to make 
 ## Installation
 
 Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
-It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required.
+It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required. On RN 0.60+, this module can be auto-linked (Android still requires FCM setup below).
+
+### Manual Linking
 
 
 ```
