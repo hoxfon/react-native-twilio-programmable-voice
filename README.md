@@ -1,5 +1,6 @@
 # react-native-twilio-programmable-voice
-This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your ReactNatvie App. This module is not curated nor maintained, but inspired by Twilio.
+
+This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your React Native App. This module is not affiliated with or maintained by the Twilio team. This is maintained by contributions from the community.
 
 # Twilio Programmable Voice SDK
 
@@ -8,7 +9,9 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 ## Breaking changes in v4.0.0
 
-- Android: remove the following block from your application's `AndroidManifest.xml`
+It implements [react-native autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) as many other native libraries > react-native 0.60.0
+
+Android: update Firebase Messaging to 17.3.4. Remove the following block from your application's `AndroidManifest.xml`
 ```xml
     <!-- [START instanceId_listener] -->
     <service
@@ -20,6 +23,8 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
     </service>
     <!-- [END instanceId_listener] -->
 ```
+
+Android X is supported.
 
 Data passed to the event `deviceDidReceiveIncoming` does not contain the key `call_state`, because state of Call Invites was removed in Twilio Android v3.0.0
 
@@ -57,7 +62,9 @@ ReactNative success is directly linked to its module ecosystem. One way to make 
 ## Installation
 
 Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
-It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required.
+It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required. On RN 0.60+, this module can be auto-linked (Android still requires FCM setup below).
+
+### Manual Linking
 
 
 ```
@@ -140,8 +147,9 @@ buildscript {
 
 dependencies {
     ...
+    // on React Native 0.60+, this module can be auto-linked and doesn't need a manual entry here
 
-    compile project(':react-native-twilio-programmable-voice')
+    implementation project(':react-native-twilio-programmable-voice')
 }
 
 // this plugin looks for google-services.json in your project
@@ -168,22 +176,12 @@ In your `AndroidManifest.xml`
             </intent-filter>
         </service>
         <!-- [END fcm_listener] -->
-        <!-- [START instanceId_listener] -->
-        <service
-            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseInstanceIDService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
-            </intent-filter>
-        </service>
-        <!-- [END instanceId_listener] -->
-        <!-- Twilio Voice -->
 
      .....
 
 ```
 
-In `android/settings.gradle`
+In `android/settings.gradle` (not necessary if auto-linking on RN 0.60+)
 
 ```gradle
 ...
@@ -192,7 +190,7 @@ include ':react-native-twilio-programmable-voice'
 project(':react-native-twilio-programmable-voice').projectDir = file('../node_modules/react-native-twilio-programmable-voice/android')
 ```
 
-Register module (in `MainApplication.java`)
+Register module (in `MainApplication.java`) (not necessary if auto-linking on RN 0.60+ unless you want to control microphone permission)
 
 ```java
 import com.hoxfon.react.RNTwilioVoice.TwilioVoicePackage;  // <--- Import Package
