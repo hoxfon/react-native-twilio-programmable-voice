@@ -462,7 +462,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
             }
 
-            // clearIncomingNotification(activeCallInvite);
+            clearIncomingNotification(activeCallInvite);
         } else if (intent.getAction().equals(ACTION_FCM_TOKEN)) {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "handleIncomingCallIntent ACTION_FCM_TOKEN");
