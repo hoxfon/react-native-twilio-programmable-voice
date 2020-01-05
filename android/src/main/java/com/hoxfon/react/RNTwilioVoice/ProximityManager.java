@@ -151,9 +151,9 @@ public class ProximityManager {
             // SensorManager.SENSOR_DELAY_UI(60 ms),
             // SensorManager.SENSOR_DELAY_NORMAL(200 ms)
             sensorManager.registerListener(
-                proximityListener,
-                proximitySensor,
-                SensorManager.SENSOR_DELAY_NORMAL
+                    proximityListener,
+                    proximitySensor,
+                    SensorManager.SENSOR_DELAY_NORMAL
             );
         }
     }

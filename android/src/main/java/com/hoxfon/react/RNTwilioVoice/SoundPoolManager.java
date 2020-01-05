@@ -7,8 +7,8 @@ import android.net.Uri;
 
 public class SoundPoolManager {
 
-    private boolean playing = false;
     private static SoundPoolManager instance;
+    private boolean playing = false;
     private Ringtone ringtone = null;
 
     private SoundPoolManager(Context context) {

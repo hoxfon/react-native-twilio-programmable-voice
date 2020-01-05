@@ -16,11 +16,10 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
 public class HeadsetManager {
 
-    private BroadcastReceiver wiredHeadsetReceiver;
     private static final String ACTION_HEADSET_PLUG = (android.os.Build.VERSION.SDK_INT >= 21)
-        ? AudioManager.ACTION_HEADSET_PLUG
-        : Intent.ACTION_HEADSET_PLUG;
-
+            ? AudioManager.ACTION_HEADSET_PLUG
+            : Intent.ACTION_HEADSET_PLUG;
+    private BroadcastReceiver wiredHeadsetReceiver;
     private EventManager eventManager;
 
     public HeadsetManager(EventManager em) {
