@@ -123,11 +123,11 @@ RCT_EXPORT_METHOD(disconnect) {
 
 RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
   NSLog(@"Mute/UnMute call");
-  self.activeCall.muted = *(muted);
+  self.activeCall.muted = muted ? YES : NO;
 }
 
 RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
-  [self toggleAudioRoute:*speaker];
+  [self toggleAudioRoute: speaker ? YES : NO];
 }
 
 RCT_EXPORT_METHOD(sendDigits: (NSString *)digits) {
