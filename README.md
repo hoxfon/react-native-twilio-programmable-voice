@@ -291,10 +291,6 @@ TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
     //     }
 })
 
-// iOS Only
-TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
-
-// Android Only
 TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     // {
     //     call_sid: string,  // Twilio call sid
@@ -303,6 +299,10 @@ TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     //     call_to: string,   // "client:bob"
     // }
 })
+
+// iOS Only
+TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
+
 // Android Only
 TwilioVoice.addEventListener('proximity', function(data) {
     // {

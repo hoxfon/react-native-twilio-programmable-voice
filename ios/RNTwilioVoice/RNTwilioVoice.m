@@ -51,7 +51,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
+  return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady", @"deviceDidReceiveIncoming"];
 }
 
 @synthesize bridge = _bridge;
@@ -325,6 +325,22 @@ withCompletionHandler:(void (^)(void))completion {
     if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
         [self incomingPushHandled];
     }
+
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    if (callInvite.callSid) {
+      [params setObject:callInvite.callSid forKey:@"call_sid"];
+    }
+
+    if (callInvite.from) {
+      [params setObject:callInvite.from forKey:@"call_from"];
+    }
+    if (callInvite.to) {
+      [params setObject:callInvite.to forKey:@"call_to"];
+    }
+
+    [params setObject:StatePending forKey:@"call_state"];
+
+    [self sendEventWithName:@"deviceDidReceiveIncoming" body:params];
 }
 
 - (void)cancelledCallInviteReceived:(TVOCancelledCallInvite *)cancelledCallInvite error:(NSError *)error {
@@ -546,6 +562,7 @@ withCompletionHandler:(void (^)(void))completion {
     TVOCall *call = self.activeCalls[action.callUUID.UUIDString];
 
     if (callInvite) {
+        [self sendEventWithName:@"callRejected" body:@"callRejected"];
         [callInvite reject];
         [self.activeCallInvites removeObjectForKey:callInvite.uuid.UUIDString];
     } else if (call) {
