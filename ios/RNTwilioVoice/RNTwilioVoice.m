@@ -164,10 +164,10 @@ RCT_REMAP_METHOD(getActiveCall,
       [params setObject:callInvite.callSid forKey:@"call_sid"];
     }
     if (callInvite.from) {
-      [params setObject:callInvite.from forKey:@"from"];
+      [params setObject:callInvite.from forKey:@"call_from"];
     }
     if (callInvite.to) {
-      [params setObject:callInvite.to forKey:@"to"];
+      [params setObject:callInvite.to forKey:@"call_to"];
     }
     [params setObject:StatePending forKey:@"call_state"];
     resolve(params);
