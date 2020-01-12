@@ -117,6 +117,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private HeadsetManager headsetManager;
     private EventManager eventManager;
 
+    private SoundPoolManager soundPoolManager;
+
     public TwilioVoiceModule(ReactApplicationContext reactContext,
     boolean shouldAskForMicPermission) {
         super(reactContext);
@@ -134,6 +136,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         headsetManager = new HeadsetManager(eventManager);
 
         notificationManager = (android.app.NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        soundPoolManager = SoundPoolManager.getInstance(reactContext);
 
         /*
          * Setup the broadcast receiver to be notified of GCM Token updates
@@ -391,7 +394,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "handleIncomingCallIntent state = PENDING");
                 }
-                SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
+                soundPoolManager.playRinging();
 
                 if (getReactApplicationContext().getCurrentActivity() != null) {
                     Window window = getReactApplicationContext().getCurrentActivity().getWindow();
@@ -422,7 +425,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 //   - the call is answered (activeCall != null)
                 //   - the call is rejected
 
-                SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+                soundPoolManager.stopRinging();
 
                 // the call is not active yet
                 if (activeCall == null) {
@@ -552,7 +555,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void accept() {
         callAccepted = true;
-        SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+        soundPoolManager.stopRinging();
         if (activeCallInvite != null){
             if (activeCallInvite.getState() == CallInvite.State.PENDING) {
                 if (BuildConfig.DEBUG) {
@@ -582,7 +585,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void reject() {
         callAccepted = false;
-        SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+        soundPoolManager.stopRinging();
         WritableMap params = Arguments.createMap();
         if (activeCallInvite != null){
             params.putString("call_sid",   activeCallInvite.getCallSid());
@@ -598,7 +601,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void ignore() {
         callAccepted = false;
-        SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
+        soundPoolManager.stopRinging();
         WritableMap params = Arguments.createMap();
         if (activeCallInvite != null){
             params.putString("call_sid",   activeCallInvite.getCallSid());
@@ -667,6 +670,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void disconnect() {
         if (activeCall != null) {
+            soundPoolManager.playDisconnect();
             activeCall.disconnect();
             activeCall = null;
         }

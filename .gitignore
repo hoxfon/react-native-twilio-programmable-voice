@@ -41,6 +41,11 @@ proguard/
 # Android Studio captures folder
 captures/
 
+#Android generated
+android/.classpath
+android/.project
+android/.settings/org.eclipse.buildship.core.prefs
+
 # Intellij
 *.iml
 .idea/workspace.xml
