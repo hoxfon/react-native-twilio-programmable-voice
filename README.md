@@ -3,7 +3,7 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 2.1.0 (bundled within this library)
+- Android 3.3.0 (bundled within this library)
 - iOS 2.1.0 (specified by the app's own podfile)
 
 ## Breaking changes in v4.0.0
@@ -21,11 +21,23 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
     <!-- [END instanceId_listener] -->
 ```
 
+Data passed to the event `deviceDidReceiveIncoming` does not contain the key `call_state`, because state of Call Invites was removed in Twilio Android v3.0.0
+
 - iOS: params changes for `connectionDidConnect` and `connectionDidDisconnect`
 
     to => call_to
     from => call_from
     error => err
+
+New features
+
+Twilio Programmable Voice SDK v3.0.0 handles call invites directly and makes it easy to distinguish a call invites from an active call, which previously was confusing.
+To ensure that an active call is displayed when the app comes to foreground you should use the promise `getActiveCall()`.
+To ensure that a call invite is displayed when the app comes to foreground use the promise `getCallInvite()`. Please note that call invites don't have a `call_state` field.
+
+You should use `hold()` to put a call on hold.
+
+You can be notified when a call is `ringing` by listening for `callStateRinging` events.
 
 ## Breaking changes in v3.0.0
 
@@ -251,19 +263,11 @@ TwilioVoice.addEventListener('deviceNotReady', function(data) {
     // }
 })
 TwilioVoice.addEventListener('connectionDidConnect', function(data) {
-    // Android
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
-    // }
-    // iOS
-    // {
-    //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
-    //     from: string,      // "+441234567890" // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //     to: string,        // "client:bob"    // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
     // }
 })
 TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
@@ -271,24 +275,28 @@ TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
     //   | {
     //       err: string
     //     }
-    //   | Android
-    //     {
+    //   | {
     //         call_sid: string,  // Twilio call sid
-    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
     //         call_from: string, // "+441234567890"
     //         call_to: string,   // "client:bob"
     //         err?: string,
     //     }
-    //   | iOS
-    //     {
-    //         call_sid: string,  // Twilio call sid
-    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
-    //         call_from?: string, // "+441234567890"
-    //         call_to?: string,   // "client:bob"
-    //         from?: string,      // "+441234567890" // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //         to?: string,        // "client:bob"    // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //         error?: string,                        // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //     }
+})
+TwilioVoice.addEventListener('callStateRinging', function(data: mixed) {
+    //   {
+    //       call_sid: string,  // Twilio call sid
+    //       call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
+    //       call_from: string, // "+441234567890"
+    //       call_to: string,   // "client:bob"
+    //   }
+})
+TwilioVoice.addEventListener('callInviteCancelled', function(data: mixed) {
+    //   {
+    //       call_sid: string,  // Twilio call sid
+    //       call_from: string, // "+441234567890"
+    //       call_to: string,   // "client:bob"
+    //   }
 })
 
 // iOS Only
@@ -298,7 +306,6 @@ TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
 TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
@@ -339,14 +346,25 @@ TwilioVoice.ignore()
 // mutedValue must be a boolean
 TwilioVoice.setMuted(mutedValue)
 
+// put a call on hold
+TwilioVoice.setOnHold(holdValue)
+
+// send digits
 TwilioVoice.sendDigits(digits)
 
-// should be called after the app is initialized
-// to catch incoming call when the app was in the background
+// Ensure that an active call is displayed when the app comes to foreground
 TwilioVoice.getActiveCall()
-    .then(incomingCall => {
-        if (incomingCall){
-            _deviceDidReceiveIncoming(incomingCall)
+    .then(activeCall => {
+        if (activeCall){
+            _displayActiveCall(activeCall)
+        }
+    })
+
+// Ensure that call invites are displayed when the app comes to foreground
+TwilioVoice.getCallInvite()
+    .then(callInvite => {
+        if (callInvite){
+            _handleCallInvite(callInvite)
         }
     })
 
