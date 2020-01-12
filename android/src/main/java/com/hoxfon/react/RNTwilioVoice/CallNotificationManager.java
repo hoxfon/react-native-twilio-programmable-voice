@@ -21,6 +21,7 @@ import android.view.WindowManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.twilio.voice.CallInvite;
+import com.twilio.voice.CancelledCallInvite;
 
 import java.util.List;
 
@@ -307,12 +308,18 @@ public class CallNotificationManager {
     }
 
     public void removeIncomingCallNotification(ReactApplicationContext context,
-                                               CallInvite callInvite,
+                                               CancelledCallInvite callInvite,
                                                int notificationId) {
-        Log.d(TAG, "removeIncomingCallNotification");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "removeIncomingCallNotification");
+        }
+        if (context == null) {
+            Log.e(TAG, "Context is null");
+            return;
+        }
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (callInvite != null && callInvite.getState() == CallInvite.State.PENDING) {
+            if (callInvite != null) {
                 /*
                  * If the incoming call message was cancelled then remove the notification by matching
                  * it with the call sid from the list of notifications in the notification drawer.

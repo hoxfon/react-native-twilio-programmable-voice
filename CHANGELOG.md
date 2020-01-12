@@ -3,14 +3,23 @@
 ## 4.0.0
 
 - Android
+  - implement new autolinking react native API
   - update Firebase Messaging to 17.3.4 which simplifies how to obtain the FCM token
   - Android X migration
   - use gradle 5.4.1
   - use API 28
-  - upgrade com.twilio:voice-android to 2.1.0
+  - upgrade com.twilio:voice-android to 3.3.0
+  - implement `hold` to hold a call
+  - new event `callInviteCancelled`
+  - new event `callStateRinging`
+  - new method `getCallInvite`
+  - implement call ringing Twilio event
+  - remove `call_state` from CallInvite
 - iOS
-  - convert params for connectionDidConnect to => call_to, from => call_from
-  - convert params for connectionDidDisconnect to => call_to, from => call_from, error => err
+  - convert params for `connectionDidConnect` to => `call_to`, from => `call_from`
+  - convert params for `connectionDidDisconnect` to => `call_to`, from => `call_from`, `error` => `err`
+
+- throw an error when listening to events that do not exist
 
 ## 3.21.3
 
