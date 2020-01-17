@@ -2,11 +2,12 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.1'
-        classpath 'com.google.gms:google-services:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.5.2'
+        classpath 'com.google.gms:google-services:4.2.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -15,21 +16,24 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
     }
 }
 
 apply plugin: 'com.android.library'
 
+def DEFAULT_COMPILE_SDK_VERSION = 28
+def DEFAULT_BUILD_TOOLS_VERSION = "28.0.3"
+def DEFAULT_TARGET_SDK_VERSION = 28
+def DEFAULT_SUPPORT_LIB_VERSION = "28.0.0"
+
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
+    buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
@@ -43,10 +47,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.twilio:voice-android:2.0.7'
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.google.firebase:firebase-messaging:17.+'
-    testCompile 'junit:junit:4.12'
+    def supportLibVersion = rootProject.hasProperty('supportLibVersion') ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
+
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.twilio:voice-android:2.1.0'
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation 'com.facebook.react:react-native:+'
+    implementation 'com.google.firebase:firebase-messaging:17.+'
+    testImplementation 'junit:junit:4.12'
 }

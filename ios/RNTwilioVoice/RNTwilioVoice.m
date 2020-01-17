@@ -99,7 +99,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
   device.proximityMonitoringEnabled = YES;
 
   if (self.call && self.call.state == TVOCallStateConnected) {
-    [self.call disconnect];
+    [self performEndCallActionWithUUID:self.call.uuid];
   } else {
     NSUUID *uuid = [NSUUID UUID];
     NSString *handle = [params valueForKey:@"To"];
@@ -122,14 +122,14 @@ RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
   [self toggleAudioRoute:speaker];
 }
 
-RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
+RCT_EXPORT_METHOD(sendDigits: (NSString *)digits) {
   if (self.call && self.call.state == TVOCallStateConnected) {
     NSLog(@"SendDigits %@", digits);
     [self.call sendDigits:digits];
   }
 }
 
-RCT_EXPORT_METHOD(unregister){
+RCT_EXPORT_METHOD(unregister) {
   NSLog(@"unregister");
   NSString *accessToken = [self fetchAccessToken];
 
@@ -148,16 +148,16 @@ RCT_EXPORT_METHOD(unregister){
 
 RCT_REMAP_METHOD(getActiveCall,
                  resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject){
+                 rejecter:(RCTPromiseRejectBlock)reject) {
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
   if (self.callInvite) {
-    if (self.callInvite.callSid){
+    if (self.callInvite.callSid) {
       [params setObject:self.callInvite.callSid forKey:@"call_sid"];
     }
-    if (self.callInvite.from){
+    if (self.callInvite.from) {
       [params setObject:self.callInvite.from forKey:@"from"];
     }
-    if (self.callInvite.to){
+    if (self.callInvite.to) {
       [params setObject:self.callInvite.to forKey:@"to"];
     }
     if (self.callInvite.state == TVOCallInviteStatePending) {
@@ -172,10 +172,10 @@ RCT_REMAP_METHOD(getActiveCall,
     if (self.call.sid) {
       [params setObject:self.call.sid forKey:@"call_sid"];
     }
-    if (self.call.to){
+    if (self.call.to) {
       [params setObject:self.call.to forKey:@"call_to"];
     }
-    if (self.call.from){
+    if (self.call.from) {
       [params setObject:self.call.from forKey:@"call_from"];
     }
     if (self.call.state == TVOCallStateConnected) {
@@ -299,15 +299,15 @@ RCT_REMAP_METHOD(getActiveCall,
   [self performEndCallActionWithUUID:callInvite.uuid];
 
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  if (self.callInvite.callSid){
+  if (self.callInvite.callSid) {
     [params setObject:self.callInvite.callSid forKey:@"call_sid"];
   }
 
-  if (self.callInvite.from){
-    [params setObject:self.callInvite.from forKey:@"from"];
+  if (self.callInvite.from) {
+    [params setObject:self.callInvite.from forKey:@"call_from"];
   }
-  if (self.callInvite.to){
-    [params setObject:self.callInvite.to forKey:@"to"];
+  if (self.callInvite.to) {
+    [params setObject:self.callInvite.to forKey:@"call_to"];
   }
   if (self.callInvite.state == TVOCallInviteStateCanceled) {
     [params setObject:StateDisconnected forKey:@"call_state"];
@@ -337,11 +337,11 @@ RCT_REMAP_METHOD(getActiveCall,
     [callParams setObject:StateConnected forKey:@"call_state"];
   }
 
-  if (call.from){
-    [callParams setObject:call.from forKey:@"from"];
+  if (call.from) {
+    [callParams setObject:call.from forKey:@"call_from"];
   }
-  if (call.to){
-    [callParams setObject:call.to forKey:@"to"];
+  if (call.to) {
+    [callParams setObject:call.to forKey:@"call_to"];
   }
   [self sendEventWithName:@"connectionDidConnect" body:callParams];
 }
@@ -357,7 +357,6 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)call:(TVOCall *)call didDisconnectWithError:(NSError *)error {
   NSLog(@"Call disconnected with error: %@", error);
 
-  [self performEndCallActionWithUUID:call.uuid];
   [self callDisconnected:error];
 }
 
@@ -368,15 +367,15 @@ RCT_REMAP_METHOD(getActiveCall,
     if (error.localizedFailureReason) {
       errMsg = [error localizedFailureReason];
     }
-    [params setObject:errMsg forKey:@"error"];
+    [params setObject:errMsg forKey:@"err"];
   }
   if (self.call.sid) {
     [params setObject:self.call.sid forKey:@"call_sid"];
   }
-  if (self.call.to){
+  if (self.call.to) {
     [params setObject:self.call.to forKey:@"call_to"];
   }
-  if (self.call.from){
+  if (self.call.from) {
     [params setObject:self.call.from forKey:@"call_from"];
   }
   if (self.call.state == TVOCallStateDisconnected) {
