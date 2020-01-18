@@ -1,10 +1,10 @@
 # react-native-twilio-programmable-voice
-This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your ReactNatvie App. This module is not curated nor maintained, but inspired by Twilio.
+This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your React Native App. This module is not affiliated with or maintained by the Twilio team. This is maintained by contributions from the community.
 
 # Twilio Programmable Voice SDK
 
-- Android 2.1.0 (bundled within this library)
-- iOS 2.1.0 (specified by the app's own podfile)
+- Android 5.0.2 (bundled within this library)
+- iOS 5.1.1 (specified by the app's own podfile; min. version 5.x)
 
 ## Breaking changes in v4.0.0
 
@@ -45,7 +45,7 @@ ReactNative success is directly linked to its module ecosystem. One way to make 
 ## Installation
 
 Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
-It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required.
+It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required. On RN 0.60+, this module can be auto-linked (Android still requires FCM setup below).
 
 
 ```
@@ -63,11 +63,11 @@ Edit your `Podfile` to include TwilioVoice framework
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '10.0'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.1.0'
+    pod 'TwilioVoice', '~> 5.1.1'
     ...
 end
 
@@ -82,11 +82,11 @@ Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '10.0'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.1.0'
+    pod 'TwilioVoice', '~> 5.1.1'
     pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
     ...
 end
@@ -120,7 +120,7 @@ It contains keys and settings for all your applications under Firebase. This lib
 buildscript {
   ...
   dependencies {
-    classpath 'com.google.gms:google-services:3.1.2'
+    classpath 'com.google.gms:google-services:4.2.0'
   }
 }
 
@@ -128,8 +128,9 @@ buildscript {
 
 dependencies {
     ...
+    // on React Native 0.60+, this module can be auto-linked and doesn't need a manual entry here
 
-    compile project(':react-native-twilio-programmable-voice')
+    implementation project(':react-native-twilio-programmable-voice')
 }
 
 // this plugin looks for google-services.json in your project
@@ -156,22 +157,12 @@ In your `AndroidManifest.xml`
             </intent-filter>
         </service>
         <!-- [END fcm_listener] -->
-        <!-- [START instanceId_listener] -->
-        <service
-            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseInstanceIDService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
-            </intent-filter>
-        </service>
-        <!-- [END instanceId_listener] -->
-        <!-- Twilio Voice -->
 
      .....
 
 ```
 
-In `android/settings.gradle`
+In `android/settings.gradle` (not necessary if auto-linking on RN 0.60+)
 
 ```gradle
 ...
@@ -180,7 +171,7 @@ include ':react-native-twilio-programmable-voice'
 project(':react-native-twilio-programmable-voice').projectDir = file('../node_modules/react-native-twilio-programmable-voice/android')
 ```
 
-Register module (in `MainApplication.java`)
+Register module (in `MainApplication.java`) (not necessary if auto-linking on RN 0.60+ unless you want to control microphone permission)
 
 ```java
 import com.hoxfon.react.RNTwilioVoice.TwilioVoicePackage;  // <--- Import Package
