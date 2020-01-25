@@ -64,6 +64,8 @@ import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_NOT_READY
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_STATE_RINGING;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_INVITE_CANCELLED;
+import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_IS_RECONNECTING;
+import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_RECONNECT;
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
@@ -249,7 +251,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (call != null) {
                     params.putString("call_sid",   call.getSid());
                     params.putString("call_from",  call.getFrom());
-                    params.putString("call_state", call.getState().name());
                 }
                 eventManager.sendEvent(EVENT_CALL_STATE_RINGING, params);
             }
@@ -282,26 +283,42 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 eventManager.sendEvent(EVENT_CONNECTION_DID_CONNECT, params);
             }
 
-//            Prepare methods Twilio for v4
-//            @Override
-//            public void onReconnecting(Call call, CallException callException) {
-//                if (BuildConfig.DEBUG) {
-//                    Log.d(TAG, "CALL RECONNECTING callListener().onReconnecting call state = "+call.getState());
-//                }
-//                // TODO implement
-////                eventManager.sendEvent(XXX, params);
-//
-//            }
-//
-//            @Override
-//            public void onReconnected(Call call) {
-//                if (BuildConfig.DEBUG) {
-//                    Log.d(TAG, "CALL RECONNECTED callListener().onReconnected call state = "+call.getState());
-//                }
-//
-//                // TODO implement
-////                eventManager.sendEvent(XXX, params);
-//            }
+            /**
+             * `onReconnecting()` callback is raised when a network change is detected and Call is already in `CONNECTED`
+             * `Call.State`. If the call is in `CONNECTING` or `RINGING` when network change happened the SDK will continue
+             * attempting to connect, but a reconnect event will not be raised.
+             */
+            @Override
+            public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "CALL RECONNECTING callListener().onReconnecting call state = "+call.getState());
+                }
+                WritableMap params = Arguments.createMap();
+                if (call != null) {
+                    params.putString("call_sid",   call.getSid());
+                    params.putString("call_from", call.getFrom());
+                    params.putString("call_to", call.getTo());
+                }
+                eventManager.sendEvent(EVENT_CONNECTION_IS_RECONNECTING, params);
+
+            }
+
+            /**
+             * The call is successfully reconnected after reconnecting attempt.
+             */
+            @Override
+            public void onReconnected(@NonNull Call call) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "CALL RECONNECTED callListener().onReconnected call state = "+call.getState());
+                }
+                WritableMap params = Arguments.createMap();
+                if (call != null) {
+                    params.putString("call_sid",   call.getSid());
+                    params.putString("call_from", call.getFrom());
+                    params.putString("call_to", call.getTo());
+                }
+                eventManager.sendEvent(EVENT_CONNECTION_DID_RECONNECT, params);
+            }
 
             @Override
             public void onDisconnected(Call call, CallException error) {
@@ -605,7 +622,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "accept()");
             }
-            AcceptOptions acceptOptions = new AcceptOptions.Builder().build();
+            AcceptOptions acceptOptions = new AcceptOptions.Builder()
+                    .enableDscp(true)
+                    .build();
             activeCallInvite.accept(getReactApplicationContext(), acceptOptions, callListener);
             clearIncomingNotification(activeCallInvite.getCallSid());
 
@@ -711,6 +730,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+            .enableDscp(true)
             .params(twiMLParams)
             .build();
 

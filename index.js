@@ -16,6 +16,8 @@ const _eventHandlers = {
     deviceNotReady: new Map(),
     deviceDidReceiveIncoming: new Map(),
     connectionDidConnect: new Map(),
+    connectionIsReconnecting: new Map(),
+    connectionDidReconnect: new Map(),
     connectionDidDisconnect: new Map(),
     callStateRinging: new Map(),
     callInviteCancelled: new Map(),
