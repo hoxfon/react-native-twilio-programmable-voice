@@ -4,14 +4,14 @@ This is a React Native wrapper for Twilio Programmable Voice SDK that lets you m
 
 # Twilio Programmable Voice SDK
 
-- Android 3.3.0 (bundled within this library)
+- Android 4.5.0 (bundled within this library)
 - iOS 2.1.0 (specified by the app's own podfile)
 
 ## Breaking changes in v4.0.0
 
 It implements [react-native autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) as many other native libraries > react-native 0.60.0
 
-Android: update Firebase Messaging to 17.3.4. Remove the following block from your application's `AndroidManifest.xml`
+Android: update Firebase Messaging to 17.6.+. Remove the following block from your application's `AndroidManifest.xml`
 ```xml
     <!-- [START instanceId_listener] -->
     <service
@@ -267,6 +267,12 @@ TwilioVoice.addEventListener('connectionDidConnect', function(data) {
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
+})
+TwilioVoice.addEventListener('connectionIsReconnecting', function(data) {
+    // empty data
+})
+TwilioVoice.addEventListener('connectionDidReconnect', function(data) {
+    // empty data
 })
 TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
     //   | null
