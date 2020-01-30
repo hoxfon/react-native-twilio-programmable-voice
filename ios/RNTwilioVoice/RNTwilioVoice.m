@@ -21,6 +21,7 @@
 @property (nonatomic, strong) CXCallController *callKitCallController;
 @property (nonatomic, strong) void(^incomingPushCompletionCallback)(void);
 @property (nonatomic, strong) TVODefaultAudioDevice *audioDevice;
+@property (nonatomic, assign) BOOL userInitiatedDisconnect;
 @end
 
 @implementation RNTwilioVoice {
@@ -113,6 +114,7 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
 
 RCT_EXPORT_METHOD(disconnect) {
   NSLog(@"Disconnecting call");
+    self.userInitiatedDisconnect = YES;
   [self performEndCallActionWithUUID:self.call.uuid];
 }
 
@@ -201,6 +203,15 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)initPushRegistry {
+  
+   /*
+    * The important thing to remember when providing a TVOAudioDevice is that the device must be set
+    * before performing any other actions with the SDK (such as connecting a Call, or accepting an incoming Call).
+    * In this case we've already initialized our own `TVODefaultAudioDevice` instance which we will now set.
+    */
+  self.audioDevice = [TVODefaultAudioDevice audioDevice];
+  TwilioVoice.audioDevice = self.audioDevice;
+
   self.voipRegistry = [[PKPushRegistry alloc] initWithQueue:dispatch_get_main_queue()];
   self.voipRegistry.delegate = self;
   self.voipRegistry.desiredPushTypes = [NSSet setWithObject:PKPushTypeVoIP];
@@ -416,6 +427,14 @@ RCT_REMAP_METHOD(getActiveCall,
   self.callKitCompletionCallback = nil;
 }
 
+- (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
+    NSLog(@"Call failed to connect: %@", error);
+    
+    self.callKitCompletionCallback(NO);
+    [self performEndCallActionWithUUID:call.uuid];
+    [self callDisconnected:call];
+}
+
 #pragma mark - AVAudioSession
 - (void)toggleAudioRoute: (BOOL *)toSpeaker {
   // The mode set by the Voice SDK is "VoiceChat" so the default audio route is the built-in receiver.
@@ -530,6 +549,73 @@ RCT_REMAP_METHOD(getActiveCall,
 
   [action fulfill];
 }
+
+- (void)call:(TVOCall *)call didDisconnectWithError:(NSError *)error {
+    if (error) {
+        NSLog(@"Call failed: %@", error);
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        NSString* errMsg = [error localizedDescription];
+        if (error.localizedFailureReason) {
+          errMsg = [error localizedFailureReason];
+        }
+        [params setObject:errMsg forKey:@"error"];
+        if (self.call.sid) {
+          [params setObject:self.call.sid forKey:@"call_sid"];
+        }
+        if (self.call.to){
+          [params setObject:self.call.to forKey:@"call_to"];
+        }
+        if (self.call.from){
+          [params setObject:self.call.from forKey:@"call_from"];
+        }
+        if (self.call.state == TVOCallStateDisconnected) {
+          [params setObject:StateDisconnected forKey:@"call_state"];
+        }
+        [self sendEventWithName:@"connectionDidDisconnect" body:params];
+
+        [self performEndCallActionWithUUID:call.uuid];
+
+        self.call = nil;
+        self.callKitCompletionCallback = nil;
+    } else {
+        NSLog(@"connectionDidDisconnect");
+
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        [params setObject:self.call.sid forKey:@"call_sid"];
+        if (self.call.to){
+          [params setObject:self.call.to forKey:@"call_to"];
+        }
+        if (self.call.from){
+          [params setObject:self.call.from forKey:@"call_from"];
+        }
+        if (self.call.state == TVOCallStateDisconnected) {
+          [params setObject:StateDisconnected forKey:@"call_state"];
+        }
+        [self sendEventWithName:@"connectionDidDisconnect" body:params];
+        if (self.call.state == TVOCallStateConnected) {
+          [self performEndCallActionWithUUID:call.uuid];
+        }
+        self.call = nil;
+    }
+
+    if (!self.userInitiatedDisconnect) {
+        CXCallEndedReason reason = CXCallEndedReasonRemoteEnded;
+        if (error) {
+            reason = CXCallEndedReasonFailed;
+        }
+        
+        [self.callKitProvider reportCallWithUUID:call.uuid endedAtDate:[NSDate date] reason:reason];
+    }
+    
+    [self callDisconnected:call];
+}
+
+- (void)callDisconnected:(TVOCall *)call {
+    
+    self.call = nil;
+    self.userInitiatedDisconnect = NO;
+}
+
 
 - (void)provider:(CXProvider *)provider performSetHeldCallAction:(CXSetHeldCallAction *)action {
   if (self.call && self.call.state == TVOCallStateConnected) {
