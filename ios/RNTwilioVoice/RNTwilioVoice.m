@@ -61,6 +61,25 @@ RCT_EXPORT_MODULE()
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (instancetype)init
+{
+  self = [super init];
+    
+   /*
+    * The important thing to remember when providing a TVOAudioDevice is that the device must be set
+    * before performing any other actions with the SDK (such as connecting a Call, or accepting an incoming Call).
+    * In this case we've already initialized our own `TVODefaultAudioDevice` instance which we will now set.
+    */
+  self.audioDevice = [TVODefaultAudioDevice audioDevice];
+  TwilioVoice.audioDevice = self.audioDevice;
+
+  return self;
+}
+
+- (void)didReceiveMemoryWarning {
+  [super didReceiveMemoryWarning];
+}
+
 RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
   _token = token;
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
@@ -203,14 +222,6 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)initPushRegistry {
-  
-   /*
-    * The important thing to remember when providing a TVOAudioDevice is that the device must be set
-    * before performing any other actions with the SDK (such as connecting a Call, or accepting an incoming Call).
-    * In this case we've already initialized our own `TVODefaultAudioDevice` instance which we will now set.
-    */
-  self.audioDevice = [TVODefaultAudioDevice audioDevice];
-  TwilioVoice.audioDevice = self.audioDevice;
 
   self.voipRegistry = [[PKPushRegistry alloc] initWithQueue:dispatch_get_main_queue()];
   self.voipRegistry.delegate = self;
@@ -281,14 +292,28 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type withCompletionHandler:(void (^)(void))completion {
   NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
   
-  // Save for later when the notification is properly handled.
-  self.incomingPushCompletionCallback = completion;
+    NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType:withCompletionHandler:");
 
-  if ([type isEqualToString:PKPushTypeVoIP]) {
-    [TwilioVoice handleNotification:payload.dictionaryPayload
-                           delegate:self
-                           delegateQueue:nil];
-  }
+    // Save for later when the notification is properly handled.
+    self.incomingPushCompletionCallback = completion;
+
+    
+    if ([type isEqualToString:PKPushTypeVoIP]) {
+        // The Voice SDK will use main queue to invoke `cancelledCallInviteReceived:error` when delegate queue is not passed
+        if (![TwilioVoice handleNotification:payload.dictionaryPayload delegate:self delegateQueue:nil]) {
+            NSLog(@"This is not a valid Twilio Voice notification.");
+        }
+    }
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
+        // Save for later when the notification is properly handled.
+        self.incomingPushCompletionCallback = completion;
+    } else {
+        /**
+        * The Voice SDK processes the call notification and returns the call invite synchronously. Report the incoming call to
+        * CallKit and fulfill the completion before exiting this callback method.
+        */
+        completion();
+    }
 }
 
 - (void)incomingPushHandled {
@@ -308,31 +333,39 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (void)handleCallInviteReceived:(TVOCallInvite *)callInvite {
+
+  [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
+
   NSLog(@"callInviteReceived:");
   if (self.callInvite) {
     NSLog(@"Already a pending incoming call invite.");
     NSLog(@"  >> Ignoring call from %@", callInvite.from);
-    [self incomingPushHandled];
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
+      [self incomingPushHandled];
+    }
     return;
   } else if (self.call) {
     NSLog(@"Already an active call.");
     NSLog(@"  >> Ignoring call from %@", callInvite.from);
-    [self incomingPushHandled];
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
+      [self incomingPushHandled];
+    }
     return;
   }
 
   self.callInvite = callInvite;
 
   [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
+  if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
+    [self incomingPushHandled];
+  }
 }
 
-- (void)handleCallInviteCanceled:(TVOCancelledCallInvite *)callInvite {
+- (void)handleCallInviteCanceled:(TVOCancelledCallInvite *)cancelledCallInvite {
   NSLog(@"callInviteCanceled");
 
-    //TODO figure this out
-  //[self performEndCallActionWithUUID:callInvite.uuid];
-
   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+
   if (self.callInvite.callSid){
     [params setObject:self.callInvite.callSid forKey:@"call_sid"];
   }
@@ -347,9 +380,13 @@ RCT_REMAP_METHOD(getActiveCall,
   
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
+  [self performEndCallActionWithUUID:seld.callInvite.uuid];
+  
   self.callInvite = nil;
 
-  [self incomingPushHandled];
+  if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
+    [self incomingPushHandled];
+  }
 }
 
 - (void)notificationError:(NSError *)error {
@@ -377,54 +414,6 @@ RCT_REMAP_METHOD(getActiveCall,
     [callParams setObject:call.to forKey:@"to"];
   }
   [self sendEventWithName:@"connectionDidConnect" body:callParams];
-}
-
-- (void)callDidDisconnect:(TVOCall *)call {
-  NSLog(@"connectionDidDisconnect");
-
-  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  [params setObject:self.call.sid forKey:@"call_sid"];
-  if (self.call.to){
-    [params setObject:self.call.to forKey:@"call_to"];
-  }
-  if (self.call.from){
-    [params setObject:self.call.from forKey:@"call_from"];
-  }
-  if (self.call.state == TVOCallStateDisconnected) {
-    [params setObject:StateDisconnected forKey:@"call_state"];
-  }
-  [self sendEventWithName:@"connectionDidDisconnect" body:params];
-  if (self.call.state == TVOCallStateConnected) {
-    [self performEndCallActionWithUUID:call.uuid];
-  }
-  self.call = nil;
-}
-
-- (void)call:(TVOCall *)call didFailWithError:(NSError *)error {
-  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  NSString* errMsg = [error localizedDescription];
-  if (error.localizedFailureReason) {
-    errMsg = [error localizedFailureReason];
-  }
-  [params setObject:errMsg forKey:@"error"];
-  if (self.call.sid) {
-    [params setObject:self.call.sid forKey:@"call_sid"];
-  }
-  if (self.call.to){
-    [params setObject:self.call.to forKey:@"call_to"];
-  }
-  if (self.call.from){
-    [params setObject:self.call.from forKey:@"call_from"];
-  }
-  if (self.call.state == TVOCallStateDisconnected) {
-    [params setObject:StateDisconnected forKey:@"call_state"];
-  }
-  [self sendEventWithName:@"connectionDidDisconnect" body:params];
-
-  [self performEndCallActionWithUUID:call.uuid];
-
-  self.call = nil;
-  self.callKitCompletionCallback = nil;
 }
 
 - (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
@@ -483,12 +472,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider performStartCallAction:(CXStartCallAction *)action {
   NSLog(@"provider:performStartCallAction");
-/*
-  
-  self.audioDevice.block = ^ {
-      kDefaultAVAudioSessionConfigurationBlock();
-      [weakSelf setMicrophoneInUse:microphone];
-  };*/
+
   self.audioDevice.enabled = NO;
   self.audioDevice.block();
 
@@ -508,15 +492,6 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)provider:(CXProvider *)provider performAnswerCallAction:(CXAnswerCallAction *)action {
   NSLog(@"provider:performAnswerCallAction");
-
-  // RCP: Workaround from https://forums.developer.apple.com/message/169511 suggests configuring audio in the
-  //      completion block of the `reportNewIncomingCallWithUUID:update:completion:` method instead of in
-  //      `provider:performAnswerCallAction:` per the WWDC examples.
-  /*typeof(self) __weak weakSelf = self;
-  self.audioDevice.block = ^ {
-      kDefaultAVAudioSessionConfigurationBlock();
-      [weakSelf setMicrophoneInUse:microphone];
-  };*/
 
   NSAssert([self.callInvite.uuid isEqual:action.callUUID], @"We only support one Invite at a time.");
 
@@ -735,6 +710,7 @@ RCT_REMAP_METHOD(getActiveCall,
   self.call = [self.callInvite acceptWithDelegate:self];
   self.callInvite = nil;
   self.callKitCompletionCallback = completionHandler;
+  [self incomingPushHandled];
 }
 
 - (void)handleAppTerminateNotification {
