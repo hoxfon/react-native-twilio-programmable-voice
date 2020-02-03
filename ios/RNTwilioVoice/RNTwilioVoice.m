@@ -76,10 +76,6 @@ RCT_EXPORT_MODULE()
   return self;
 }
 
-- (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];
-}
-
 RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
   _token = token;
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
@@ -334,7 +330,7 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (void)handleCallInviteReceived:(TVOCallInvite *)callInvite {
 
-  [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
+  [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
 
   NSLog(@"callInviteReceived:");
   if (self.callInvite) {
@@ -380,7 +376,7 @@ RCT_REMAP_METHOD(getActiveCall,
   
   [self sendEventWithName:@"connectionDidDisconnect" body:params];
 
-  [self performEndCallActionWithUUID:seld.callInvite.uuid];
+  [self performEndCallActionWithUUID:self.callInvite.uuid];
   
   self.callInvite = nil;
 
