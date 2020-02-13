@@ -82,11 +82,11 @@ Edit your `Podfile` to include TwilioVoice framework
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '10.0'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.1.0'
+    pod 'TwilioVoice', '~> 5.1.1'
     ...
 end
 
@@ -101,11 +101,11 @@ Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '10.0'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.1.0'
+    pod 'TwilioVoice', '~> 5.1.1'
     pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
     ...
 end
