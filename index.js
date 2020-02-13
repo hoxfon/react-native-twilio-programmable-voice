@@ -47,11 +47,6 @@ const Twilio = {
         }
         return result
     },
-    initWithTokenUrl(url) {
-        if (Platform.OS === IOS) {
-            TwilioVoice.initWithAccessTokenUrl(url)
-        }
-    },
     connect(params = {}) {
         TwilioVoice.connect(params)
     },

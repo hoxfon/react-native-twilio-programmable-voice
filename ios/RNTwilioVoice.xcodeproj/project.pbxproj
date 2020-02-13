@@ -7,26 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		016DD9B51ECCA23A00315CD4 /* TwilioVoice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		38F71DFA1E9C333F0067E86F /* RNTwilioVoice.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */; };
-		38F71DFB1E9C333F0067E86F /* RNTwilioVoice.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		38F71DF31E9C333F0067E86F /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-				38F71DFB1E9C333F0067E86F /* RNTwilioVoice.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwilioVoice.framework; path = "../../../Downloads/twilio-voice-ios/TwilioVoice.framework"; sourceTree = "<group>"; };
 		38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTwilioVoice.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTwilioVoice.h; sourceTree = "<group>"; };
 		38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTwilioVoice.m; sourceTree = "<group>"; };
@@ -37,7 +21,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				016DD9B51ECCA23A00315CD4 /* TwilioVoice.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +30,6 @@
 		016DD9801ECC9B4B00315CD4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -86,7 +68,6 @@
 			buildConfigurationList = 38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoice" */;
 			buildPhases = (
 				38F71DF11E9C333F0067E86F /* Sources */,
-				38F71DF31E9C333F0067E86F /* CopyFiles */,
 				016DD9B31ECCA22F00315CD4 /* Frameworks */,
 			);
 			buildRules = (
@@ -118,6 +99,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 38F71DEC1E9C333E0067E86F;
@@ -191,7 +173,7 @@
 					"${SRCROOT}/../../../ios/Pods/Headers/Public",
 					"${SRCROOT}/../../../ios/Pods/Headers/Public/TwilioVoice",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -241,7 +223,7 @@
 					"${SRCROOT}/../../../ios/Pods/Headers/Public",
 					"${SRCROOT}/../../../ios/Pods/Headers/Public/TwilioVoice",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
