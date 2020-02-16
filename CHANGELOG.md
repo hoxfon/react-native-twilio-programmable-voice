@@ -8,7 +8,7 @@
   - Android X migration
   - use gradle 5.4.1
   - use API 28
-  - upgrade com.twilio:voice-android to 3.3.0
+  - upgrade com.twilio:voice-android to 4.3.0
   - implement `hold` to hold a call
   - new event `callInviteCancelled`
   - new event `callStateRinging`
@@ -16,6 +16,14 @@
   - implement call ringing Twilio event
   - remove `call_state` from CallInvite
 - iOS
+  - implement new autolinking react native API
+  - update Twilio Voice SDK to v5.2.0
+  - remove method `initWithAccessTokenUrl`, please use `initWithAccessToken` instead
+  - event parity with Android `deviceDidReceiveIncoming`
+  - new event `callInviteCancelled`
+  - new event `callStateRinging`
+  - new event `connectionIsReconnecting`
+  - new event `connectionDidReconnect`
   - convert params for `connectionDidConnect` to => `call_to`, from => `call_from`
   - convert params for `connectionDidDisconnect` to => `call_to`, from => `call_from`, `error` => `err`
 
