@@ -7,11 +7,11 @@ buildscript {
             url 'https://maven.google.com'
             name 'Google'
         }
-        jcenter()
         google()
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath 'com.google.gms:google-services:4.3.3'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -22,8 +22,8 @@ buildscript {
 allprojects {
     repositories {
         mavenLocal()
-        jcenter()
         google()
+        jcenter()
         maven { url "https://jitpack.io" }
         maven {
             url 'https://maven.google.com'
@@ -38,12 +38,21 @@ allprojects {
 
 apply plugin: 'com.android.library'
 
+def DEFAULT_COMPILE_SDK_VERSION = 28
+def DEFAULT_BUILD_TOOLS_VERSION = "28.0.3"
+def DEFAULT_TARGET_SDK_VERSION = 28
+def DEFAULT_SUPPORT_LIB_VERSION = "28.0.3"
+
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
+    buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
@@ -57,15 +66,20 @@ android {
 }
 
 dependencies {
+    def supportLibVersion = rootProject.hasProperty('supportLibVersion') ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.twilio:voice-android:4+'
+    implementation 'com.twilio:voice-android:4.5.0'
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.google.firebase:firebase-messaging:17.+'
+    implementation 'com.google.firebase:firebase-messaging:20.1.1'
+
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.x.x'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'
+
     testImplementation 'junit:junit:4.12'
 }

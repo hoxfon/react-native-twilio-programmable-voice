@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.authors      = spec['author']['name']
   s.homepage     = spec['homepage']
   s.license      = spec['license']
-  s.platform     = :ios, "8.1"
+  s.platform     = :ios, "10.0"
 
   s.source_files = [ "ios/RNTwilioVoice/*.h", "ios/RNTwilioVoice/*.m"]
   s.source = {:path => "./RNTwilioVoice"}
