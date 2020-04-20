@@ -33,7 +33,7 @@ import com.hoxfon.react.RNTwilioVoice.models.Visitor;
 import java.io.InputStream;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ALLOW_VISITOR;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_VISITOR;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REQUEST_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_OFF;
@@ -163,7 +163,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
       String action = intent.getAction();
       Log.d(TAG, "ACTION RECEIVED " + action);
-      if (action.equals(ACTION_DISCONNECTED_CALL)) {
+      if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
         finish();
       }
     }
@@ -272,7 +272,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
     if (!isReceiverRegistered) {
       IntentFilter intentFilter = new IntentFilter();
-      intentFilter.addAction(ACTION_DISCONNECTED_CALL);
+      intentFilter.addAction(ACTION_CANCEL_CALL_INVITE);
 
       LocalBroadcastManager.getInstance(getReactInstanceManager().getCurrentReactContext())
           .registerReceiver(automaticCallBroadcastReceiver, intentFilter);

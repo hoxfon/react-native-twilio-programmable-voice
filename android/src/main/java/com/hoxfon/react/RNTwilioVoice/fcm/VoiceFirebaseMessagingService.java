@@ -2,10 +2,12 @@ package com.hoxfon.react.RNTwilioVoice.fcm;
 
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -18,6 +20,7 @@ import com.hoxfon.react.RNTwilioVoice.BuildConfig;
 import com.hoxfon.react.RNTwilioVoice.CallNotificationManager;
 import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
+import com.twilio.voice.CallException;
 import com.twilio.voice.MessageListener;
 import com.twilio.voice.Voice;
 
@@ -61,7 +64,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Bundle data: " + remoteMessage.getData());
+          Log.d(TAG, "Received onMessageReceived()");
+          Log.d(TAG, "Bundle data: " + remoteMessage.getData());
+          Log.d(TAG, "From: " + remoteMessage.getFrom());
         }
 
         Log.d(TAG, "Incoming notification: " + remoteMessage.getData());
@@ -74,7 +79,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
-            boolean valid = Voice.handleMessage(data, new MessageListener() {
+            boolean valid = Voice.handleMessage(getApplicationContext(), data, new MessageListener() {
                 @Override
                 public void onCallInvite(final CallInvite callInvite) {
 
@@ -93,22 +98,42 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                                 if (BuildConfig.DEBUG) {
                                     Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
                                 }
-                                Intent launchIntent = callNotificationManager.getLaunchIntent(
-                                    (ReactApplicationContext)context,
-                                    notificationId,
-                                    callInvite,
-                                    false,
-                                    appImportance
-                                );
+
                                 // app is not in foreground
                                 if (appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                                    launchIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                                    context.startActivity(launchIntent);
-                                }
-                                Intent intent = new Intent(ACTION_INCOMING_CALL);
-                                intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-                                intent.putExtra(INCOMING_CALL_INVITE, callInvite);
-                                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+                                  boolean shouldStartNewTask = false;
+
+                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                      shouldStartNewTask = true;
+                                  }
+
+                                  Intent launchIntent = callNotificationManager.getLaunchIntent(
+                                      (ReactApplicationContext)context,
+                                      notificationId,
+                                      callInvite,
+                                      shouldStartNewTask,
+                                      appImportance
+                                  );
+
+                                  // Starting with Android 10 applications can't launch an activity when in background.
+                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                      Intent intent = new Intent(ACTION_INCOMING_CALL);
+                                      intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
+                                      intent.putExtra(INCOMING_CALL_INVITE, callInvite);
+                                      LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                      callNotificationManager.createIncomingCallNotification(
+                                              (ReactApplicationContext) context, callInvite, notificationId,
+                                              launchIntent);
+                                  } else {
+                                      context.startActivity(launchIntent);
+                                  }
+                              }
+
+                              Intent intent = new Intent(ACTION_INCOMING_CALL);
+                              intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
+                              intent.putExtra(INCOMING_CALL_INVITE, callInvite);
+                              LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                             } else {
                                 // Otherwise wait for construction, then handle the incoming call
                                 mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
@@ -140,7 +165,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                 }
 
                 @Override
-                public void onCancelledCallInvite(final CancelledCallInvite cancelledCallInvite) {
+                public void onCancelledCallInvite(final CancelledCallInvite cancelledCallInvite, final CallException callException) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {

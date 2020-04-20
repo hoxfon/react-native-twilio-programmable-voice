@@ -15,9 +15,9 @@ import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.ReactContext;
 import com.hoxfon.react.RNTwilioVoice.R;
 
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ACCEPTED_CALL;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECTED_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ANSWER_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CALL_INVITE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_CALL;
 
 /**
  * Created by estebanabait on 6/5/18.
@@ -51,7 +51,7 @@ public class UnlockScreenActivity extends ReactActivity {
     acceptCallBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Intent intent = new Intent(ACTION_ACCEPTED_CALL);
+        Intent intent = new Intent(ACTION_ANSWER_CALL);
         LocalBroadcastManager.getInstance(reactContext).sendBroadcast(intent);
         finish();
       }
@@ -61,7 +61,7 @@ public class UnlockScreenActivity extends ReactActivity {
     rejectCallBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Intent intent = new Intent(ACTION_REJECTED_CALL);
+        Intent intent = new Intent(ACTION_REJECT_CALL);
         LocalBroadcastManager.getInstance(reactContext).sendBroadcast(intent);
         finish();
       }
@@ -84,7 +84,7 @@ public class UnlockScreenActivity extends ReactActivity {
 
       String action = intent.getAction();
       Log.d(TAG, "ACTION RECEIVED " + action);
-      if (action.equals(ACTION_DISCONNECTED_CALL)) {
+      if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
         finish();
       }
 
@@ -97,7 +97,7 @@ public class UnlockScreenActivity extends ReactActivity {
   private void registerReceiver() {
     if (!isReceiverRegistered) {
       IntentFilter intentFilter = new IntentFilter();
-      intentFilter.addAction(ACTION_DISCONNECTED_CALL);
+      intentFilter.addAction(ACTION_CANCEL_CALL_INVITE);
 
       LocalBroadcastManager.getInstance(getReactInstanceManager().getCurrentReactContext()).registerReceiver(
           unlockScreenBroadcastReceiver, intentFilter);

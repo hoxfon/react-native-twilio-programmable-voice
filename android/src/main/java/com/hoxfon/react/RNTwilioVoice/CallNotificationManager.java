@@ -105,17 +105,39 @@ public class CallNotificationManager {
         return launchIntent;
     }
 
+    public Intent getCallAcceptedIntent(ReactApplicationContext context,
+                                  CallInvite callInvite,
+                                  Boolean shouldStartNewTask,
+                                  int appImportance
+    ) {
+        Intent launchIntent = new Intent(context, getMainActivityClass(context));
+
+        int launchFlag = Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP;
+        if (shouldStartNewTask || appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+            launchFlag = Intent.FLAG_ACTIVITY_NEW_TASK;
+        }
+
+        launchIntent.setAction(ACTION_ANSWER_CALL);
+
+        if (callInvite != null) {
+            launchIntent.putExtra(INCOMING_CALL_INVITE, callInvite);
+        }
+        return launchIntent;
+    }
+
     public void createIncomingCallNotification(ReactApplicationContext context,
                                                CallInvite callInvite,
                                                int notificationId,
                                                Intent launchIntent)
     {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "createIncomingCallNotification intent "+launchIntent.getFlags());
+            Log.d(TAG, "createIncomingCallNotification intent " + launchIntent.getFlags());
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
@@ -145,7 +167,8 @@ public class CallNotificationManager {
 
         // build notification large icon
         Resources res = context.getResources();
-        int largeIconResId = res.getIdentifier("ic_launcher", "mipmap", context.getPackageName());
+        int largeIconResId = res.getIdentifier("ic_launcher", "mipmap",
+                context.getPackageName());
         Bitmap largeIconBitmap = BitmapFactory.decodeResource(res, largeIconResId);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -158,21 +181,23 @@ public class CallNotificationManager {
         Intent rejectIntent = new Intent(ACTION_REJECT_CALL)
                 .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1, rejectIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.addAction(0, "DISMISS", pendingRejectIntent);
+        PendingIntent pendingRejectIntent = PendingIntent.getBroadcast(context, 1,
+                rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.addAction(0, "RECHAZAR", pendingRejectIntent);
 
         // Answer action
         Intent answerIntent = new Intent(ACTION_ANSWER_CALL);
         answerIntent
                 .putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0, answerIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "ANSWER", pendingAnswerIntent);
+        PendingIntent pendingAnswerIntent = PendingIntent.getBroadcast(context, 0,
+                answerIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "ACEPTAR",
+                pendingAnswerIntent);
 
         notificationManager.notify(notificationId, notificationBuilder.build());
-        TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+callInvite.getCallSid(), notificationId);
+        TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX
+                + callInvite.getCallSid(), notificationId);
     }
 
     public void initCallNotificationsChannel(NotificationManager notificationManager) {
