@@ -146,10 +146,14 @@ RCT_EXPORT_METHOD(unregister) {
   NSString *accessToken = [self fetchAccessToken];
   NSString *cachedDeviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:kCachedDeviceToken];
   if ([cachedDeviceToken length] > 0) {
+      /* Clear the device token when unregistering. */
+      [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:kCachedDeviceToken];
       [TwilioVoice unregisterWithAccessToken:accessToken
                                  deviceToken:cachedDeviceToken
                                   completion:^(NSError * _Nullable error) {
                                     if (error) {
+                                        /* Undo token clear on failure */
+                                        [[NSUserDefaults standardUserDefaults] setObject:cachedDeviceToken forKey:kCachedDeviceToken];
                                         NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                     } else {
                                         NSLog(@"Successfully unregistered for VoIP push notifications.");
@@ -270,10 +274,14 @@ RCT_REMAP_METHOD(getCallInvite,
 
     NSString *cachedDeviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:kCachedDeviceToken];
     if ([cachedDeviceToken length] > 0) {
+        /* Clear the device token when unregistering. */
+        [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:kCachedDeviceToken];
         [TwilioVoice unregisterWithAccessToken:accessToken
                                                 deviceToken:cachedDeviceToken
                                                  completion:^(NSError * _Nullable error) {
                                                    if (error) {
+                                                     /* Undo token clear on failure */
+                                                     [[NSUserDefaults standardUserDefaults] setObject:cachedDeviceToken forKey:kCachedDeviceToken];
                                                      NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                                    } else {
                                                      NSLog(@"Successfully unregistered for VoIP push notifications.");
