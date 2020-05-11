@@ -147,7 +147,7 @@ RCT_EXPORT_METHOD(unregister) {
   NSString *cachedDeviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:kCachedDeviceToken];
   if ([cachedDeviceToken length] > 0) {
       /* Clear the device token when unregistering. */
-      [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:kCachedDeviceToken];
+      [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedDeviceToken];
       [TwilioVoice unregisterWithAccessToken:accessToken
                                  deviceToken:cachedDeviceToken
                                   completion:^(NSError * _Nullable error) {
@@ -275,7 +275,7 @@ RCT_REMAP_METHOD(getCallInvite,
     NSString *cachedDeviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:kCachedDeviceToken];
     if ([cachedDeviceToken length] > 0) {
         /* Clear the device token when unregistering. */
-        [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:kCachedDeviceToken];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedDeviceToken];
         [TwilioVoice unregisterWithAccessToken:accessToken
                                                 deviceToken:cachedDeviceToken
                                                  completion:^(NSError * _Nullable error) {
