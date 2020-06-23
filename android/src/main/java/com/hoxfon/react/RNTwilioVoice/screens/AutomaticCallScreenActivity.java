@@ -34,6 +34,8 @@ import java.io.InputStream;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_ALLOW_VISITOR;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CALL_INVITE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_VISITOR;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REQUEST_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_OFF;
@@ -85,6 +87,12 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     automaticCallBroadcastReceiver = new AutomaticCallScreenActivity.AutomaticCallBroadcastReceiver();
     registerReceiver();
 
+    String callSid = getIntent().getStringExtra("CALL_SID");
+    String token = getIntent().getStringExtra("SESSION_TOKEN");
+    String community = getIntent().getStringExtra("ACTIVE_COMMUNITY");
+
+    requestVisitorProfile(token, callSid);
+
     visitorProfile = (CardView) findViewById(R.id.visitor_profile);
 
     // set invisible when started. We'll animate it when the data is ready.
@@ -93,12 +101,6 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     //Retrieve default system animation duration.
     shortAnimationDuration = getResources().getInteger(
       android.R.integer.config_shortAnimTime);
-
-    String callSid = getIntent().getStringExtra("CALL_SID");
-    String token = getIntent().getStringExtra("SESSION_TOKEN");
-    String community = getIntent().getStringExtra("ACTIVE_COMMUNITY");
-
-    requestVisitorProfile(token, callSid);
 
     Button speakerBtn = (Button) findViewById(R.id.speaker_btn);
     speakerBtn.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +165,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
 
       String action = intent.getAction();
       Log.d(TAG, "ACTION RECEIVED " + action);
-      if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
+      if (action.equals(ACTION_CANCEL_CALL_INVITE) || action.equals(ACTION_DISCONNECTED_CALL)) {
         finish();
       }
     }
@@ -273,6 +275,7 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     if (!isReceiverRegistered) {
       IntentFilter intentFilter = new IntentFilter();
       intentFilter.addAction(ACTION_CANCEL_CALL_INVITE);
+      intentFilter.addAction(ACTION_DISCONNECTED_CALL);
 
       LocalBroadcastManager.getInstance(getReactInstanceManager().getCurrentReactContext())
           .registerReceiver(automaticCallBroadcastReceiver, intentFilter);

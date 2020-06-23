@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.hoxfon.react.RNTwilioVoice.R;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CALL_INVITE;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_DISCONNECTED_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_OFF;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_SPEAKER_ON;
@@ -92,7 +93,7 @@ public class DirectCallScreenActivity extends ReactActivity {
 
       String action = intent.getAction();
       Log.d(TAG, "ACTION RECEIVED " + action);
-      if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
+      if (action.equals(ACTION_CANCEL_CALL_INVITE) || action.equals(ACTION_DISCONNECTED_CALL)) {
         finish();
       }
 
@@ -107,6 +108,7 @@ public class DirectCallScreenActivity extends ReactActivity {
     if (!isReceiverRegistered) {
       IntentFilter intentFilter = new IntentFilter();
       intentFilter.addAction(ACTION_CANCEL_CALL_INVITE);
+      intentFilter.addAction(ACTION_DISCONNECTED_CALL);
 
       LocalBroadcastManager.getInstance(getReactInstanceManager().getCurrentReactContext())
           .registerReceiver(directCallBroadcastReceiver, intentFilter);

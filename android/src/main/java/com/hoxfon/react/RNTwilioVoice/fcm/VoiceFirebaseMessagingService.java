@@ -1,6 +1,6 @@
 package com.hoxfon.react.RNTwilioVoice.fcm;
 
-import android.app.ActivityManager;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
@@ -35,6 +35,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CAL
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CANCELLED_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.SHOW_UNLOCK_SCREEN;
 import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
@@ -90,69 +91,122 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     handler.post(new Runnable() {
                         public void run() {
                             // Construct and load our normal React JS code bundle
-                            ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                            ReactInstanceManager mReactInstanceManager =
+                                    ((ReactApplication) getApplication()).getReactNativeHost()
+                                            .getReactInstanceManager();
+
                             ReactContext context = mReactInstanceManager.getCurrentReactContext();
                             // If it's constructed, send a notification
                             if (context != null) {
-                                int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
+                                int appImportance = callNotificationManager
+                                        .getApplicationImportance((ReactApplicationContext)context);
+
                                 if (BuildConfig.DEBUG) {
-                                    Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
+                                    Log.d(TAG, "CONTEXT present appImportance = "
+                                            + appImportance);
                                 }
 
+                                Intent intent = new Intent(ACTION_INCOMING_CALL);
+                                intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
+                                intent.putExtra(INCOMING_CALL_INVITE, callInvite);
+                                intent.putExtra(SHOW_UNLOCK_SCREEN, false);
+
                                 // app is not in foreground
-                                if (appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-
-                                  boolean shouldStartNewTask = false;
-
-                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                      shouldStartNewTask = true;
-                                  }
-
-                                  Intent launchIntent = callNotificationManager.getLaunchIntent(
-                                      (ReactApplicationContext)context,
-                                      notificationId,
-                                      callInvite,
-                                      shouldStartNewTask,
-                                      appImportance
-                                  );
+                                if (appImportance != IMPORTANCE_FOREGROUND) {
 
                                   // Starting with Android 10 applications can't launch an activity when in background.
-                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                      Intent intent = new Intent(ACTION_INCOMING_CALL);
-                                      intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-                                      intent.putExtra(INCOMING_CALL_INVITE, callInvite);
-                                      LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                  if (Build.VERSION.SDK_INT >= 29) {
+                                      Intent[] answerIntent = callNotificationManager
+                                              .getAnswerIntent(
+                                                      (ReactApplicationContext)context,
+                                                      notificationId,
+                                                      callInvite,
+                                                      true,
+                                                       appImportance
+                                      );
                                       callNotificationManager.createIncomingCallNotification(
-                                              (ReactApplicationContext) context, callInvite, notificationId,
-                                              launchIntent);
+                                              (ReactApplicationContext) context, callInvite,
+                                              notificationId, answerIntent);
                                   } else {
-                                      context.startActivity(launchIntent);
+                                      Intent[] launchIntent = callNotificationManager
+                                              .getAnswerIntent((ReactApplicationContext)context,
+                                                      notificationId,
+                                                      callInvite,
+                                                      false,
+                                                      appImportance
+                                      );
+
+                                      context.startActivities(launchIntent);
                                   }
+
+                                  intent.putExtra(SHOW_UNLOCK_SCREEN, false);
+                                  LocalBroadcastManager.getInstance(context)
+                                          .sendBroadcast(intent);
+
+                              } else {
+                                  intent.putExtra(SHOW_UNLOCK_SCREEN, true);
+                                  LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                               }
 
-                              Intent intent = new Intent(ACTION_INCOMING_CALL);
-                              intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-                              intent.putExtra(INCOMING_CALL_INVITE, callInvite);
-                              LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                             } else {
+
+                                if (BuildConfig.DEBUG) {
+                                    Log.d(TAG, "CONTEXT not present");
+                                }
+
                                 // Otherwise wait for construction, then handle the incoming call
                                 mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
                                     public void onReactContextInitialized(ReactContext context) {
-                                        int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
+                                        int appImportance = callNotificationManager
+                                                .getApplicationImportance(
+                                                        (ReactApplicationContext)context);
+
                                         if (BuildConfig.DEBUG) {
-                                            Log.d(TAG, "CONTEXT not present appImportance = " + appImportance);
+                                            Log.d(TAG, "CONTEXT initialized appImportance"
+                                                    + appImportance);
                                         }
-                                        Intent launchIntent = callNotificationManager.getLaunchIntent(
-                                            (ReactApplicationContext)context, notificationId, callInvite, true, appImportance);
-                                        launchIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                                        context.startActivity(launchIntent);
+
                                         Intent intent = new Intent(ACTION_INCOMING_CALL);
-                                        intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
+                                        intent.putExtra(INCOMING_CALL_NOTIFICATION_ID,
+                                                notificationId);
                                         intent.putExtra(INCOMING_CALL_INVITE, callInvite);
+                                        intent.putExtra(SHOW_UNLOCK_SCREEN, false);
+
+                                        if (Build.VERSION.SDK_INT >= 29) {
+                                            Intent[] answerIntent = callNotificationManager
+                                                    .getAnswerIntent(
+                                                            (ReactApplicationContext)context,
+                                                            notificationId, callInvite,
+                                                            true, appImportance
+                                            );
+                                            callNotificationManager.createIncomingCallNotification(
+                                                    (ReactApplicationContext) context, callInvite,
+                                                    notificationId, answerIntent);
+                                        } else {
+
+                                            if (BuildConfig.DEBUG) {
+                                                Log.d(TAG, "Starting Main Activity");
+                                            }
+
+                                            Intent[] launchIntent = callNotificationManager
+                                                    .getAnswerIntent(
+                                                            (ReactApplicationContext)context,
+                                                    notificationId,
+                                                    callInvite,
+                                                    false,
+                                                    appImportance
+                                            );
+
+
+                                            context.startActivities(launchIntent);
+
+                                            intent.putExtra(SHOW_UNLOCK_SCREEN, true);
+
+                                            LocalBroadcastManager.getInstance(context)
+                                                    .sendBroadcast(intent);
+                                        }
+
                                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                                        callNotificationManager.createIncomingCallNotification(
-                                                (ReactApplicationContext) context, callInvite, notificationId,
-                                                launchIntent);
                                     }
                                 });
                                 if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
