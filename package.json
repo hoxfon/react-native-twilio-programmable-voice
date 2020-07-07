@@ -1,13 +1,37 @@
 {
-  "name": "@x-guard/react-native-twilio-programmable-voice",
-  "version": "3.21.2",
-  "description": "React Native wrapper for Twilio Programmable Voice SDK",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "_from": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+  "_id": "react-native-twilio-programmable-voice@4.0.0",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/react-native-twilio-programmable-voice",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "react-native-twilio-programmable-voice@git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+    "name": "react-native-twilio-programmable-voice",
+    "escapedName": "react-native-twilio-programmable-voice",
+    "rawSpec": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+    "saveSpec": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+    "fetchSpec": "https://github.com/hoxfon/react-native-twilio-programmable-voice.git",
+    "gitCommittish": "23b8632f60ee4183e4728d46759a6fbb4b938522"
   },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+  "_spec": "react-native-twilio-programmable-voice@git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+  "_where": "/Users/wesdewitte/Documents/projects/xg-rn-alarm-prototype",
+  "author": {
+    "name": "Fabrizio Moscon"
+  },
+  "bugs": {
+    "url": "https://github.com/hoxfon/react-native-twilio-programmable-voice/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "React Native wrapper for Twilio Programmable Voice SDK",
   "devDependencies": {},
-  "homepage": "https://github.com/x-guard/react-native-twilio-programmable-voice",
+  "homepage": "https://github.com/hoxfon/react-native-twilio-programmable-voice",
   "keywords": [
     "twilio",
     "react-native",
@@ -21,20 +45,15 @@
     "gcm",
     "fcm"
   ],
-  "bugs": {
-    "url": "https://github.com/x-guard/react-native-twilio-programmable-voice/issues"
-  },
+  "license": "MIT",
+  "main": "index.js",
+  "name": "react-native-twilio-programmable-voice",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:x-guard/react-native-twilio-programmable-voice.git"
+    "url": "git+ssh://git@github.com/hoxfon/react-native-twilio-programmable-voice.git"
   },
-  "rnpm": {
-    "android": {
-      "packageInstance": "new TwilioVoicePackage()"
-    }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": {
-    "name": "Fabrizio Moscon"
-  },
-  "license": "MIT"
+  "version": "4.0.0"
 }

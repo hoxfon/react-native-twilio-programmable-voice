@@ -1,43 +1,19 @@
 # react-native-twilio-programmable-voice
-This is a React Native wrapper for Twilio Programmable Voice SDK that lets you make and receive calls from your ReactNatvie App. This module is not curated nor maintained, but inspired by Twilio.
 
-# Twilio Programmable Voice SDK
+This is a React-Native wrapper for [Twilio Programmable Voice SDK](https://www.twilio.com/voice) which lets you make and receive calls from your React-Native App. This module is not affiliated with nor officially maintained by Twilio, and it is maintained by open source contributors.
 
-- Android 2.0.7 (bundled within this library)
-- iOS 2.0.4 (specified by the app's own podfile)
+## Twilio Programmable Voice SDK
 
-## Breaking changes in v3.0.0
+- Android 4.5.0 (bundled within the module)
+- iOS 5.1.0 (specified by the app's own podfile)
 
-- initWitToken returns an object with a property `initialized` instead of `initilized`
-- iOS event `connectionDidConnect` returns the same properties as Android
-move property `to` => `call_to`
-move property `from` => `call_from`
+## Breaking changes in v4.0.0
 
-## Migrating Android from v1 to v2 (incoming call use FCM)
+The module implements [react-native autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) as many other native libraries > react-native 0.60.0, therefore it doesn't need to be linked manually.
 
-You will need to make changes both on your Twilio account using Twilio Web Console and on your react native app.
-Twilio Programmable Voice Android SDK uses `FCM` since version 2.0.0.beta5.
-
-Before you start, I strongly suggest that you read the list of Twilio changes from Android SDK v2.0.0 beta4 to beta5:
-[Twilio example App: Migrating from GCM to FCM](https://github.com/twilio/voice-quickstart-android/blob/d7d4f0658e145eb94ab8f5e34f6fd17314e7ab17/README.md#migrating-from-gcm-to-fcm)
-
-These are all the changes required:
-
-- remove all the GCM related code from your `AndroidManifest.xml` and add the following code to receive `FCM` notifications
-(I wasn't successful in keeping react-native-fcm working at the same time. If you know how please open an issue to share).
+Android: update Firebase Messaging to 17.6.+. Remove the following block from your application's `AndroidManifest.xml` if you are migrating from v3.
 
 ```xml
-    .....
-
-    <!-- Twilio Voice -->
-    <!-- [START fcm_listener] -->
-    <service
-        android:name="com.hoxfon.react.TwilioVoice.fcm.VoiceFirebaseMessagingService">
-        <intent-filter>
-            <action android:name="com.google.firebase.MESSAGING_EVENT" />
-        </intent-filter>
-    </service>
-    <!-- [END fcm_listener] -->
     <!-- [START instanceId_listener] -->
     <service
         android:name="com.hoxfon.react.TwilioVoice.fcm.VoiceFirebaseInstanceIDService"
@@ -47,86 +23,101 @@ These are all the changes required:
         </intent-filter>
     </service>
     <!-- [END instanceId_listener] -->
-    <!-- Twilio Voice -->
 ```
 
-- log into your Firebase console. Navigate to: Project settings > CLOUD MESSAGING. Copy your `Server key`
-- in Twilio console add a new Push Credential, type `FCM`, fcm secret Firebase FCM `Server key`
-- include in your project `google-services.json`; if you have not include it yet
-- rename getIncomingCall() to getActiveCall()
+Android X is supported.
 
-If something doesn't work as expected or you want to make a request open an issue.
+Data passed to the event `deviceDidReceiveIncoming` does not contain the key `call_state`, because state of Call Invites was removed in Twilio Android and iOS SDK v3.0.0
 
-## Help wanted!
+- iOS: params changes for `connectionDidConnect` and `connectionDidDisconnect`
 
-There is no need to ask permissions to contribute. Just open an issue or provide a PR. Everybody is welcome to contribute.
+    to => call_to
+    from => call_from
+    error => err
 
-ReactNative success is directly linked to its module ecosystem. One way to make an impact is helping contributing to this module or another of the many community lead ones.
+New features
 
-![help wanted](images/vjeux_tweet.png "help wanted")
+Twilio Programmable Voice SDK v3.0.0 handles call invites directly and makes it easy to distinguish a call invites from an active call, which previously was confusing.
+To ensure that an active call is displayed when the app comes to foreground you should use the promise `getActiveCall()`.
+To ensure that a call invite is displayed when the app comes to foreground use the promise `getCallInvite()`. Please note that call invites don't have a `call_state` field.
+
+You should use `hold()` to put a call on hold.
+
+You can be notified when a call is `ringing` by listening for `callStateRinging` events.
+
+iOS application can now receive the following events, that in v3 where only dispatched to Android:
+
+- deviceDidReceiveIncoming
+- callInviteCancelled
+- callStateRinging
+- connectionIsReconnecting
+- connectionDidReconnect
+
+## Breaking changes in v3.0.0
+
+- initWitToken returns an object with a property `initialized` instead of `initilized`
+- iOS event `connectionDidConnect` returns the same properties as Android
+move property `to` => `call_to`
+move property `from` => `call_from`
 
 ## Installation
 
 Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
 It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required.
 
-
-```
+```bash
 npm install react-native-twilio-programmable-voice --save
+```
+
+- **React Native 0.60+**
+
+[CLI autolink feature](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) links the module while building the app.
+
+- **React Native <= 0.59**
+
+```bash
 react-native link react-native-twilio-programmable-voice
 ```
 
-### iOS Installation - when projects made with react-native init
+### iOS Installation
+
+If you can't or don't want to use autolink, you can also manually link the library using the instructions below (click on the arrow to show them):
+
+<details>
+<summary>Manually link the library on iOS</summary>
+
+Follow the [instructions in the React Native documentation](https://facebook.github.io/react-native/docs/linking-libraries-ios#manual-linking) to manually link the framework
+
 After you have linked the library with `react-native link react-native-twilio-programmable-voice`
 check that `libRNTwilioVoice.a` is present under YOUR_TARGET > Build Phases > Link Binaries With Libraries. If it is not present you can add it using the + sign at the bottom of that list.
+</details>
 
 Edit your `Podfile` to include TwilioVoice framework
 
-```
+```ruby
 source 'https://github.com/cocoapods/specs'
 
 # min version for TwilioVoice to work
-platform :ios, '8.1'
+platform :ios, '10.0'
 
 target <YOUR_TARGET> do
     ...
-    pod 'TwilioVoice', '~> 2.0.0'
+    pod 'TwilioVoice', '~> 5.2.0'
     ...
 end
-
 ```
 
-run `pod install` from inside your project `ios` directory
-
-### iOS Installation - when projects made without react-native init
-Edit your `Podfile` to include TwilioVoice and RNTwilioVoice frameworks
-
-```
-source 'https://github.com/cocoapods/specs'
-
-# min version for TwilioVoice to work
-platform :ios, '8.1'
-
-target <YOUR_TARGET> do
-    ...
-    pod 'TwilioVoice', '~> 2.0.0'
-    pod 'RNTwilioVoice', path: '../node_modules/react-native-twilio-programmable-voice'
-    ...
-end
-
+```bash
+cd ios/ && pod install
 ```
 
-run `pod install` from inside your project `ios` directory
+#### CallKit
 
-### CallKit
+The iOS library works through [CallKit](https://developer.apple.com/reference/callkit) and handling calls is much simpler than the  Android implementation as CallKit handles the inbound calls answering, ignoring, or rejecting. Outbound calls must be controlled by custom React-Native screens and controls.
 
-The current iOS part of this library works through [CallKit](https://developer.apple.com/reference/callkit). Because of this the call flow is much simpler than on Android as CallKit handles the inbound calls answering, ignoring, or rejecting.
-Because of CallKit, the only event listeners present are "deviceReady", "connectionDidConnect", "connectionDidDisconnect", and "callRejected".
+#### VoIP Service Certificate
 
-### VoIP Service Certificate
-
-Twilio Programmable Voice for iOS utilizes Apple's VoIP Services and VoIP "Push Notifications" instead of FCM. You will need a VoIP Service Certificate from Apple to receive calls.
-
+Twilio Programmable Voice for iOS utilizes Apple's VoIP Services and VoIP "Push Notifications" instead of FCM. You will need a VoIP Service Certificate from Apple to receive calls. Follow [the official Twilio instructions](https://github.com/twilio/voice-quickstart-ios#7-create-voip-service-certificate) to complete this step.
 
 ## Android Installation
 
@@ -135,41 +126,27 @@ Setup FCM
 You must download the file `google-services.json` from the Firebase console.
 It contains keys and settings for all your applications under Firebase. This library obtains the resource `senderID` for registering for remote GCM from that file.
 
-**NOTE: To use a specific `play-service-gcm` version, update the `compile` instruction in your App's `android/app/build.gradle` (replace `10.+` with the version you prefer):**
+#### `android/build.gradle`
 
-```gradle
-...
-
+```groovy
 buildscript {
-  ...
-  dependencies {
-    classpath 'com.google.gms:google-services:3.1.2'
-  }
-}
-
-...
-
-dependencies {
-    ...
-
-    compile project(':react-native-twilio-programmable-voice')
+    dependencies {
+        // override the google-service version if needed
+        // https://developers.google.com/android/guides/google-services-plugin
+        classpath 'com.google.gms:google-services:4.3.3'
+    }
 }
 
 // this plugin looks for google-services.json in your project
 apply plugin: 'com.google.gms.google-services'
 ```
 
-In your `AndroidManifest.xml`
+#### `AndroidManifest.xml`
 
 ```xml
-    .....
     <uses-permission android:name="android.permission.VIBRATE" />
 
-
     <application ....>
-
-        ....
-
         <!-- Twilio Voice -->
         <!-- [START fcm_listener] -->
         <service
@@ -179,55 +156,50 @@ In your `AndroidManifest.xml`
             </intent-filter>
         </service>
         <!-- [END fcm_listener] -->
-        <!-- [START instanceId_listener] -->
-        <service
-            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseInstanceIDService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
-            </intent-filter>
-        </service>
-        <!-- [END instanceId_listener] -->
-        <!-- Twilio Voice -->
-
-     .....
-
 ```
 
-In `android/settings.gradle`
+If you can't or don't want to use autolink, you can also manually link the library using the instructions below (click on the arrow to show them):
 
-```gradle
-...
+<details>
+<summary>Manually link the library on Android</summary>
 
+Make the following changes:
+
+#### `android/settings.gradle`
+
+```groovy
 include ':react-native-twilio-programmable-voice'
-project(':react-native-twilio-programmable-voice').projectDir = file('../node_modules/react-native-twilio-programmable-voice/android')
+project(':react-native-twilio-programmable-voice').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-twilio-programmable-voice/android')
 ```
 
-Register module (in `MainApplication.java`)
+#### `android/app/build.gradle`
+
+```groovy
+dependencies {
+   implementation project(':react-native-twilio-programmable-voice')
+}
+```
+
+#### `android/app/src/main/.../MainApplication.java`
+On top, where imports are:
 
 ```java
 import com.hoxfon.react.RNTwilioVoice.TwilioVoicePackage;  // <--- Import Package
+```
 
-public class MainApplication extends Application implements ReactApplication {
+Add the `TwilioVoicePackage` class to your list of exported packages.
 
-    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-        @Override
-        protected boolean getUseDeveloperSupport() {
-            return BuildConfig.DEBUG;
-        }
-
-        @Override
-        protected List<ReactPackage> getPackages() {
-            return Arrays.<ReactPackage>asList(
-                new MainReactPackage(),
-                new TwilioVoicePackage()         // <---- Add the Package : by default it will ask microphone permissions
-                // new TwilioVoicePackage(false) // <---- pass false to handle microphone permissions in your application
-            );
-        }
-    };
-    ....
+```java
+@Override
+protected List<ReactPackage> getPackages() {
+    return Arrays.asList(
+            new MainReactPackage(),
+            new TwilioVoicePackage()         // <---- Add the package
+            // new TwilioVoicePackage(false) // <---- pass false if you don't want to ask for microphone permissions
+    );
 }
 ```
+</details>
 
 ## Usage
 
@@ -246,9 +218,11 @@ async function initTelephony() {
         console.err(err)
     }
 }
- // iOS Only
-function initTelephonyWithUrl(url) {
-    TwilioVoice.initWithTokenUrl(url)
+
+function initTelephonyWithToken(token) {
+    TwilioVoice.initWithAccessToken(token)
+
+    // iOS only, configure CallKit
     try {
         TwilioVoice.configureCallKit({
             appName:       'TwilioVoiceExample',                  // Required param
@@ -274,19 +248,25 @@ TwilioVoice.addEventListener('deviceNotReady', function(data) {
     // }
 })
 TwilioVoice.addEventListener('connectionDidConnect', function(data) {
-    // Android
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //     call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
-    // iOS
+})
+TwilioVoice.addEventListener('connectionIsReconnecting', function(data) {
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
-    //     from: string,      // "+441234567890" // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //     to: string,        // "client:bob"    // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
+    //     call_from: string, // "+441234567890"
+    //     call_to: string,   // "client:bob"
+    // }
+})
+TwilioVoice.addEventListener('connectionDidReconnect', function(data) {
+    // {
+    //     call_sid: string,  // Twilio call sid
+    //     call_from: string, // "+441234567890"
+    //     call_to: string,   // "client:bob"
     // }
 })
 TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
@@ -294,44 +274,48 @@ TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
     //   | {
     //       err: string
     //     }
-    //   | Android
-    //     {
+    //   | {
     //         call_sid: string,  // Twilio call sid
-    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
+    //         call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
     //         call_from: string, // "+441234567890"
     //         call_to: string,   // "client:bob"
     //         err?: string,
     //     }
-    //   | iOS
-    //     {
-    //         call_sid: string,  // Twilio call sid
-    //         call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
-    //         call_from?: string, // "+441234567890"
-    //         call_to?: string,   // "client:bob"
-    //         from?: string,      // "+441234567890" // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //         to?: string,        // "client:bob"    // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //         error?: string,                        // issue 44 (https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/44)
-    //     }
+})
+TwilioVoice.addEventListener('callStateRinging', function(data: mixed) {
+    //   {
+    //       call_sid: string,  // Twilio call sid
+    //       call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
+    //       call_from: string, // "+441234567890"
+    //       call_to: string,   // "client:bob"
+    //   }
+})
+TwilioVoice.addEventListener('callInviteCancelled', function(data: mixed) {
+    //   {
+    //       call_sid: string,  // Twilio call sid
+    //       call_from: string, // "+441234567890"
+    //       call_to: string,   // "client:bob"
+    //   }
 })
 
 // iOS Only
 TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
 
-// Android Only
 TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     // {
     //     call_sid: string,  // Twilio call sid
-    //     call_state: 'PENDING' | 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' 'DISCONNECTED' | 'CANCELLED',
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
 })
+
 // Android Only
 TwilioVoice.addEventListener('proximity', function(data) {
     // {
     //     isNear: boolean
     // }
 })
+
 // Android Only
 TwilioVoice.addEventListener('wiredHeadset', function(data) {
     // {
@@ -362,32 +346,52 @@ TwilioVoice.ignore()
 // mutedValue must be a boolean
 TwilioVoice.setMuted(mutedValue)
 
+// put a call on hold
+TwilioVoice.setOnHold(holdValue)
+
+// send digits
 TwilioVoice.sendDigits(digits)
 
-// should be called after the app is initialized
-// to catch incoming call when the app was in the background
+// Ensure that an active call is displayed when the app comes to foreground
 TwilioVoice.getActiveCall()
-    .then(incomingCall => {
-        if (incomingCall){
-            _deviceDidReceiveIncoming(incomingCall)
+    .then(activeCall => {
+        if (activeCall){
+            _displayActiveCall(activeCall)
         }
     })
+
+// Ensure that call invites are displayed when the app comes to foreground
+TwilioVoice.getCallInvite()
+    .then(callInvite => {
+        if (callInvite){
+            _handleCallInvite(callInvite)
+        }
+    })
+
+// Unregister device with Twilio (iOS only)
+TwilioVoice.unregister()
 ```
+
+## Help wanted
+
+There is no need to ask permissions to contribute. Just open an issue or provide a PR. Everybody is welcome to contribute.
+
+ReactNative success is directly linked to its module ecosystem. One way to make an impact is helping contributing to this module or another of the many community lead ones.
+
+![help wanted](images/vjeux_tweet.png "help wanted")
 
 ## Twilio Voice SDK reference
 
-[iOS changelog](https://www.twilio.com/docs/api/voice-sdk/ios/changelog)
-
-[Android changelog](https://www.twilio.com/docs/api/voice-sdk/android/changelog)
+[iOS changelog](https://www.twilio.com/docs/voice/voip-sdk/ios/changelog)
+[Android changelog](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog)
 
 ## Credits
 
 [voice-quickstart-android](https://github.com/twilio/voice-quickstart-android)
 
+[voice-quickstart-ios](https://github.com/twilio/voice-quickstart-ios)
+
 [react-native-push-notification](https://github.com/zo0r/react-native-push-notification)
-
-[voice-quickstart-objc](https://github.com/twilio/voice-quickstart-objc)
-
 
 ## License
 

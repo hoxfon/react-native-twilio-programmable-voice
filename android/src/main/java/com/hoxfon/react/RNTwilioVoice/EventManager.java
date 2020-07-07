@@ -1,6 +1,6 @@
 package com.hoxfon.react.RNTwilioVoice;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -21,6 +21,11 @@ public class EventManager {
     public static final String EVENT_CONNECTION_DID_CONNECT = "connectionDidConnect";
     public static final String EVENT_CONNECTION_DID_DISCONNECT = "connectionDidDisconnect";
     public static final String EVENT_DEVICE_DID_RECEIVE_INCOMING = "deviceDidReceiveIncoming";
+    public static final String EVENT_CALL_STATE_RINGING = "callStateRinging";
+    public static final String EVENT_CALL_INVITE_CANCELLED = "callInviteCancelled";
+    public static final String EVENT_CONNECTION_IS_RECONNECTING = "connectionIsReconnecting";
+    public static final String EVENT_CONNECTION_DID_RECONNECT = "connectionDidReconnect";
+
 
     public EventManager(ReactApplicationContext context) {
         mContext = context;
