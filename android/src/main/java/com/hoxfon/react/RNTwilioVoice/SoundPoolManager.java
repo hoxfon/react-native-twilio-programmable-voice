@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.util.Log;
 
 public class SoundPoolManager {
 
@@ -24,6 +25,7 @@ public class SoundPoolManager {
     }
 
     public void playRinging() {
+        Log.d("LOL TESTING", "playRinging wesdew");
         if (!playing) {
             ringtone.play();
             playing = true;

@@ -1,25 +1,26 @@
 {
-  "_from": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+  "_from": "git+https://github.com/X-Guard/react-native-twilio-programmable-voice.git#ea3119b732c59bb0bcca63e10aad7dc2be611ab2",
   "_id": "react-native-twilio-programmable-voice@4.0.0",
   "_inBundle": false,
   "_integrity": "",
-  "_location": "/react-native-twilio-programmable-voice",
+  "_location": "/@x-guard/react-native-twilio-programmable-voice",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "react-native-twilio-programmable-voice@git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
-    "name": "react-native-twilio-programmable-voice",
-    "escapedName": "react-native-twilio-programmable-voice",
-    "rawSpec": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
-    "saveSpec": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
-    "fetchSpec": "https://github.com/hoxfon/react-native-twilio-programmable-voice.git",
-    "gitCommittish": "23b8632f60ee4183e4728d46759a6fbb4b938522"
+    "raw": "@x-guard/react-native-twilio-programmable-voice@git+https://github.com/X-Guard/react-native-twilio-programmable-voice.git#ea3119b732c59bb0bcca63e10aad7dc2be611ab2",
+    "name": "@x-guard/react-native-twilio-programmable-voice",
+    "escapedName": "@x-guard%2freact-native-twilio-programmable-voice",
+    "scope": "@x-guard",
+    "rawSpec": "git+https://github.com/X-Guard/react-native-twilio-programmable-voice.git#ea3119b732c59bb0bcca63e10aad7dc2be611ab2",
+    "saveSpec": "git+https://github.com/X-Guard/react-native-twilio-programmable-voice.git#ea3119b732c59bb0bcca63e10aad7dc2be611ab2",
+    "fetchSpec": "https://github.com/X-Guard/react-native-twilio-programmable-voice.git",
+    "gitCommittish": "ea3119b732c59bb0bcca63e10aad7dc2be611ab2"
   },
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
-  "_spec": "react-native-twilio-programmable-voice@git+https://github.com/hoxfon/react-native-twilio-programmable-voice.git#23b8632f60ee4183e4728d46759a6fbb4b938522",
+  "_resolved": "git+https://github.com/X-Guard/react-native-twilio-programmable-voice.git#ea3119b732c59bb0bcca63e10aad7dc2be611ab2",
+  "_spec": "@x-guard/react-native-twilio-programmable-voice@git+https://github.com/X-Guard/react-native-twilio-programmable-voice.git#ea3119b732c59bb0bcca63e10aad7dc2be611ab2",
   "_where": "/Users/wesdewitte/Documents/projects/xg-rn-alarm-prototype",
   "author": {
     "name": "Fabrizio Moscon"

@@ -464,7 +464,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
             if (activeCallInvite != null) {
                 callAccepted = false;
-                SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
+
+                Log.d(TAG, "handleIncomingCallIntent wesdew");
+//                SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
                 if (getReactApplicationContext().getCurrentActivity() != null) {
                     Window window = getReactApplicationContext().getCurrentActivity().getWindow();
@@ -523,7 +525,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "VoiceBroadcastReceiver.onReceive "+action+". Intent "+ intent.getExtras());
+                Log.d(TAG, "VoiceBroadcastReceiver.onReceive "+action+". Intent wesdew "+ intent.getExtras());
             }
             if (action.equals(ACTION_INCOMING_CALL)) {
                 handleIncomingCallIntent(intent);
@@ -620,7 +622,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
         if (activeCallInvite != null) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "accept()");
+                Log.d(TAG, "accept() wesdew");
             }
             AcceptOptions acceptOptions = new AcceptOptions.Builder()
                     .enableDscp(true)
@@ -648,6 +650,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void reject() {
         callAccepted = false;
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "reject() wesdew");
+        }
         SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
         WritableMap params = Arguments.createMap();
         if (activeCallInvite != null) {

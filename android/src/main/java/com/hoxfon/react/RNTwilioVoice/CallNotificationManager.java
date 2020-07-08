@@ -90,6 +90,7 @@ public class CallNotificationManager {
                                   Boolean shouldStartNewTask,
                                   int appImportance
     ) {
+        Log.d(TAG, "getLaunchIntent intent ");
         Intent launchIntent = new Intent(context, getMainActivityClass(context));
 
         int launchFlag = Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP;
@@ -110,6 +111,7 @@ public class CallNotificationManager {
         if (callInvite != null) {
             launchIntent.putExtra(INCOMING_CALL_INVITE, callInvite);
         }
+        Log.d(TAG, "getLaunchIntent return ");
         return launchIntent;
     }
 
