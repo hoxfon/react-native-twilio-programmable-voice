@@ -25,7 +25,6 @@ public class SoundPoolManager {
     }
 
     public void playRinging() {
-        Log.d("LOL TESTING", "playRinging wesdew");
         if (!playing) {
             ringtone.play();
             playing = true;

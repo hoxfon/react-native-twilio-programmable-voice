@@ -172,7 +172,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
    * Send the CancelledCallInvite to the TwilioVoiceModule
    */
   private void sendCancelledCallInviteToActivity(CancelledCallInvite cancelledCallInvite) {
-    Log.d(TAG, "sendCancelledCallInviteToActivity wesdew: ");
+    Log.d(TAG, "sendCancelledCallInviteToActivity");
     SoundPoolManager.getInstance((this)).stopRinging();
     Intent intent = new Intent(ACTION_CANCEL_CALL_INVITE);
     intent.putExtra(CANCELLED_CALL_INVITE, cancelledCallInvite);
