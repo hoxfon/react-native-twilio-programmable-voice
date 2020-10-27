@@ -9,6 +9,8 @@ const IOS = 'ios'
 
 const TwilioVoice = NativeModules.RNTwilioVoice
 
+console.log('### TwilioVoice', TwilioVoice)
+
 const NativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
 
 const _eventHandlers = {

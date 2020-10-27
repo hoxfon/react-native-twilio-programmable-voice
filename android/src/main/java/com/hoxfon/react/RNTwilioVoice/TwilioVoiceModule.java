@@ -5,11 +5,14 @@ import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Icon;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -19,6 +22,12 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.telecom.Connection;
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -57,6 +66,7 @@ import com.twilio.voice.Voice;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.hoxfon.react.RNTwilioVoice.Constants.EXTRA_CALL_UUID;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_CONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_DISCONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEIVE_INCOMING;
@@ -69,7 +79,7 @@ import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_R
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
-    public static String TAG = "RNTwilioVoice";
+    public static String TAG = "RNTPV:TwilioVoiceModule";
 
     private static final int MIC_PERMISSION_REQUEST_CODE = 1;
 
@@ -130,9 +140,16 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private HeadsetManager headsetManager;
     private EventManager eventManager;
 
-    public TwilioVoiceModule(ReactApplicationContext reactContext,
-    boolean shouldAskForMicPermission) {
+    // new
+    private ReactApplicationContext reactContext;
+    public static PhoneAccountHandle handle;
+    private static TelecomManager telecomManager;
+    private static TelephonyManager telephonyManager;
+    // endnew
+
+    public TwilioVoiceModule(ReactApplicationContext reactContext, boolean shouldAskForMicPermission) {
         super(reactContext);
+        this.reactContext = reactContext;
         if (BuildConfig.DEBUG) {
             Voice.setLogLevel(LogLevel.DEBUG);
         } else {
@@ -168,6 +185,123 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (shouldAskForMicPermission && !checkPermissionForMicrophone()) {
             requestPermissionForMicrophone();
         }
+
+        VoiceConnectionService.setAvailable(false);
+
+        // this come from RN
+//        this._settings = options;
+
+        if (isConnectionServiceAvailable()) {
+            this.registerPhoneAccount();
+            this.registerEvents();
+            VoiceConnectionService.setAvailable(true);
+        }
+    }
+
+    private String getApplicationName(Context appContext) {
+        ApplicationInfo applicationInfo = appContext.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+
+        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(stringId);
+    }
+
+    private void initializeTelecomManager() {
+        Context context = this.getAppContext();
+        ComponentName cName = new ComponentName(context, VoiceConnectionService.class);
+        String appName = this.getApplicationName(context);
+
+        handle = new PhoneAccountHandle(cName, appName);
+        telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+    }
+
+    private void registerPhoneAccount(Context appContext) {
+        if (!isConnectionServiceAvailable()) {
+            return;
+        }
+
+        this.initializeTelecomManager();
+        String appName = this.getApplicationName(this.getAppContext());
+
+        PhoneAccount.Builder builder = new PhoneAccount.Builder(handle, appName)
+                .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER);
+
+        int identifier = appContext.getResources().getIdentifier("ic_launcher", "mipmap", appContext.getPackageName());
+        Icon icon = Icon.createWithResource(appContext, identifier);
+        builder.setIcon(icon);
+
+        PhoneAccount account = builder.build();
+
+        telephonyManager = (TelephonyManager) this.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+
+        telecomManager.registerPhoneAccount(account);
+    }
+
+    @ReactMethod
+    public static Boolean isConnectionServiceAvailable() {
+        // PhoneAccount is available since api level 23
+        return Build.VERSION.SDK_INT >= 23;
+    }
+
+    @ReactMethod
+    public void registerPhoneAccount() {
+        if (!isConnectionServiceAvailable()) {
+            return;
+        }
+
+        this.registerPhoneAccount(this.getAppContext());
+    }
+
+    @ReactMethod
+    public void registerEvents() {
+        if (!isConnectionServiceAvailable()) {
+            return;
+        }
+
+        voiceBroadcastReceiver = new VoiceBroadcastReceiver();
+        registerReceiver();
+        VoiceConnectionService.setPhoneAccountHandle(handle);
+    }
+
+    // TODO use this method in all other places instead of reactContext.getApplicationContext()
+    private Context getAppContext() {
+        return this.reactContext.getApplicationContext();
+    }
+
+//    @ReactMethod
+//    public void displayIncomingCall(String uuid, String number, String callerName) {
+//        if (!isConnectionServiceAvailable() || !hasPhoneAccount()) {
+//            return;
+//        }
+//
+//        Log.d(TAG, "displayIncomingCall number: " + number + ", callerName: " + callerName);
+//
+//        Bundle extras = new Bundle();
+//        Uri uri = Uri.fromParts(PhoneAccount.SCHEME_TEL, number, null);
+//
+//        extras.putParcelable(TelecomManager.EXTRA_INCOMING_CALL_ADDRESS, uri);
+//        extras.putString(EXTRA_CALLER_NAME, callerName);
+//        extras.putString(EXTRA_CALL_UUID, uuid);
+//
+//        telecomManager.addNewIncomingCall(handle, extras);
+//    }
+
+    private static boolean hasPhoneAccount() {
+        return isConnectionServiceAvailable() && telecomManager != null
+                && telecomManager.getPhoneAccount(handle) != null && telecomManager.getPhoneAccount(handle).isEnabled();
+    }
+
+    @ReactMethod
+    public void answerIncomingCall(String uuid) {
+        if (!isConnectionServiceAvailable() || !hasPhoneAccount()) {
+            return;
+        }
+
+        Connection conn = VoiceConnectionService.getConnection(uuid);
+        if (conn == null) {
+            return;
+        }
+
+        conn.onAnswer();
     }
 
     @Override
@@ -525,6 +659,70 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "VoiceBroadcastReceiver.onReceive "+action+". Intent "+ intent.getExtras());
             }
+            WritableMap args = Arguments.createMap();
+            HashMap<String, String> attributeMap = (HashMap<String, String>)intent.getSerializableExtra("attributeMap");
+
+            switch (action) {
+//                case ACTION_END_CALL:
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    eventManager.eventManager("RNCallKeepPerformEndCallAction", args);
+//                    break;
+                case ACTION_ANSWER_CALL:
+                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+                    eventManager.sendEvent("RNCallKeepPerformAnswerCallAction", args);
+                    break;
+//                case ACTION_HOLD_CALL:
+//                    args.putBoolean("hold", true);
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    eventManager.sendEvent("RNCallKeepDidToggleHoldAction", args);
+//                    break;
+//                case ACTION_UNHOLD_CALL:
+//                    args.putBoolean("hold", false);
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    eventManager.sendEvent("RNCallKeepDidToggleHoldAction", args);
+//                    break;
+//                case ACTION_MUTE_CALL:
+//                    args.putBoolean("muted", true);
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    eventManager.sendEvent("RNCallKeepDidPerformSetMutedCallAction", args);
+//                    break;
+//                case ACTION_UNMUTE_CALL:
+//                    args.putBoolean("muted", false);
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    eventManager.sendEvent("RNCallKeepDidPerformSetMutedCallAction", args);
+//                    break;
+//                case ACTION_DTMF_TONE:
+//                    args.putString("digits", attributeMap.get("DTMF"));
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    eventManager.sendEvent("RNCallKeepDidPerformDTMFAction", args);
+//                    break;
+//                case ACTION_ONGOING_CALL:
+//                    args.putString("handle", attributeMap.get(EXTRA_CALL_NUMBER));
+//                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    args.putString("name", attributeMap.get(EXTRA_CALLER_NAME));
+//                    eventManager.sendEvent("RNCallKeepDidReceiveStartCallAction", args);
+//                    break;
+//                case ACTION_AUDIO_SESSION:
+//                    eventManager.sendEvent("RNCallKeepDidActivateAudioSession", null);
+//                    break;
+//                case ACTION_CHECK_REACHABILITY:
+//                    eventManager.sendEvent("RNCallKeepCheckReachability", null);
+//                    break;
+//                case ACTION_WAKE_APP:
+//                    Intent headlessIntent = new Intent(reactContext, RNCallKeepBackgroundMessagingService.class);
+//                    headlessIntent.putExtra("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+//                    headlessIntent.putExtra("name", attributeMap.get(EXTRA_CALLER_NAME));
+//                    headlessIntent.putExtra("handle", attributeMap.get(EXTRA_CALL_NUMBER));
+//                    Log.d(TAG, "wakeUpApplication: " + attributeMap.get(EXTRA_CALL_UUID) + ", number : " + attributeMap.get(EXTRA_CALL_NUMBER) + ", displayName:" + attributeMap.get(EXTRA_CALLER_NAME));
+//
+//                    ComponentName name = reactContext.startService(headlessIntent);
+//                    if (name != null) {
+//                        HeadlessJsTaskService.acquireWakeLockNow(reactContext);
+//                    }
+//                    break;
+            }
+
+
             if (action.equals(ACTION_INCOMING_CALL)) {
                 handleIncomingCallIntent(intent);
             } else if (action.equals(ACTION_CANCEL_CALL_INVITE)) {

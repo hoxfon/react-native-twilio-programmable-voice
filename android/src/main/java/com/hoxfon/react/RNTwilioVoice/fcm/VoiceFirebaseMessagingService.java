@@ -49,7 +49,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
         // Notify Activity of FCM token
         Intent intent = new Intent(ACTION_FCM_TOKEN);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     /**
@@ -162,6 +162,6 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         SoundPoolManager.getInstance((this)).stopRinging();
         Intent intent = new Intent(ACTION_CANCEL_CALL_INVITE);
         intent.putExtra(CANCELLED_CALL_INVITE, cancelledCallInvite);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }
