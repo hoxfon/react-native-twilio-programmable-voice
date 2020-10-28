@@ -681,6 +681,14 @@ withCompletionHandler:(void (^)(void))completion {
     }
 }
 
+- (void)provider:(CXProvider *)provider performPlayDTMFCallAction:(CXPlayDTMFCallAction *)action {
+  TVOCall *call = self.activeCalls[action.callUUID.UUIDString];
+  if (call && call.state == TVOCallStateConnected) {
+    RCTLogInfo(@"SendDigits %@", action.digits);
+    [call sendDigits:action.digits];
+  }
+}
+
 #pragma mark - CallKit Actions
 - (void)performStartCallActionWithUUID:(NSUUID *)uuid handle:(NSString *)handle {
   if (uuid == nil || handle == nil) {
