@@ -4,12 +4,18 @@ import {
     Platform,
 } from 'react-native'
 
+import uuid from 'uuid'
+
+import RNCallKeep from 'react-native-callkeep'
+console.log('### RNCallKeep', RNCallKeep)
 const ANDROID = 'android'
 const IOS = 'ios'
 
 const TwilioVoice = NativeModules.RNTwilioVoice
 
 const NativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
+
+const getNewUuid = () => uuid.v4().toLowerCase();
 
 const _eventHandlers = {
     deviceReady: new Map(),
@@ -30,6 +36,17 @@ const Twilio = {
     // Listen to deviceReady and deviceNotReady events to see whether
     // the initialization succeeded
     async initWithToken(token) {
+        RNCallKeep.setup({
+            ios: {
+                appName: 'Hoxfon',
+            },
+            android: {
+                alertTitle: 'Permissions required',
+                alertDescription: 'This application needs to access your phone accounts',
+                cancelButton: 'Cancel',
+                okButton: 'ok',
+            },
+        })
         if (typeof token !== 'string') {
             return {
                 initialized: false,
@@ -38,6 +55,9 @@ const Twilio = {
         };
 
         const result = await TwilioVoice.initWithAccessToken(token)
+        if (Platform.OS === ANDROID && result && result.initialized) {
+            RNCallKeep.setAvailable(true)
+        }
         // native react promise present only for Android
         // iOS initWithAccessToken doesn't return
         if (Platform.OS === IOS) {
@@ -49,8 +69,18 @@ const Twilio = {
     },
     connect(params = {}) {
         TwilioVoice.connect(params)
+        const callUUID = getNewUuid()
+        if (Platform.OS === ANDROID) {
+            RNCallKeep.startCall(callUUID, params.To, "Paul Smith")
+        }
+        // TODO iOS
     },
-    disconnect: TwilioVoice.disconnect,
+    disconnect() {
+        TwilioVoice.disconnect()
+        if (Platform.OS === ANDROID) {
+            RNCallKeep.setAvailable(false)
+        }
+    },
     accept() {
         if (Platform.OS === IOS) {
             return
