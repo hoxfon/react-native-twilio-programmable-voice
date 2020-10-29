@@ -515,6 +515,9 @@ withCompletionHandler:(void (^)(void))completion {
         NSLog(@"didDisconnect");
     }
 
+    UIDevice* device = [UIDevice currentDevice];
+    device.proximityMonitoringEnabled = NO;
+
     if (!self.userInitiatedDisconnect) {
         CXCallEndedReason reason = CXCallEndedReasonRemoteEnded;
         if (error) {
@@ -734,8 +737,6 @@ withCompletionHandler:(void (^)(void))completion {
   if (uuid == nil) {
     return;
   }
-  UIDevice* device = [UIDevice currentDevice];
-  device.proximityMonitoringEnabled = NO;
 
   CXEndCallAction *endCallAction = [[CXEndCallAction alloc] initWithCallUUID:uuid];
   CXTransaction *transaction = [[CXTransaction alloc] initWithAction:endCallAction];
