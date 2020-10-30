@@ -687,7 +687,7 @@ withCompletionHandler:(void (^)(void))completion {
 - (void)provider:(CXProvider *)provider performPlayDTMFCallAction:(CXPlayDTMFCallAction *)action {
   TVOCall *call = self.activeCalls[action.callUUID.UUIDString];
   if (call && call.state == TVOCallStateConnected) {
-    RCTLogInfo(@"SendDigits %@", action.digits);
+    NSLog(@"SendDigits %@", action.digits);
     [call sendDigits:action.digits];
   }
 }
