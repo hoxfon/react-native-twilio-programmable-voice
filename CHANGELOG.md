@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 4.1.0
+
+- iOS
+  - Adds ability to handle DTMF codes in CallKit
+
 ## 4.0.2
 
 - iOS
