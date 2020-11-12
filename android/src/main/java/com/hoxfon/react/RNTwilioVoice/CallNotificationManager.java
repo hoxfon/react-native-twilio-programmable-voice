@@ -33,7 +33,6 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REJECT_CAL
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_HANGUP_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_MISSED_CALL;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.NOTIFICATION_TYPE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CALL_SID_KEY;
@@ -86,7 +85,9 @@ public class CallNotificationManager {
 
     public Intent getLaunchIntent(ReactApplicationContext context,
                                   int notificationId,
-                                  CallInvite callInvite,
+                                  String callInviteSid,
+                                  String callInviteFrom,
+                                  String callInviteTo,
                                   Boolean shouldStartNewTask,
                                   int appImportance
     ) {
@@ -107,14 +108,15 @@ public class CallNotificationManager {
                                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 );
 
-        if (callInvite != null) {
-            launchIntent.putExtra(INCOMING_CALL_INVITE, callInvite);
-        }
+        launchIntent.putExtra("call_sid", callInviteSid);
+        launchIntent.putExtra("call_from", callInviteFrom);
+        launchIntent.putExtra("call_to", callInviteTo);
         return launchIntent;
     }
 
     public void createIncomingCallNotification(ReactApplicationContext context,
-                                               CallInvite callInvite,
+                                               String callInviteSid,
+                                               String callInviteFrom,
                                                int notificationId,
                                                Intent launchIntent)
     {
@@ -131,7 +133,7 @@ public class CallNotificationManager {
          */
         Bundle extras = new Bundle();
         extras.putInt(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-        extras.putString(CALL_SID_KEY, callInvite.getCallSid());
+        extras.putString(CALL_SID_KEY, callInviteSid);
         extras.putString(NOTIFICATION_TYPE, ACTION_INCOMING_CALL);
         /*
          * Create the notification shown in the notification drawer
@@ -145,7 +147,7 @@ public class CallNotificationManager {
                         .setCategory(NotificationCompat.CATEGORY_CALL)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle("Incoming call")
-                        .setContentText(callInvite.getFrom() + " is calling")
+                        .setContentText(callInviteFrom + " is calling")
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
@@ -180,7 +182,7 @@ public class CallNotificationManager {
         notificationBuilder.addAction(R.drawable.ic_call_white_24dp, "ANSWER", pendingAnswerIntent);
 
         notificationManager.notify(notificationId, notificationBuilder.build());
-        TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+callInvite.getCallSid(), notificationId);
+        TwilioVoiceModule.callNotificationMap.put(INCOMING_NOTIFICATION_PREFIX+callInviteSid, notificationId);
     }
 
     public void initCallNotificationsChannel(NotificationManager notificationManager) {

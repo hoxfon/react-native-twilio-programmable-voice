@@ -82,7 +82,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     // Empty HashMap, contains parameters for the Outbound call
     private HashMap<String, String> twiMLParams = new HashMap<>();
 
-    public static final String INCOMING_CALL_INVITE          = "INCOMING_CALL_INVITE";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
     public static final String NOTIFICATION_TYPE             = "NOTIFICATION_TYPE";
     public static final String CANCELLED_CALL_INVITE         = "CANCELLED_CALL_INVITE";
@@ -461,8 +460,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "handleIncomingCallIntent");
             }
-            activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
-            if (activeCallInvite != null) {
+            if (intent != null) {
                 callAccepted = false;
                 SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
@@ -479,9 +477,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                         appImportance == RunningAppProcessInfo.IMPORTANCE_SERVICE) {
 
                     WritableMap params = Arguments.createMap();
-                    params.putString("call_sid", activeCallInvite.getCallSid());
-                    params.putString("call_from", activeCallInvite.getFrom());
-                    params.putString("call_to", activeCallInvite.getTo()); // TODO check if needed
+                    params.putString("call_sid", intent.getStringExtra("call_sid"));
+                    params.putString("call_from", intent.getStringExtra("call_from"));
+                    params.putString("call_to", intent.getStringExtra("call_to"));
                     eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
                 }
             } else {
