@@ -55,9 +55,10 @@ dependencies {
     def supportLibVersion = rootProject.hasProperty('supportLibVersion') ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.twilio:voice-android:4.5.0'
+    implementation 'com.twilio:voice-android:5.0.2'
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.google.firebase:firebase-messaging:17.6.+'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     testImplementation 'junit:junit:4.12'
 }

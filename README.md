@@ -22,6 +22,7 @@ The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon
 It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
 
 You can install it with:
+
 ```bash
 # Yarn
 yarn add https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/twilio-android-sdk-5
