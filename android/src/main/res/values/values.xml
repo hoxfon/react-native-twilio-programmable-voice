@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="answer" translatable="false">Answer</string>
+    <string name="decline" translatable="false">Decline</string>
+    <string name="hangup" translatable="false">Hang up</string>
+    <string name="call_in_progress" translatable="false">Call in progress</string>
+    <string name="call_incoming" translatable="false">Incoming call</string>
+    <string name="call_missed" translatable="false">Missed call</string>
+</resources>

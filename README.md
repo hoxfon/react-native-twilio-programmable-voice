@@ -4,7 +4,7 @@ This is a React-Native wrapper for [Twilio Programmable Voice SDK](https://www.t
 
 ## Twilio Programmable Voice SDK
 
-- Android 4.5.0 (bundled within the module)
+- Android 5.0.0 (bundled within the module)
 - iOS 5.1.0 (specified by the app's own podfile)
 
 ## Breaking changes in v4.0.0
