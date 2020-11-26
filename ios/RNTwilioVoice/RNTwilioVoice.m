@@ -347,6 +347,9 @@ withCompletionHandler:(void (^)(void))completion {
     if (callInvite.from) {
         from = [callInvite.from stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     }
+    if (callInvite.customParameters[@"CallerName"]) {
+        from = callInvite.customParameters[@"CallerName"];
+    }
     // Always report to CallKit
     [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
     self.activeCallInvites[[callInvite.uuid UUIDString]] = callInvite;
@@ -722,7 +725,8 @@ withCompletionHandler:(void (^)(void))completion {
 }
 
 - (void)reportIncomingCallFrom:(NSString *)from withUUID:(NSUUID *)uuid {
-  CXHandle *callHandle = [[CXHandle alloc] initWithType:CXHandleTypeGeneric value:from];
+  CXHandleType type = [[from substringToIndex:1] isEqual:@"+"] ? CXHandleTypePhoneNumber : CXHandleTypeGeneric;
+  CXHandle *callHandle = [[CXHandle alloc] initWithType:type value:from];
 
   CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
   callUpdate.remoteHandle = callHandle;
