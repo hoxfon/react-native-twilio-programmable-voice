@@ -115,6 +115,16 @@ cd ios/ && pod install
 
 The iOS library works through [CallKit](https://developer.apple.com/reference/callkit) and handling calls is much simpler than the  Android implementation as CallKit handles the inbound calls answering, ignoring, or rejecting. Outbound calls must be controlled by custom React-Native screens and controls.
 
+To pass caller's name to CallKit via voip push notification add custom parameter 'CallerName' to Twilio Dial verb.
+```xml
+    <Dial>
+    <Client>
+        <Identity>Client</Identity>
+        <Parameter name="CallerName">NAME TO DISPLAY</Parameter>
+    </Client>
+    </Dial>
+```    
+
 #### VoIP Service Certificate
 
 Twilio Programmable Voice for iOS utilizes Apple's VoIP Services and VoIP "Push Notifications" instead of FCM. You will need a VoIP Service Certificate from Apple to receive calls. Follow [the official Twilio instructions](https://github.com/twilio/voice-quickstart-ios#7-create-voip-service-certificate) to complete this step.
