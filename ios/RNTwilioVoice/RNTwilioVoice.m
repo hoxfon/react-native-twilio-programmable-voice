@@ -11,6 +11,7 @@
 @import TwilioVoice;
 
 NSString * const kCachedDeviceToken = @"CachedDeviceToken";
+NSString * const kCallerNameCustomParameter = @"CallerName";
 
 @interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate>
 
@@ -347,8 +348,8 @@ withCompletionHandler:(void (^)(void))completion {
     if (callInvite.from) {
         from = [callInvite.from stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     }
-    if (callInvite.customParameters[@"CallerName"]) {
-        from = callInvite.customParameters[@"CallerName"];
+    if (callInvite.customParameters[kCallerNameCustomParameter]) {
+        from = callInvite.customParameters[kCallerNameCustomParameter];
     }
     // Always report to CallKit
     [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
