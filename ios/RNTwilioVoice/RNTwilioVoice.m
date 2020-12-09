@@ -131,6 +131,11 @@ RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
     self.activeCall.muted = muted ? YES : NO;
 }
 
+RCT_EXPORT_METHOD(setOnHold: (BOOL *)isOnHold) {
+  NSLog(@"Hold/Unhold call");
+    self.activeCall.onHold = isOnHold ? YES : NO;
+}
+
 RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
     [self toggleAudioRoute: speaker ? YES : NO];
 }
