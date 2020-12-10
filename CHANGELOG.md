@@ -1,5 +1,10 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 4.2.0
+
+- iOS
+  - Added ability to pass caller's name to CallKit in push notification
+
 ## 4.1.0
 
 - iOS
