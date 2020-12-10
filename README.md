@@ -115,7 +115,8 @@ cd ios/ && pod install
 
 The iOS library works through [CallKit](https://developer.apple.com/reference/callkit) and handling calls is much simpler than the  Android implementation as CallKit handles the inbound calls answering, ignoring, or rejecting. Outbound calls must be controlled by custom React-Native screens and controls.
 
-To pass caller's name to CallKit via voip push notification add custom parameter 'CallerName' to Twilio Dial verb.
+To pass caller's name to CallKit via Voip push notification add custom parameter 'CallerName' to Twilio Dial verb.
+
 ```xml
     <Dial>
     <Client>
@@ -123,7 +124,7 @@ To pass caller's name to CallKit via voip push notification add custom parameter
         <Parameter name="CallerName">NAME TO DISPLAY</Parameter>
     </Client>
     </Dial>
-```    
+```
 
 #### VoIP Service Certificate
 
