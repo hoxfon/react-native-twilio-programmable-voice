@@ -126,6 +126,28 @@ To pass caller's name to CallKit via Voip push notification add custom parameter
     </Dial>
 ```
 
+If your app gets killed after receiving push notification you must initialize CallKit on start
+
+```obj-c
+// add import
+#import <RNTwilioVoice/RNTwilioVoice.h>
+
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  // ...
+
+  // add these three lines
+  RNTwilioVoice *voice = [bridge moduleForName:@"RNTwilioVoice"];
+  [voice initPushRegistry];
+  // you can pass same arguments as from your JS code
+  [voice configureCallKit:@{ @"appName" : @"YOUR FANCY APP NAME" }];
+  return YES;
+}
+```
+
 #### VoIP Service Certificate
 
 Twilio Programmable Voice for iOS utilizes Apple's VoIP Services and VoIP "Push Notifications" instead of FCM. You will need a VoIP Service Certificate from Apple to receive calls. Follow [the official Twilio instructions](https://github.com/twilio/voice-quickstart-ios#7-create-voip-service-certificate) to complete this step.
