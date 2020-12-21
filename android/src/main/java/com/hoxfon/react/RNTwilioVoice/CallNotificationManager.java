@@ -105,7 +105,7 @@ public class CallNotificationManager {
         /*
          * Create the notification shown in the notification drawer
          */
-        String title = context.getString(R.string.call_missed);
+        String title = context.getString(R.string.call_missed_title);
         NotificationCompat.Builder notification =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
                         .setGroup(MISSED_CALLS_GROUP)
@@ -115,7 +115,7 @@ public class CallNotificationManager {
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .setSmallIcon(R.drawable.ic_call_missed_white_24dp)
                         .setContentTitle(title)
-                        .setContentText(callFrom + " called")
+                        .setContentText(callFrom + context.getString(R.string.call_missed_from))
                         .setAutoCancel(true)
                         .setShowWhen(true)
                         .setExtras(extras)
@@ -128,9 +128,9 @@ public class CallNotificationManager {
             inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(title);
         } else {
-            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " missed calls");
+            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + context.getString(R.string.call_missed_title_plural));
         }
-        inboxStyle.addLine("last call from: " +callFrom);
+        inboxStyle.addLine(context.getString(R.string.call_missed_more) +callFrom);
         sharedPrefEditor.putInt(MISSED_CALLS_GROUP, missedCalls);
         sharedPrefEditor.commit();
 
