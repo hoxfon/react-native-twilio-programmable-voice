@@ -69,10 +69,10 @@ import static com.hoxfon.react.RNTwilioVoice.Constants.PREFERENCE_KEY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_CONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_DISCONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEIVE_INCOMING;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_INVITE_CANCELLED;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_NOT_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_STATE_RINGING;
+import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_INVITE_CANCELLED;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_IS_RECONNECTING;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_RECONNECT;
 
@@ -111,7 +111,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private AudioFocusRequest focusRequest;
     private HeadsetManager headsetManager;
     private EventManager eventManager;
-    private int callInviteIntent;
+    private int existingCallInviteIntent;
 
     public TwilioVoiceModule(ReactApplicationContext reactContext,
     boolean shouldAskForMicPermission) {
@@ -170,8 +170,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Module creation "+action+". Intent "+ intent.getExtras());
         }
-        if (action.equals(ACTION_ACCEPT) && callInviteIntent != currentCallInviteIntent) {
-            callInviteIntent = currentCallInviteIntent;
+        if (action.equals(ACTION_ACCEPT) && currentCallInviteIntent != existingCallInviteIntent) {
+            existingCallInviteIntent = currentCallInviteIntent;
             handleIncomingCallIntent(intent);
         }
     }
@@ -190,17 +190,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     @Override
+    public String getName() {
+        return TAG;
+    }
+
+    @Override
     public void onNewIntent(Intent intent) {
         // This is called only when the App is in the foreground
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNewIntent " + intent.toString());
         }
         handleIncomingCallIntent(intent);
-    }
-
-    @Override
-    public String getName() {
-        return TAG;
     }
 
     private RegistrationListener registrationListener() {
@@ -698,26 +698,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     twiMLParams.put(key, params.getString(key));
                     break;
                 default:
-                    Log.d(TAG, "Could not convert with key: " + key + ".");
+                    Log.d(TAG, "Could not convert key: " + key + ". ReadableType: "+ readableType.toString());
                     break;
             }
         }
 
-//        Set<IceServer> iceServers = new HashSet<>();
-//        iceServers.add(new IceServer("stun:global.stun.twilio.com:3478?transport=udp"));
-//        iceServers.add(new IceServer("turn:global.turn.twilio.com:3478?transport=udp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
-//        iceServers.add(new IceServer("turn:global.turn.twilio.com:3478?transport=tcp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
-//        iceServers.add(new IceServer("turn:global.turn.twilio.com:443?transport=tcp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
-//
-//        IceOptions iceOptions = new IceOptions.Builder()
-//                .iceServers(iceServers)
-//                .build();
-//
-//        ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
-//                .iceOptions(iceOptions)
-//                .enableDscp(true)
-//                .params(twiMLParams)
-//                .build();
         ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
                 .enableDscp(true)
                 .params(twiMLParams)
@@ -807,7 +792,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         savedAudioMode = audioManager.getMode();
         // Request audio focus before making any device switch
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AudioAttributes playbackAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -845,7 +830,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             return;
         }
         audioManager.setMode(savedAudioMode);
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (focusRequest != null) {
                 audioManager.abandonAudioFocusRequest(focusRequest);
             }
@@ -864,9 +849,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             return;
         }
         if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
-//            Snackbar.make(coordinatorLayout,
-//                    "Microphone permissions needed. Please allow in your application settings.",
-//                    SNACKBAR_DURATION).show();
+            // TODO
         } else {
             ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
         }
