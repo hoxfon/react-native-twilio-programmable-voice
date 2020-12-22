@@ -358,7 +358,7 @@ TwilioVoice.ignore()
 TwilioVoice.setMuted(mutedValue)
 
 // put a call on hold
-TwilioVoice.setOnHold(holdValue)
+TwilioVoice.hold(holdValue)
 
 // send digits
 TwilioVoice.sendDigits(digits)
