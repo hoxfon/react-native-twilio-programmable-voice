@@ -193,6 +193,7 @@ public class CallNotificationManager {
                 "Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setLightColor(Color.GREEN);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        channel.setShowBadge(false);
         notificationManager.createNotificationChannel(channel);
     }
 
