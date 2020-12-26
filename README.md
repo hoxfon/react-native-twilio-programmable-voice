@@ -4,8 +4,67 @@ This is a React-Native wrapper for [Twilio Programmable Voice SDK](https://www.t
 
 ## Twilio Programmable Voice SDK
 
-- Android 5.0.0 (bundled within the module)
+- Android 5.0.2 (bundled within the module)
 - iOS 5.1.0 (specified by the app's own podfile)
+
+## Breaking changes in v5.0.0
+
+Changes on [Android Twilio Voice SDK v5](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog#500) are reflected in the JavaScript API, the way call invites are handled and ...
+
+- when the app is not in foreground incoming calls result in a heads-up notification with action to "ACCEPT" and "REJECT"
+- ReactMethod `accept` does not dispatch any event. Previously it would dispatch `connectionDidDisconnect`
+- ReactMethod `reject` dispatch a `callInviteCancelled` event instead of `connectionDidDisconnect`
+- ReactMethod `ignore` does not dispatch any event. Previously it would dispatch `connectionDidDisconnect`
+
+To allow the library to show heads up notifications you must add the following lines to your application `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+    <!-- receive calls when the app is in the background-->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        ...
+    >
+        <service
+            android:enabled="true"
+            android:name="com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService">
+            <intent-filter>
+                <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_ACCEPT" />
+                <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_REJECT" />
+            </intent-filter>
+        </service>
+        ...
+    </application>
+```
+
+## ICE
+
+See https://www.twilio.com/docs/stun-turn
+
+```bash
+curl -X POST https://api.twilio.com/2010-04-01/Accounts/ACb0b56ae3bf07ce4045620249c3c90b40/Tokens.json \
+-u ACb0b56ae3bf07ce4045620249c3c90b40:f5c84f06e5c02b55fa61696244a17c84
+```
+
+```java
+Set<IceServer> iceServers = new HashSet<>();
+// server URLs returned by calling the Twilio Rest API to generate a new token
+iceServers.add(new IceServer("stun:global.stun.twilio.com:3478?transport=udp"));
+iceServers.add(new IceServer("turn:global.turn.twilio.com:3478?transport=udp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
+iceServers.add(new IceServer("turn:global.turn.twilio.com:3478?transport=tcp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
+iceServers.add(new IceServer("turn:global.turn.twilio.com:443?transport=tcp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
+
+IceOptions iceOptions = new IceOptions.Builder()
+		.iceServers(iceServers)
+		.build();
+
+ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+		.iceOptions(iceOptions)
+		.enableDscp(true)
+		.params(twiMLParams)
+		.build();
+```
 
 ## Breaking changes in v4.0.0
 
