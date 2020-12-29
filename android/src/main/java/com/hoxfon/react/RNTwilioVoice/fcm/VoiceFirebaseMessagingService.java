@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactContext;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.hoxfon.react.RNTwilioVoice.Constants;
 import com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService;
 import com.twilio.voice.CallException;
 import com.hoxfon.react.RNTwilioVoice.BuildConfig;
@@ -28,13 +29,6 @@ import com.twilio.voice.Voice;
 import java.util.Map;
 import java.util.Random;
 
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_CANCEL_CALL;
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_FCM_TOKEN;
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_INCOMING_CALL;
-import static com.hoxfon.react.RNTwilioVoice.Constants.INCOMING_CALL_INVITE;
-import static com.hoxfon.react.RNTwilioVoice.Constants.CANCELLED_CALL_INVITE;
-import static com.hoxfon.react.RNTwilioVoice.Constants.CANCELLED_CALL_INVITE_ERROR;
-import static com.hoxfon.react.RNTwilioVoice.Constants.INCOMING_CALL_NOTIFICATION_ID;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
@@ -49,7 +43,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Refreshed token: " + token);
 
         // Notify Activity of FCM token
-        Intent intent = new Intent(ACTION_FCM_TOKEN);
+        Intent intent = new Intent(Constants.ACTION_FCM_TOKEN);
         LocalBroadcastManager.getInstance(this.getBaseContext()).sendBroadcast(intent);
     }
 
@@ -103,9 +97,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                                 return;
                             }
 
-                            Intent intent = new Intent(ACTION_INCOMING_CALL);
-                            intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-                            intent.putExtra(INCOMING_CALL_INVITE, callInvite);
+                            Intent intent = new Intent(Constants.ACTION_INCOMING_CALL);
+                            intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
+                            intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
                             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
                     });
@@ -133,9 +127,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
     private void handleInvite(CallInvite callInvite, int notificationId) {
         Intent intent = new Intent(this, IncomingCallNotificationService.class);
-        intent.setAction(ACTION_INCOMING_CALL);
-        intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-        intent.putExtra(INCOMING_CALL_INVITE, callInvite);
+        intent.setAction(Constants.ACTION_INCOMING_CALL);
+        intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
+        intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
 
         startService(intent);
     }
@@ -143,10 +137,10 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     private void handleCancelledCallInvite(CancelledCallInvite cancelledCallInvite, CallException callException) {
         Log.e(TAG, "handleCancelledCallInvite exception: " + callException.getMessage());
         Intent intent = new Intent(this, IncomingCallNotificationService.class);
-        intent.setAction(ACTION_CANCEL_CALL);
-        intent.putExtra(CANCELLED_CALL_INVITE, cancelledCallInvite);
+        intent.setAction(Constants.ACTION_CANCEL_CALL);
+        intent.putExtra(Constants.CANCELLED_CALL_INVITE, cancelledCallInvite);
         if (callException != null) {
-            intent.putExtra(CANCELLED_CALL_INVITE_ERROR, callException.getMessage());
+            intent.putExtra(Constants.CANCELLED_CALL_INVITE_ERROR, callException.getMessage());
         }
         startService(intent);
     }

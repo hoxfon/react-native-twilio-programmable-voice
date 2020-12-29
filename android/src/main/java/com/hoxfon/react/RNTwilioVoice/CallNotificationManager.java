@@ -15,6 +15,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -22,17 +24,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.List;
 
 import static android.content.Context.ACTIVITY_SERVICE;
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_HANGUP_CALL;
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_INCOMING_CALL;
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_MISSED_CALL;
-import static com.hoxfon.react.RNTwilioVoice.Constants.INCOMING_CALL_NOTIFICATION_ID;
-import static com.hoxfon.react.RNTwilioVoice.Constants.CALL_SID_KEY;
-import static com.hoxfon.react.RNTwilioVoice.Constants.MISSED_CALLS_GROUP;
-import static com.hoxfon.react.RNTwilioVoice.Constants.MISSED_CALLS_NOTIFICATION_ID;
-import static com.hoxfon.react.RNTwilioVoice.Constants.HANGUP_NOTIFICATION_ID;
-import static com.hoxfon.react.RNTwilioVoice.Constants.PREFERENCE_KEY;
-import static com.hoxfon.react.RNTwilioVoice.Constants.ACTION_CLEAR_MISSED_CALLS_COUNT;
-import static com.hoxfon.react.RNTwilioVoice.Constants.CLEAR_MISSED_CALLS_NOTIFICATION_ID;
+
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
 public class CallNotificationManager {
 
@@ -73,12 +66,15 @@ public class CallNotificationManager {
     }
 
     public void createMissedCallNotification(ReactApplicationContext context, String callSid, String callFrom) {
-        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "createMissedCallNotification()");
+        }
+        SharedPreferences sharedPref = context.getSharedPreferences(Constants.PREFERENCE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
 
         Intent intent = new Intent(context, getMainActivityClass(context));
-        intent.setAction(ACTION_MISSED_CALL)
-                .putExtra(INCOMING_CALL_NOTIFICATION_ID, MISSED_CALLS_NOTIFICATION_ID)
+        intent.setAction(Constants.ACTION_MISSED_CALL)
+                .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.MISSED_CALLS_NOTIFICATION_ID)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -91,16 +87,16 @@ public class CallNotificationManager {
         PendingIntent clearMissedCallsCountPendingIntent = PendingIntent.getBroadcast(
                 context,
                 0,
-                new Intent(ACTION_CLEAR_MISSED_CALLS_COUNT)
-                        .putExtra(INCOMING_CALL_NOTIFICATION_ID, CLEAR_MISSED_CALLS_NOTIFICATION_ID),
+                new Intent(Constants.ACTION_CLEAR_MISSED_CALLS_COUNT)
+                        .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.CLEAR_MISSED_CALLS_NOTIFICATION_ID),
                 0
         );
         /*
          * Pass the notification id and call sid to use as an identifier to open the notification
          */
         Bundle extras = new Bundle();
-        extras.putInt(INCOMING_CALL_NOTIFICATION_ID, MISSED_CALLS_NOTIFICATION_ID);
-        extras.putString(CALL_SID_KEY, callSid);
+        extras.putInt(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.MISSED_CALLS_NOTIFICATION_ID);
+        extras.putString(Constants.CALL_SID_KEY, callSid);
 
         /*
          * Create the notification shown in the notification drawer
@@ -108,7 +104,7 @@ public class CallNotificationManager {
         String title = context.getString(R.string.call_missed_title);
         NotificationCompat.Builder notification =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
-                        .setGroup(MISSED_CALLS_GROUP)
+                        .setGroup(Constants.MISSED_CALLS_GROUP)
                         .setGroupSummary(true)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -122,16 +118,16 @@ public class CallNotificationManager {
                         .setDeleteIntent(clearMissedCallsCountPendingIntent)
                         .setContentIntent(pendingIntent);
 
-        int missedCalls = sharedPref.getInt(MISSED_CALLS_GROUP, 0);
+        int missedCalls = sharedPref.getInt(Constants.MISSED_CALLS_GROUP, 0);
         missedCalls++;
         if (missedCalls == 1) {
             inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(title);
         } else {
-            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + context.getString(R.string.call_missed_title_plural));
+            inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " " + context.getString(R.string.call_missed_title_plural));
         }
-        inboxStyle.addLine(context.getString(R.string.call_missed_more) +callFrom);
-        sharedPrefEditor.putInt(MISSED_CALLS_GROUP, missedCalls);
+        inboxStyle.addLine(context.getString(R.string.call_missed_more) + " " + callFrom);
+        sharedPrefEditor.putInt(Constants.MISSED_CALLS_GROUP, missedCalls);
         sharedPrefEditor.commit();
 
         notification.setStyle(inboxStyle);
@@ -146,13 +142,13 @@ public class CallNotificationManager {
         }
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(MISSED_CALLS_NOTIFICATION_ID, notification.build());
+        notificationManager.notify(Constants.MISSED_CALLS_NOTIFICATION_ID, notification.build());
     }
 
     public void createHangupNotification(ReactApplicationContext context, String callSid, String caller) {
         Intent intent = new Intent(context, getMainActivityClass(context));
-        intent.setAction(ACTION_INCOMING_CALL)
-                .putExtra(INCOMING_CALL_NOTIFICATION_ID, HANGUP_NOTIFICATION_ID)
+        intent.setAction(Constants.ACTION_OPEN_CALL_IN_PROGRESS)
+                .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -165,21 +161,21 @@ public class CallNotificationManager {
         PendingIntent hangupPendingIntent = PendingIntent.getBroadcast(
                 context,
                 0,
-                new Intent(ACTION_HANGUP_CALL)
-                        .putExtra(INCOMING_CALL_NOTIFICATION_ID, HANGUP_NOTIFICATION_ID),
+                new Intent(Constants.ACTION_HANGUP_CALL)
+                        .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         Bundle extras = new Bundle();
-        extras.putInt(INCOMING_CALL_NOTIFICATION_ID, HANGUP_NOTIFICATION_ID);
-        extras.putString(CALL_SID_KEY, callSid);
+        extras.putInt(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID);
+        extras.putString(Constants.CALL_SID_KEY, callSid);
 
         Notification notification;
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String title = context.getString(R.string.call_in_progress);
         String actionText = context.getString(R.string.hangup);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notification = new Notification.Builder(context, createChannel(title, notificationManager))
+            notification = new NotificationCompat.Builder(context, createChannel(title, notificationManager))
                     .setContentTitle(title)
                     .setContentText(caller)
                     .setSmallIcon(R.drawable.ic_call_white_24dp)
@@ -191,6 +187,7 @@ public class CallNotificationManager {
                     .addAction(0, actionText, hangupPendingIntent)
                     .build();
         } else {
+            // noinspection deprecation
             notification = new NotificationCompat.Builder(context)
                     .setContentTitle(title)
                     .setContentText(caller)
@@ -205,7 +202,7 @@ public class CallNotificationManager {
                     .addAction(0, actionText, hangupPendingIntent)
                     .build();
         }
-        notificationManager.notify(HANGUP_NOTIFICATION_ID, notification);
+        notificationManager.notify(Constants.HANGUP_NOTIFICATION_ID, notification);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -221,6 +218,6 @@ public class CallNotificationManager {
 
     public void removeHangupNotification(ReactApplicationContext context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(HANGUP_NOTIFICATION_ID);
+        notificationManager.cancel(Constants.HANGUP_NOTIFICATION_ID);
     }
 }
