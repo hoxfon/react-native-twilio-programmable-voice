@@ -14,13 +14,20 @@ public class Constants {
     public static final String CANCELLED_CALL_INVITE = "CANCELLED_CALL_INVITE";
     public static final String CANCELLED_CALL_INVITE_ERROR = "CANCELLED_CALL_INVITE_ERROR";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
+    public static final String ACTION_OPEN_CALL_INVITE = "com.hoxfon.react.RNTwilioVoice.OPEN_CALL_INVITE";
     public static final String ACTION_ACCEPT = "com.hoxfon.react.RNTwilioVoice.ACTION_ACCEPT";
     public static final String ACTION_REJECT = "com.hoxfon.react.RNTwilioVoice.ACTION_REJECT";
-    public static final String ACTION_MISSED_CALL   = "MISSED_CALL";
-    public static final String ACTION_HANGUP_CALL   = "HANGUP_CALL";
-    public static final String ACTION_INCOMING_CALL_NOTIFICATION = "ACTION_INCOMING_CALL_NOTIFICATION";
+    public static final String ACTION_MISSED_CALL = "MISSED_CALL";
+    public static final String ACTION_HANGUP_CALL = "HANGUP_CALL";
     public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
     public static final String ACTION_CANCEL_CALL = "ACTION_CANCEL_CALL";
     public static final String ACTION_FCM_TOKEN = "ACTION_FCM_TOKEN";
     public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "CLEAR_MISSED_CALLS_COUNT";
+    public static final String ACTION_OPEN_CALL_IN_PROGRESS = "CALL_IN_PROGRESS";
+
+    public static final String CALL_SID = "call_sid";
+    public static final String CALL_STATE = "call_state";
+    public static final String CALL_FROM = "call_from";
+    public static final String CALL_TO = "call_to";
+    public static final String ERROR = "err";
 }
