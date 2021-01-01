@@ -87,7 +87,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                             if (context != null) {
                                 appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
                                 if (BuildConfig.DEBUG) {
-                                    Log.d(TAG, "context is present, appImportance = " + appImportance);
+                                    Log.d(TAG, "context not present, appImportance = " + appImportance);
                                 }
                             }
 
@@ -140,7 +140,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         intent.setAction(Constants.ACTION_CANCEL_CALL);
         intent.putExtra(Constants.CANCELLED_CALL_INVITE, cancelledCallInvite);
         if (callException != null) {
-            intent.putExtra(Constants.CANCELLED_CALL_INVITE_ERROR, callException.getMessage());
+            intent.putExtra(Constants.CANCELLED_CALL_INVITE_EXCEPTION, callException.getMessage());
         }
         startService(intent);
     }

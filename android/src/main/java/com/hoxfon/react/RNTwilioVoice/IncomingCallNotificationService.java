@@ -34,12 +34,16 @@ public class IncomingCallNotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onStartCommand() intent: " + intent + ", flags: " + flags);
+        }
         String action = intent.getAction();
 
         CallInvite callInvite = intent.getParcelableExtra(Constants.INCOMING_CALL_INVITE);
         int notificationId = intent.getIntExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, 0);
 
         switch (action) {
+            // when a callInvite is received in the background
             case Constants.ACTION_INCOMING_CALL:
                 handleIncomingCall(callInvite, notificationId);
                 break;
@@ -64,15 +68,16 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private Notification createNotification(CallInvite callInvite, int notificationId, int channelImportance) {
-        Context ctx = getApplicationContext();
+        Context context = getApplicationContext();
 
-        Intent intent = new Intent(ctx, getMainActivityClass(ctx));
-        intent.setAction(Constants.ACTION_OPEN_CALL_INVITE);
+        Intent intent = new Intent(context, getMainActivityClass(context));
+        intent.setAction(Constants.ACTION_INCOMING_CALL);
         intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         PendingIntent pendingIntent =
-                PendingIntent.getActivity(ctx, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
@@ -117,16 +122,16 @@ public class IncomingCallNotificationService extends Service {
                                            final CallInvite callInvite,
                                            int notificationId,
                                            String channelId) {
-        Context ctx = getApplicationContext();
+        Context context = getApplicationContext();
 
-        Intent rejectIntent = new Intent(ctx, IncomingCallNotificationService.class);
+        Intent rejectIntent = new Intent(context, IncomingCallNotificationService.class);
         rejectIntent.setAction(Constants.ACTION_REJECT);
         rejectIntent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
         rejectIntent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
         PendingIntent piRejectIntent = PendingIntent.getService(getApplicationContext(), 0, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action rejectAction = new NotificationCompat.Action.Builder(android.R.drawable.ic_menu_delete, getString(R.string.reject), piRejectIntent).build();
 
-        Intent acceptIntent = new Intent(ctx, IncomingCallNotificationService.class);
+        Intent acceptIntent = new Intent(context, IncomingCallNotificationService.class);
         acceptIntent.setAction(Constants.ACTION_ACCEPT);
         acceptIntent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
         acceptIntent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
@@ -134,7 +139,7 @@ public class IncomingCallNotificationService extends Service {
         NotificationCompat.Action answerAction = new NotificationCompat.Action.Builder(android.R.drawable.ic_menu_call, getString(R.string.accept), piAcceptIntent).build();
 
         NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx, channelId)
+                new NotificationCompat.Builder(context, channelId)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle(getString(R.string.call_incoming_title))
                         .setContentText(text)
@@ -149,8 +154,8 @@ public class IncomingCallNotificationService extends Service {
                         .setContentIntent(pendingIntent);
 
         // build notification large icon
-        Resources res = ctx.getResources();
-        int largeIconResId = res.getIdentifier("ic_launcher", "mipmap", ctx.getPackageName());
+        Resources res = context.getResources();
+        int largeIconResId = res.getIdentifier("ic_launcher", "mipmap", context.getPackageName());
         Bitmap largeIconBitmap = BitmapFactory.decodeResource(res, largeIconResId);
 
         if (largeIconResId != 0) {
@@ -166,7 +171,6 @@ public class IncomingCallNotificationService extends Service {
         if (channelImportance == NotificationManager.IMPORTANCE_LOW) {
             channelId = Constants.VOICE_CHANNEL_LOW_IMPORTANCE;
         }
-        Log.d(TAG, "channel importance: %d" + channelImportance);
         NotificationChannel callInviteChannel = new NotificationChannel(channelId,
                 "Incoming calls", channelImportance);
         callInviteChannel.setLightColor(Color.GREEN);
@@ -226,7 +230,7 @@ public class IncomingCallNotificationService extends Service {
         int importance = NotificationManager.IMPORTANCE_LOW;
         if (!isAppVisible()) {
             if (BuildConfig.DEBUG) {
-                Log.i(TAG, "setCallInProgressNotification - app is NOT visible.");
+                Log.i(TAG, "app is NOT visible.");
             }
             importance = NotificationManager.IMPORTANCE_HIGH;
         }
@@ -237,6 +241,9 @@ public class IncomingCallNotificationService extends Service {
      * Send the CallInvite to the Activity. Start the activity if it is not running already.
      */
     private void sendCallInviteToActivity(CallInvite callInvite, int notificationId) {
+        // TODO in case the app is killed there is not enough time for the incoming call event to be sent to JS
+        // therefore leaving the heads up notification present is the only way to allow the call to be answered
+        // endForeground();
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "sendCallInviteToActivity()");
         }

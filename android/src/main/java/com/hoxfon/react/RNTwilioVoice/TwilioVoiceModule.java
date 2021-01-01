@@ -102,6 +102,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public TwilioVoiceModule(ReactApplicationContext reactContext,
     boolean shouldAskForMicPermission) {
         super(reactContext);
+
         if (BuildConfig.DEBUG) {
             Voice.setLogLevel(LogLevel.DEBUG);
         } else {
@@ -418,7 +419,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             activeCallInvite = intent.getParcelableExtra(Constants.INCOMING_CALL_INVITE);
 
             switch (action) {
-                // when the app is visible the call invite is received directly by the activity
+                // when a callInvite is received in the foreground
                 case Constants.ACTION_INCOMING_CALL:
                     handleCallInviteNotification();
                     break;
@@ -472,7 +473,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         String action = intent.getAction();
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "handleIncomingCallIntent() action: " + action);
+            Log.d(TAG, "handleStartActivityIntent() action: " + action);
         }
         activeCallInvite = intent.getParcelableExtra(Constants.INCOMING_CALL_INVITE);
 
@@ -503,8 +504,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 reject();
                 break;
 
-            case Constants.ACTION_OPEN_CALL_INVITE:
-                // the notification already brings the activity to the top
+            case Constants.ACTION_INCOMING_CALL:
+                handleCallInviteNotification();
                 break;
 
             case Constants.ACTION_OPEN_CALL_IN_PROGRESS:
@@ -527,13 +528,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
-        // TODO check whether the following condition is ever true
-        if (getReactApplicationContext().getCurrentActivity() != null) {
-            Window window = getReactApplicationContext().getCurrentActivity().getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-            );
-        }
+        // TODO refactor this old block as it doesn't work in Android SDK 29
+        // not called when phone is locked
+        // the window flags can only be changed by the main View that, on creation of activity?
+//        if (getReactApplicationContext().getCurrentActivity() != null) {
+//            Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+//            window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+//                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//            );
+//        }
         // if the app is VISIBLE, send a call received event
         int appImportance = callNotificationManager.getApplicationImportance(getReactApplicationContext());
         if (appImportance <= RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
@@ -564,7 +567,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             params.putString(Constants.CALL_SID, cancelledCallInvite.getCallSid());
             params.putString(Constants.CALL_FROM, cancelledCallInvite.getFrom());
             params.putString(Constants.CALL_TO, cancelledCallInvite.getTo());
-            String cancelledCallInviteErr = intent.getStringExtra(Constants.CANCELLED_CALL_INVITE_ERROR);
+            String cancelledCallInviteErr = intent.getStringExtra(Constants.CANCELLED_CALL_INVITE_EXCEPTION);
             // pass this to the event even though in v5.0.2 it is always "Call Cancelled"
             if (cancelledCallInviteErr != null) {
                 params.putString(Constants.ERROR, cancelledCallInviteErr);
