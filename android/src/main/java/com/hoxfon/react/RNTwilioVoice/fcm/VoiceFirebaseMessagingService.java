@@ -83,16 +83,18 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                             // initialise appImportance to the highest possible importance in case context is null
                             int appImportance = ActivityManager.RunningAppProcessInfo.IMPORTANCE_GONE;
 
-                            // if the app is closed or not visible, create a heads-up notification
                             if (context != null) {
                                 appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
-                                if (BuildConfig.DEBUG) {
-                                    Log.d(TAG, "context not present, appImportance = " + appImportance);
-                                }
+                            }
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "context: " + context + ". appImportance = " + appImportance);
                             }
 
                             // when the app is not started or in the background
                             if (appImportance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
+                                if (BuildConfig.DEBUG) {
+                                    Log.d(TAG, "Background");
+                                }
                                 handleInvite(callInvite, notificationId);
                                 return;
                             }

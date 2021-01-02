@@ -38,6 +38,56 @@ To allow the library to show heads up notifications you must add the following l
     </application>
 ```
 
+Launch your app with `callInvite` or `call` initial properties.
+Add the following lines to your app `MainActivity`:
+
+```java
+
+import com.hoxfon.react.RNTwilioVoice.Constants;
+...
+
+public class MainActivity extends ReactActivity {
+
+    @Override
+    protected ReactActivityDelegate createReactActivityDelegate() {
+        return new ReactActivityDelegate(this, getMainComponentName()) {
+            @Override
+            protected ReactRootView createRootView() {
+                return new RNGestureHandlerEnabledRootView(MainActivity.this);
+            }
+            @Override
+            protected Bundle getLaunchOptions() {
+                Bundle initialProperties = new Bundle();
+                Intent intent = this.getPlainActivity().getIntent();
+                if (intent == null) {
+                    return initialProperties;
+                }
+                switch (intent.getAction()) {
+                    case Constants.ACTION_INCOMING_CALL_NOTIFICATION:
+                        Bundle callInviteBundle = new Bundle();
+                        callInviteBundle.putString(Constants.CALL_SID, intent.getStringExtra(Constants.CALL_SID));
+                        callInviteBundle.putString(Constants.CALL_FROM, intent.getStringExtra(Constants.CALL_FROM));
+                        callInviteBundle.putString(Constants.CALL_TO, intent.getStringExtra(Constants.CALL_TO));
+                        initialProperties.putBundle(Constants.CALL_INVITE_KEY, callInviteBundle);
+                        break;
+
+                    case Constants.ACTION_ACCEPT:
+                        Bundle callBundle = new Bundle();
+                        callBundle.putString(Constants.CALL_SID, intent.getStringExtra(Constants.CALL_SID));
+                        callBundle.putString(Constants.CALL_FROM, intent.getStringExtra(Constants.CALL_FROM));
+                        callBundle.putString(Constants.CALL_TO, intent.getStringExtra(Constants.CALL_TO));
+                        callBundle.putString(Constants.CALL_STATE, Constants.CALL_STATE_CONNECTED);
+                        initialProperties.putBundle(Constants.CALL_KEY, callBundle);
+                        break;
+                }
+                return initialProperties;
+            }
+        };
+    }
+    ...
+}
+```
+
 ## ICE
 
 See https://www.twilio.com/docs/stun-turn
