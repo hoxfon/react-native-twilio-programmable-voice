@@ -1,5 +1,7 @@
 package com.hoxfon.react.RNTwilioVoice;
 
+import com.twilio.voice.Call;
+
 public class Constants {
     public static final String MISSED_CALLS_GROUP = "MISSED_CALLS";
     public static final int MISSED_CALLS_NOTIFICATION_ID = 1;
@@ -19,6 +21,7 @@ public class Constants {
     public static final String ACTION_MISSED_CALL = "MISSED_CALL";
     public static final String ACTION_HANGUP_CALL = "HANGUP_CALL";
     public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
+    public static final String ACTION_INCOMING_CALL_NOTIFICATION = "com.hoxfon.react.RNTwilioVoice.ACTION_INCOMING_CALL";
     public static final String ACTION_CANCEL_CALL = "ACTION_CANCEL_CALL";
     public static final String ACTION_FCM_TOKEN = "ACTION_FCM_TOKEN";
     public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "CLEAR_MISSED_CALLS_COUNT";
@@ -29,4 +32,7 @@ public class Constants {
     public static final String CALL_FROM = "call_from";
     public static final String CALL_TO = "call_to";
     public static final String ERROR = "err";
+    public static final String CALL_KEY = "call";
+    public static final String CALL_INVITE_KEY = "callInvite";
+    public static final String CALL_STATE_CONNECTED = Call.State.CONNECTED.toString();
 }

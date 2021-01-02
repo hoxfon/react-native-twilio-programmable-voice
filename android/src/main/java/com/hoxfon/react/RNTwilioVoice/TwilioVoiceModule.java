@@ -230,7 +230,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
              * raised, irrespective of the value of answerOnBridge being set to true or false
              */
             @Override
-            public void onRinging(Call call) {
+            public void onRinging(@NonNull Call call) {
                 // TODO test this with JS app
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onRinging(). Call state: " + call.getState() + ". Call: "+ call.toString());
@@ -244,7 +244,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
 
             @Override
-            public void onConnected(Call call) {
+            public void onConnected(@NonNull Call call) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onConnected(). Call state: " + call.getState());
                 }
@@ -253,21 +253,19 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 headsetManager.startWiredHeadsetEvent(getReactApplicationContext());
 
                 WritableMap params = Arguments.createMap();
-                if (call != null) {
-                    params.putString(Constants.CALL_SID,   call.getSid());
-                    params.putString(Constants.CALL_STATE, call.getState().name());
-                    params.putString(Constants.CALL_FROM, call.getFrom());
-                    params.putString(Constants.CALL_TO, call.getTo());
-                    String caller = "Show call details in the app";
-                    if (!toName.equals("")) {
-                        caller = toName;
-                    } else if (!toNumber.equals("")) {
-                        caller = toNumber;
-                    }
-                    activeCall = call;
-                    callNotificationManager.createHangupNotification(getReactApplicationContext(),
-                            call.getSid(), caller);
+                params.putString(Constants.CALL_SID, call.getSid());
+                params.putString(Constants.CALL_STATE, call.getState().name());
+                params.putString(Constants.CALL_FROM, call.getFrom());
+                params.putString(Constants.CALL_TO, call.getTo());
+                String caller = "Show call details in the app";
+                if (!toName.equals("")) {
+                    caller = toName;
+                } else if (!toNumber.equals("")) {
+                    caller = toNumber;
                 }
+                activeCall = call;
+                callNotificationManager.createHangupNotification(getReactApplicationContext(),
+                        call.getSid(), caller);
                 eventManager.sendEvent(EVENT_CONNECTION_DID_CONNECT, params);
                 activeCallInvite = null;
             }
@@ -283,11 +281,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     Log.d(TAG, "Call.Listener().onReconnecting(). Call state: " + call.getState());
                 }
                 WritableMap params = Arguments.createMap();
-                if (call != null) {
-                    params.putString(Constants.CALL_SID,   call.getSid());
-                    params.putString(Constants.CALL_FROM, call.getFrom());
-                    params.putString(Constants.CALL_TO, call.getTo());
-                }
+                params.putString(Constants.CALL_SID, call.getSid());
+                params.putString(Constants.CALL_FROM, call.getFrom());
+                params.putString(Constants.CALL_TO, call.getTo());
                 eventManager.sendEvent(EVENT_CONNECTION_IS_RECONNECTING, params);
             }
 
@@ -300,16 +296,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     Log.d(TAG, "Call.Listener().onReconnected(). Call state: " + call.getState());
                 }
                 WritableMap params = Arguments.createMap();
-                if (call != null) {
-                    params.putString(Constants.CALL_SID,   call.getSid());
-                    params.putString(Constants.CALL_FROM, call.getFrom());
-                    params.putString(Constants.CALL_TO, call.getTo());
-                }
+                params.putString(Constants.CALL_SID, call.getSid());
+                params.putString(Constants.CALL_FROM, call.getFrom());
+                params.putString(Constants.CALL_TO, call.getTo());
                 eventManager.sendEvent(EVENT_CONNECTION_DID_RECONNECT, params);
             }
 
             @Override
-            public void onDisconnected(Call call, CallException error) {
+            public void onDisconnected(@NonNull Call call, CallException error) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onDisconnected(). Call state: " + call.getState());
                 }
@@ -319,13 +313,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
                 WritableMap params = Arguments.createMap();
                 String callSid = "";
-                if (call != null) {
-                    callSid = call.getSid();
-                    params.putString(Constants.CALL_SID, callSid);
-                    params.putString(Constants.CALL_STATE, call.getState().name());
-                    params.putString(Constants.CALL_FROM, call.getFrom());
-                    params.putString(Constants.CALL_TO, call.getTo());
-                }
+                callSid = call.getSid();
+                params.putString(Constants.CALL_SID, callSid);
+                params.putString(Constants.CALL_STATE, call.getState().name());
+                params.putString(Constants.CALL_FROM, call.getFrom());
+                params.putString(Constants.CALL_TO, call.getTo());
                 if (error != null) {
                     Log.e(TAG, String.format("CallListener onDisconnected error: %d, %s",
                             error.getErrorCode(), error.getMessage()));
@@ -342,7 +334,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
 
             @Override
-            public void onConnectFailure(Call call, CallException error) {
+            public void onConnectFailure(@NonNull Call call, CallException error) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onConnectFailure(). Call state: " + call.getState());
                 }
@@ -355,13 +347,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 WritableMap params = Arguments.createMap();
                 params.putString(Constants.ERROR, error.getMessage());
                 String callSid = "";
-                if (call != null) {
-                    callSid = call.getSid();
-                    params.putString(Constants.CALL_SID, callSid);
-                    params.putString(Constants.CALL_STATE, call.getState().name());
-                    params.putString(Constants.CALL_FROM, call.getFrom());
-                    params.putString(Constants.CALL_TO, call.getTo());
-                }
+                callSid = call.getSid();
+                params.putString(Constants.CALL_SID, callSid);
+                params.putString(Constants.CALL_STATE, call.getState().name());
+                params.putString(Constants.CALL_FROM, call.getFrom());
+                params.putString(Constants.CALL_TO, call.getTo());
                 if (callSid != null && activeCall != null && activeCall.getSid() != null && activeCall.getSid().equals(callSid)) {
                     activeCall = null;
                 }
@@ -369,6 +359,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 callNotificationManager.removeHangupNotification(getReactApplicationContext());
                 toNumber = "";
                 toName = "";
+                activeCallInvite = null;
             }
         };
     }
@@ -498,14 +489,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             case Constants.ACTION_ACCEPT:
                 acceptFromIntent(intent);
-                break;
-
-            case Constants.ACTION_REJECT:
-                reject();
-                break;
-
-            case Constants.ACTION_INCOMING_CALL:
-                handleCallInviteNotification();
                 break;
 
             case Constants.ACTION_OPEN_CALL_IN_PROGRESS:
