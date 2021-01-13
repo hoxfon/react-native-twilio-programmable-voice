@@ -264,6 +264,8 @@ RCT_REMAP_METHOD(getCallInvite,
                  [self sendEventWithName:@"deviceReady" body:nil];
              }
          }];
+    } else {
+        [self sendEventWithName:@"deviceReady" body:nil];
     }
   }
 }
