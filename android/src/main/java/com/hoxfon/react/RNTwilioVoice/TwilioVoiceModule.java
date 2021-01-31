@@ -163,6 +163,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (action.equals(Constants.ACTION_ACCEPT) && currentCallInviteIntent == existingCallInviteIntent) {
             return;
         }
+
+        if (action.equals(Constants.ACTION_INCOMING_CALL_NOTIFICATION) && currentCallInviteIntent == existingCallInviteIntent) {
+            return;
+        }
+
         existingCallInviteIntent = currentCallInviteIntent;
         handleStartActivityIntent(intent);
     }
@@ -469,16 +474,27 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         activeCallInvite = intent.getParcelableExtra(Constants.INCOMING_CALL_INVITE);
 
         switch (action) {
+            case Constants.ACTION_INCOMING_CALL_NOTIFICATION:
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "ACTION_INCOMING_CALL_NOTIFICATION handleStartActivityIntent");
+                }
+                WritableMap params = Arguments.createMap();
+                params.putString(Constants.CALL_SID, activeCallInvite.getCallSid());
+                params.putString(Constants.CALL_FROM, activeCallInvite.getFrom());
+                params.putString(Constants.CALL_TO, activeCallInvite.getTo());
+                eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
+                break;
+
             case Constants.ACTION_MISSED_CALL:
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "ACTION_MISSED_CALL handleCallInviteIntent");
+                    Log.d(TAG, "ACTION_MISSED_CALL handleStartActivityIntent");
                 }
                 removeMissedCalls();
                 break;
 
             case Constants.ACTION_CLEAR_MISSED_CALLS_COUNT:
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "ACTION_CLEAR_MISSED_CALLS_COUNT handleCallInviteIntent");
+                    Log.d(TAG, "ACTION_CLEAR_MISSED_CALLS_COUNT handleStartActivityIntent");
                 }
                 removeMissedCalls();
                 break;
@@ -511,24 +527,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
-        // TODO refactor this old block as it doesn't work in Android SDK 29
-        // not called when phone is locked
-        // the window flags can only be changed by the main View that, on creation of activity?
-//        if (getReactApplicationContext().getCurrentActivity() != null) {
-//            Window window = getReactApplicationContext().getCurrentActivity().getWindow();
-//            window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-//                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-//            );
-//        }
-        // if the app is VISIBLE, send a call received event
-        int appImportance = callNotificationManager.getApplicationImportance(getReactApplicationContext());
-        if (appImportance <= RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-            WritableMap params = Arguments.createMap();
-            params.putString(Constants.CALL_SID, activeCallInvite.getCallSid());
-            params.putString(Constants.CALL_FROM, activeCallInvite.getFrom());
-            params.putString(Constants.CALL_TO, activeCallInvite.getTo());
-            eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
-        }
+        WritableMap params = Arguments.createMap();
+        params.putString(Constants.CALL_SID, activeCallInvite.getCallSid());
+        params.putString(Constants.CALL_FROM, activeCallInvite.getFrom());
+        params.putString(Constants.CALL_TO, activeCallInvite.getTo());
+        eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
     }
 
     private void handleCancelCall(Intent intent) {

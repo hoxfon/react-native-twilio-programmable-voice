@@ -40,7 +40,7 @@ public class IncomingCallNotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onStartCommand() intent: " + intent + ", flags: " + flags);
+            Log.d(TAG, "IncomingCallNotificationService onStartCommand() intent: " + intent + ", flags: " + flags);
         }
         String action = intent.getAction();
 
@@ -87,6 +87,7 @@ public class IncomingCallNotificationService extends Service {
         intent.putExtra(Constants.CALL_FROM, callInvite.getFrom());
         intent.putExtra(Constants.CALL_TO, callInvite.getTo());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -152,7 +153,9 @@ public class IncomingCallNotificationService extends Service {
      * @return the builder
      */
     @TargetApi(Build.VERSION_CODES.O)
-    private Notification buildNotification(String text, PendingIntent pendingIntent, Bundle extras,
+    private Notification buildNotification(String text,
+                                           PendingIntent pendingIntent,
+                                           Bundle extras,
                                            final CallInvite callInvite,
                                            int notificationId,
                                            String channelId) {
@@ -183,15 +186,15 @@ public class IncomingCallNotificationService extends Service {
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle(getString(R.string.call_incoming_title))
                         .setContentText(text)
-                        .setCategory(Notification.CATEGORY_CALL)
                         .setExtras(extras)
                         .setAutoCancel(true)
                         .addAction(rejectAction)
                         .addAction(answerAction)
                         .setFullScreenIntent(pendingIntent, true)
-                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setCategory(Notification.CATEGORY_CALL)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setContentIntent(pendingIntent);
+                ;
 
         // build notification large icon
         Resources res = context.getResources();

@@ -28,7 +28,8 @@ To allow the library to show heads up notifications you must add the following l
     >
         <service
             android:enabled="true"
-            android:name="com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService">
+            android:name="com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService"
+            android:foregroundServiceType="phoneCall">
             <intent-filter>
                 <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_ACCEPT" />
                 <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_REJECT" />
@@ -38,8 +39,20 @@ To allow the library to show heads up notifications you must add the following l
     </application>
 ```
 
-Launch your app with `callInvite` or `call` initial properties.
-Add the following lines to your app `MainActivity`:
+Previously, in order to launch the app when receiving a call, the flow was:
+
+1. the module would launch the app
+2. after the React app is initialised, it would always ask to the native module whether there were incoming call invites
+3. if there where any incoming call invites the module would send an event to the React app with the incoming call invite parameters
+4. the Reach app would listen to the event and launch the view with the appropriate incoming call answer/reject controls
+
+This loop was long and prone to race conditions. In case the event was sent before the React main view was completely initialised, it would not be handled at all.
+
+Version 5.0.0 replaces the previous flow by using `getLaunchOptions()` to pass initial properties from native to React when receiving a call invite as explained here: https://reactnative.dev/docs/communication-android.
+
+The React app will be launched with the initial properties `callInvite` or `call`.
+
+Add the following blocks to your app's `MainActivity`:
 
 ```java
 
@@ -84,7 +97,23 @@ public class MainActivity extends ReactActivity {
             }
         };
     }
-    ...
+
+    // ...
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    // ...
 }
 ```
 
