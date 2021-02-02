@@ -87,7 +87,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String NOTIFICATION_TYPE             = "NOTIFICATION_TYPE";
     public static final String CANCELLED_CALL_INVITE         = "CANCELLED_CALL_INVITE";
 
-
+    public static final String ACTION_NULL = "com.hoxfon.react.TwilioVoice.ACTION_NULL";
     public static final String ACTION_INCOMING_CALL = "com.hoxfon.react.TwilioVoice.INCOMING_CALL";
     public static final String ACTION_FCM_TOKEN     = "com.hoxfon.react.TwilioVoice.ACTION_FCM_TOKEN";
     public static final String ACTION_MISSED_CALL   = "com.hoxfon.react.TwilioVoice.MISSED_CALL";
@@ -457,7 +457,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     private void handleIncomingCallIntent(Intent intent) {
-        if (intent.getAction().equals(ACTION_INCOMING_CALL)) {
+        String intentAction = ACTION_NULL;
+        if (intent.getAction() instanceof String) {
+            intentAction = (String) intent.getAction();
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "intentAction" + intentAction);
+            }
+        }
+
+        if (intentAction.equals(ACTION_INCOMING_CALL)) {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "handleIncomingCallIntent");
             }
@@ -488,7 +496,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 // TODO evaluate what more is needed at this point?
                 Log.e(TAG, "ACTION_INCOMING_CALL but not active call");
             }
-        } else if (intent.getAction().equals(ACTION_CANCEL_CALL_INVITE)) {
+        } else if (intentAction.equals(ACTION_CANCEL_CALL_INVITE)) {
             SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "activeCallInvite was cancelled by " + activeCallInvite.getFrom());
@@ -509,7 +517,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
             }
             clearIncomingNotification(activeCallInvite.getCallSid());
-        } else if (intent.getAction().equals(ACTION_FCM_TOKEN)) {
+        } else if (intentAction.equals(ACTION_FCM_TOKEN)) {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "handleIncomingCallIntent ACTION_FCM_TOKEN");
             }
