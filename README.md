@@ -72,7 +72,7 @@ public class MainActivity extends ReactActivity {
             protected Bundle getLaunchOptions() {
                 Bundle initialProperties = new Bundle();
                 Intent intent = this.getPlainActivity().getIntent();
-                if (intent == null) {
+                if (intent == null || intent.getAction() == null) {
                     return initialProperties;
                 }
                 switch (intent.getAction()) {
