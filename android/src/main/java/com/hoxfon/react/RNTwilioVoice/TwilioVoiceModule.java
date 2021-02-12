@@ -147,7 +147,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         registerReceiver();
 
         Intent intent = getCurrentActivity().getIntent();
-        if (intent == null) {
+        if (intent == null || intent.getAction() == null) {
             return;
         }
         int currentCallInviteIntent = intent.hashCode();
