@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -857,5 +859,30 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         } else {
             ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
         }
+    }
+
+    public static Bundle getActivityLaunchOption(Intent intent) {
+        Bundle initialProperties = new Bundle();
+        if (intent == null || intent.getAction() == null) {
+            return initialProperties;
+        }
+        Bundle callBundle = new Bundle();
+        switch (intent.getAction()) {
+            case Constants.ACTION_INCOMING_CALL_NOTIFICATION:
+                callBundle.putString(Constants.CALL_SID, intent.getStringExtra(Constants.CALL_SID));
+                callBundle.putString(Constants.CALL_FROM, intent.getStringExtra(Constants.CALL_FROM));
+                callBundle.putString(Constants.CALL_TO, intent.getStringExtra(Constants.CALL_TO));
+                initialProperties.putBundle(Constants.CALL_INVITE_KEY, callBundle);
+                break;
+
+            case Constants.ACTION_ACCEPT:
+                callBundle.putString(Constants.CALL_SID, intent.getStringExtra(Constants.CALL_SID));
+                callBundle.putString(Constants.CALL_FROM, intent.getStringExtra(Constants.CALL_FROM));
+                callBundle.putString(Constants.CALL_TO, intent.getStringExtra(Constants.CALL_TO));
+                callBundle.putString(Constants.CALL_STATE, Constants.CALL_STATE_CONNECTED);
+                initialProperties.putBundle(Constants.CALL_KEY, callBundle);
+                break;
+        }
+        return initialProperties;
     }
 }
