@@ -87,6 +87,8 @@ To allow the library to show heads up notifications you must add the following l
     </application>
 ```
 
+Firebase Messaging 19.0.+ is imported by this module, so there is no need to import it in your app.
+
 Previously, in order to launch the app when receiving a call, the flow was:
 
 1. the module would launch the app
