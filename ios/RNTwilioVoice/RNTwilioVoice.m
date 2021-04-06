@@ -1,7 +1,3 @@
-//
-//  TwilioVoice.m
-//
-
 #import "RNTwilioVoice.h"
 #import <React/RCTLog.h>
 
