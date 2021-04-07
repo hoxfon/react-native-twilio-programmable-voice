@@ -124,6 +124,33 @@ ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
 		.build();
 ```
 
+### iOS
+
+Add the following lines to your app's `AppDelegate.m` file
+
+```Òbjective-C
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+    NSString *appName = @"<YOUR APP NAME>";
+
+    RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+                                                     moduleName:appName
+                                              initialProperties:nil];
+
+    // initialise RNTwilioVoice
+    id _rnTwilioVoice = [bridge moduleForClass:[RNTwilioVoice class]];
+    [_rnTwilioVoice initPushRegistry];
+    [_rnTwilioVoice reRegisterWithTwilioVoice];
+    NSDictionary *configCallkit = @{@"appName": appName};
+    [_rnTwilioVoice configCallKit:configCallkit];
+
+    // ...
+
+    return YES;
+}
+```
+
 ## Breaking changes in v4.0.0
 
 The module implements [react-native autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) as many other native libraries > react-native 0.60.0, therefore it doesn't need to be linked manually.
