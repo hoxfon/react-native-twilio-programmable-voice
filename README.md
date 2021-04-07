@@ -1,13 +1,55 @@
 # react-native-twilio-programmable-voice
 
-This is a React-Native wrapper for [Twilio Programmable Voice SDK](https://www.twilio.com/voice) which lets you make and receive calls from your React-Native App. This module is not affiliated with nor officially maintained by Twilio, and it is maintained by open source contributors.
+This is a react-native wrapper around [Twilio Programmable Voice SDK](https://www.twilio.com/voice), which allows your react-native app to make and receive calls.
 
-## Twilio Programmable Voice SDK
+This module is not affiliated with nor officially maintained by Twilio. It is maintained by open source contributors working during their nights and weekends.
 
-- Android 4.5.0 (bundled within the module)
-- iOS 5.1.0 (specified by the app's own podfile)
+Tested with:
 
-## Breaking changes in v4.0.0
+- react-native 0.62.2
+- Android 11
+- iOS 14
+
+## Roadmap
+
+### Project 1
+
+The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon/react-native-twilio-programmable-voice/tree/feat/twilio-android-sdk-5) which is aligned with:
+
+- Android 5.0.2
+- iOS 5.2.0
+
+It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
+
+You can install it with:
+```bash
+yarn add https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/twilio-android-sdk-5
+```
+
+I am currently updating the library to catchup with all changes published on the latest Android and iOS Twilio Voice SDK:
+
+[iOS changelog](https://www.twilio.com/docs/voice/voip-sdk/ios/changelog)
+[Android changelog](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog)
+
+My plan is to use the following links as a reference, and follow Twilio commit by commit.
+
+- https://github.com/twilio/voice-quickstart-android
+- https://github.com/twilio/voice-quickstart-ios
+
+_If you want to contribute please consider helping on this project._
+
+### Project 2
+
+Allow Android to use the built in Android telephony service to make and receive calls.
+
+## Stable release
+
+### Twilio Programmable Voice SDK
+
+- Android 4.5.0
+- iOS 5.2.0
+
+### Breaking changes in v4.0.0
 
 The module implements [react-native autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) as many other native libraries > react-native 0.60.0, therefore it doesn't need to be linked manually.
 
@@ -53,14 +95,14 @@ iOS application can now receive the following events, that in v3 where only disp
 - connectionIsReconnecting
 - connectionDidReconnect
 
-## Breaking changes in v3.0.0
+### Breaking changes in v3.0.0
 
 - initWitToken returns an object with a property `initialized` instead of `initilized`
 - iOS event `connectionDidConnect` returns the same properties as Android
 move property `to` => `call_to`
 move property `from` => `call_from`
 
-## Installation
+### Installation
 
 Before starting, we recommend you get familiar with [Twilio Programmable Voice SDK](https://www.twilio.com/docs/api/voice-sdk).
 It's easier to integrate this module into your react-native app if you follow the Quick start tutorial from Twilio, because it makes very clear which setup steps are required.
@@ -92,23 +134,8 @@ After you have linked the library with `react-native link react-native-twilio-pr
 check that `libRNTwilioVoice.a` is present under YOUR_TARGET > Build Phases > Link Binaries With Libraries. If it is not present you can add it using the + sign at the bottom of that list.
 </details>
 
-Edit your `Podfile` to include TwilioVoice framework
-
-```ruby
-source 'https://github.com/cocoapods/specs'
-
-# min version for TwilioVoice to work
-platform :ios, '10.0'
-
-target <YOUR_TARGET> do
-    ...
-    pod 'TwilioVoice', '~> 5.2.0'
-    ...
-end
-```
-
 ```bash
-cd ios/ && pod install
+cd ios && pod install
 ```
 
 #### CallKit
@@ -130,7 +157,7 @@ To pass caller's name to CallKit via Voip push notification add custom parameter
 
 Twilio Programmable Voice for iOS utilizes Apple's VoIP Services and VoIP "Push Notifications" instead of FCM. You will need a VoIP Service Certificate from Apple to receive calls. Follow [the official Twilio instructions](https://github.com/twilio/voice-quickstart-ios#7-create-voip-service-certificate) to complete this step.
 
-## Android Installation
+### Android Installation
 
 Setup FCM
 
@@ -144,7 +171,7 @@ buildscript {
     dependencies {
         // override the google-service version if needed
         // https://developers.google.com/android/guides/google-services-plugin
-        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.google.gms:google-services:4.3.4'
     }
 }
 
