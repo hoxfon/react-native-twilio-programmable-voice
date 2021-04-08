@@ -234,7 +234,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Successfully unregistered FCM");
                 }
-                // eventManager.sendEvent(EVENT_DEVICE_UNREGISTERED, null);
                 eventManager.sendEvent(EVENT_DEVICE_NOT_READY, null);
             }
 
