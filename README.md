@@ -23,8 +23,11 @@ It contains breaking changes from `react-native-twilio-programmable-voice` v4, a
 
 You can install it with:
 ```bash
+# Yarn
 yarn add https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/twilio-android-sdk-5
-```
+
+# NPM
+npm install git+https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/twilio-android-sdk-5
 
 I am currently updating the library to catchup with all changes published on the latest Android and iOS Twilio Voice SDK:
 
