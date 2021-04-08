@@ -158,7 +158,7 @@ RCT_EXPORT_METHOD(unregister) {
                                     if (error) {
                                         NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                     } else {
-                                      [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:kCachedDeviceToken];
+                                        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:kCachedDeviceToken];
                                         NSLog(@"Successfully unregistered for VoIP push notifications.");
                                     }
                                 }];
