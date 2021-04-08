@@ -645,7 +645,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
      *
      */
 
-    @ReactMethod  //
+    @ReactMethod
     public void unregister(Promise promise) {
         unregisterForCallInvites();
         WritableMap params = Arguments.createMap();
