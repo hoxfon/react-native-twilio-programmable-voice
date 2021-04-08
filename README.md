@@ -39,7 +39,7 @@ My plan is to use the following links as a reference, and follow Twilio commit b
 - https://github.com/twilio/voice-quickstart-android
 - https://github.com/twilio/voice-quickstart-ios
 
-_If you want to contribute please consider helping on this project._
+_If you want to contribute please consider helping on this project. [Click here for more information](https://github.com/hoxfon/react-native-twilio-programmable-voice/issues/158)._
 
 ### Project 2
 
