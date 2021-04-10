@@ -12,9 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-//import android.media.AudioAttributes;
-//import android.media.RingtoneManager;
-//import android.net.Uri;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -269,6 +267,7 @@ public class IncomingCallNotificationService extends Service {
         stopForeground(true);
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void setCallInProgressNotification(CallInvite callInvite, int notificationId) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setCallInProgressNotification()");

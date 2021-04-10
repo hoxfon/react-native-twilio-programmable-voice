@@ -16,7 +16,7 @@ Tested with:
 
 The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon/react-native-twilio-programmable-voice/tree/feat/twilio-android-sdk-5) which is aligned with:
 
-- Android 5.0.2
+- Android 5.1.0
 - iOS 5.2.0
 
 It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
@@ -74,6 +74,15 @@ To allow the library to show heads up notifications you must add the following l
     <application
         ...
     >
+        <!-- Twilio Voice -->
+        <!-- [START fcm_listener] -->
+        <service
+            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <service
             android:enabled="true"
             android:name="com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService"
@@ -83,7 +92,8 @@ To allow the library to show heads up notifications you must add the following l
                 <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_REJECT" />
             </intent-filter>
         </service>
-        ...
+        <!-- [END fcm_listener] -->
+        <!-- Twilio Voice -->
     </application>
 ```
 
@@ -311,7 +321,8 @@ apply plugin: 'com.google.gms.google-services'
         <!-- Twilio Voice -->
         <!-- [START fcm_listener] -->
         <service
-            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService">
+            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService"
+            android:stopWithTask="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

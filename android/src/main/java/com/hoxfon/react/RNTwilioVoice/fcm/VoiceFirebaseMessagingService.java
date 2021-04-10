@@ -40,11 +40,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(String token) {
-        Log.d(TAG, "Refreshed token: " + token);
-
-        // Notify Activity of FCM token
+        super.onNewToken(token);
         Intent intent = new Intent(Constants.ACTION_FCM_TOKEN);
-        LocalBroadcastManager.getInstance(this.getBaseContext()).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     /**

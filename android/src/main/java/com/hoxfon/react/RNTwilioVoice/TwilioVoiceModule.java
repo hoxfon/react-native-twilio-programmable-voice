@@ -204,7 +204,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private RegistrationListener registrationListener() {
         return new RegistrationListener() {
             @Override
-            public void onRegistered(String accessToken, String fcmToken) {
+            public void onRegistered(@NonNull String accessToken, @NonNull String fcmToken) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "RegistrationListener().onRegistered(). FCM registered.");
                 }
@@ -212,7 +212,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
 
             @Override
-            public void onError(RegistrationException error, String accessToken, String fcmToken) {
+            public void onError(@NonNull RegistrationException error,
+                                @NonNull String accessToken,
+                                @NonNull String fcmToken) {
                 Log.e(TAG, String.format("RegistrationListener().onError(). Code: %d. %s", error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
                 params.putString(Constants.ERROR, error.getMessage());
@@ -407,12 +409,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) {
+                return;
+            }
             String action = intent.getAction();
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "VoiceBroadcastReceiver.onReceive() action: " + action + ". Intent extra: " + intent.getExtras());
-            }
-            if (intent == null || intent.getAction() == null) {
-                return;
             }
             activeCallInvite = intent.getParcelableExtra(Constants.INCOMING_CALL_INVITE);
 
@@ -595,7 +597,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
      *
      */
     private void registerForCallInvites() {
-        final String fcmToken = FirebaseInstanceId.getInstance().getToken();
+        String fcmToken = FirebaseInstanceId.getInstance().getToken();
         if (fcmToken == null) {
             return;
         }
