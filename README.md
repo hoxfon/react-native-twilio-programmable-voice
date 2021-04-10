@@ -16,7 +16,7 @@ Tested with:
 
 The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon/react-native-twilio-programmable-voice/tree/feat/twilio-android-sdk-5) which is aligned with:
 
-- Android 5.1.0
+- Android 5.1.1
 - iOS 5.2.0
 
 It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
