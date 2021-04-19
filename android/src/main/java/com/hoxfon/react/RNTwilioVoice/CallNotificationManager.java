@@ -190,7 +190,7 @@ public class CallNotificationManager {
             return;
         }
         NotificationChannel channel = new NotificationChannel(VOICE_CHANNEL,
-                "4-(Hideable) Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
+                "4 - Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setLightColor(Color.GREEN);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         channel.setShowBadge(false);
