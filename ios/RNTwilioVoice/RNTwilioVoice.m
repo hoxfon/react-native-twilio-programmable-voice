@@ -258,6 +258,8 @@ RCT_REMAP_METHOD(getCallInvite,
                  [self sendEventWithName:@"deviceReady" body:nil];
              }
          }];
+    } else {
+        [self sendEventWithName:@"deviceReady" body:nil];
     }
   }
 }
@@ -731,6 +733,12 @@ withCompletionHandler:(void (^)(void))completion {
   callUpdate.supportsGrouping = NO;
   callUpdate.supportsUngrouping = NO;
   callUpdate.hasVideo = NO;
+
+  if ([from containsString:@"client:"]) {
+    callUpdate.localizedCallerName = @"Seguridad";
+  } else {
+    callUpdate.localizedCallerName = @"Visitante";
+  }
 
   [self.callKitProvider reportNewIncomingCallWithUUID:uuid update:callUpdate completion:^(NSError *error) {
     if (!error) {
