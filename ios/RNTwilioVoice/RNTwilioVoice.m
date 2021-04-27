@@ -734,12 +734,6 @@ withCompletionHandler:(void (^)(void))completion {
   callUpdate.supportsUngrouping = NO;
   callUpdate.hasVideo = NO;
 
-  if ([from containsString:@"client:"]) {
-    callUpdate.localizedCallerName = @"Seguridad";
-  } else {
-    callUpdate.localizedCallerName = @"Visitante";
-  }
-
   [self.callKitProvider reportNewIncomingCallWithUUID:uuid update:callUpdate completion:^(NSError *error) {
     if (!error) {
       NSLog(@"Incoming call successfully reported");
