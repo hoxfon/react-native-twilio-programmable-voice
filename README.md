@@ -28,6 +28,7 @@ yarn add https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/t
 
 # NPM
 npm install git+https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/twilio-android-sdk-5
+```
 
 I am currently updating the library to catchup with all changes published on the latest Android and iOS Twilio Voice SDK:
 
