@@ -168,6 +168,8 @@ Setup FCM
 You must download the file `google-services.json` from the Firebase console.
 It contains keys and settings for all your applications under Firebase. This library obtains the resource `senderID` for registering for remote GCM from that file.
 
+Then follow these step by step https://firebase.google.com/docs/android/setup
+
 #### `android/build.gradle`
 
 ```groovy
@@ -182,6 +184,17 @@ buildscript {
 // this plugin looks for google-services.json in your project
 apply plugin: 'com.google.gms.google-services'
 ```
+
+#### `android/app/build.gradle`
+
+```groovy
+dependencies {    
+    implementation platform('com.google.firebase:firebase-bom:26.4.0')
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+}
+```
+
 
 #### `AndroidManifest.xml`
 
