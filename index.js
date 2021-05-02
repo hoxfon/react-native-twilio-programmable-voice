@@ -106,6 +106,12 @@ const Twilio = {
         }
         _eventHandlers[type].get(handler).remove()
         _eventHandlers[type].delete(handler)
+    },
+    removeAllListeners(type) {
+        _eventHandlers[type].forEach(value => {
+            value.remove()
+        })
+        _eventHandlers[type].clear()
     }
 }
 
