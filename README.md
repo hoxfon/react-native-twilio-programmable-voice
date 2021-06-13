@@ -16,7 +16,7 @@ Tested with:
 
 The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon/react-native-twilio-programmable-voice/tree/feat/twilio-android-sdk-5) which is aligned with:
 
-- Android 5.1.1
+- Android 5.2.0
 - iOS 5.2.0
 
 It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
@@ -54,17 +54,19 @@ Allow Android to use the built in Android telephony service to make and receive 
 - Android 4.5.0
 - iOS 5.2.0
 
-
 ### Breaking changes in v5.0.0
 
-Changes on [Android Twilio Voice SDK v5](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog#500) are reflected in the JavaScript API, the way call invites are handled and ...
+Changes on [Android Twilio Voice SDK v5](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog#500) are reflected in the JavaScript API, the way call invites are handled has changed and other v5 features like `audioSwitch` have been implemented.
+`setSpeakerPhone()` has been removed, use selectAudioDevice(name: string) instead.
 
-- when the app is not in foreground incoming calls result in a heads-up notification with action to "ACCEPT" and "REJECT"
-- ReactMethod `accept` does not dispatch any event. Previously it would dispatch `connectionDidDisconnect`
-- ReactMethod `reject` dispatch a `callInviteCancelled` event instead of `connectionDidDisconnect`
-- ReactMethod `ignore` does not dispatch any event. Previously it would dispatch `connectionDidDisconnect`
+#### Background incoming calls
 
-To allow the library to show heads up notifications you must add the following lines to your application `android/app/src/main/AndroidManifest.xml`:
+- When the app is not in foreground incoming calls result in a heads-up notification with action to "ACCEPT" and "REJECT".
+- ReactMethod `accept` does not dispatch any event. In v4 it dispatched `connectionDidDisconnect`.
+- ReactMethod `reject` dispatches a `callInviteCancelled` event instead of `connectionDidDisconnect`.
+- ReactMethod `ignore` does not dispatch any event. In v4 it dispatched `connectionDidDisconnect`.
+
+To show heads up notifications, you must add the following lines to your application's `android/app/src/main/AndroidManifest.xml`:
 
 ```xml
     <!-- receive calls when the app is in the background-->
@@ -97,22 +99,22 @@ To allow the library to show heads up notifications you must add the following l
     </application>
 ```
 
-Firebase Messaging 19.0.+ is imported by this module, so there is no need to import it in your app.
+Firebase Messaging 19.0.+ is imported by this module, so there is no need to import it in your app's `bundle.gradle` file.
 
-Previously, in order to launch the app when receiving a call, the flow was:
+In v4 the flow to launch the app when receiving a call was:
 
-1. the module would launch the app
-2. after the React app is initialised, it would always ask to the native module whether there were incoming call invites
-3. if there where any incoming call invites the module would send an event to the React app with the incoming call invite parameters
-4. the Reach app would listen to the event and launch the view with the appropriate incoming call answer/reject controls
+1. the module launched the app
+2. after the React app is initialised, it always asked to the native module whether there were incoming call invites
+3. if there were any incoming call invites, the module would have sent an event to the React app with the incoming call invite parameters
+4. the Reach app would have listened to the event and would have launched the view with the appropriate incoming call answer/reject controls
 
-This loop was long and prone to race conditions. In case the event was sent before the React main view was completely initialised, it would not be handled at all.
+This loop was long and prone to race conditions. For example,when the event was sent before the React main view was completely initialised, it would not be handled at all.
 
-Version 5.0.0 replaces the previous flow by using `getLaunchOptions()` to pass initial properties from native to React when receiving a call invite as explained here: https://reactnative.dev/docs/communication-android.
+V5 replaces the previous flow by using `getLaunchOptions()` to pass initial properties from the native module to React, when receiving a call invite as explained here: https://reactnative.dev/docs/communication-android.
 
-The React app will be launched with the initial properties `callInvite` or `call`.
+The React app is launched with the initial properties `callInvite` or `call`.
 
-Add the following blocks to your app's `MainActivity`:
+To handle correctly `lauchedOptions`, you must add the following blocks to your app's `MainActivity`:
 
 ```java
 
@@ -152,6 +154,25 @@ public class MainActivity extends ReactActivity {
 
     // ...
 }
+```
+
+#### Audio Switch
+
+Access to native Twilio SDK AudioSwitch module has been added to the JavaScript API:
+
+```javascript
+// getAudioDevices returns all audio devices connected
+// {
+//     "Speakerphone": false,
+//     "Earnpiece": true, // true indicates the selected device
+// }
+getAudioDevices()
+
+// getSelectedAudioDevice returns the selected audio device
+getSelectedAudioDevice()
+
+// selectAudioDevice selects the passed audio device for the current active call
+selectAudioDevice(name: string)
 ```
 
 ## ICE
