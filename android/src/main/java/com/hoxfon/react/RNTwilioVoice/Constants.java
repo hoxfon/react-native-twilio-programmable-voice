@@ -35,4 +35,5 @@ public class Constants {
     public static final String CALL_KEY = "call";
     public static final String CALL_INVITE_KEY = "callInvite";
     public static final String CALL_STATE_CONNECTED = Call.State.CONNECTED.toString();
+    public static final String SELECTED_AUDIO_DEVICE = "selected_audio_device";
 }

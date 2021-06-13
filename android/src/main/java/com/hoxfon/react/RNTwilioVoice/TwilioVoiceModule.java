@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 
@@ -18,11 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import kotlin.Unit;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.AssertionException;
@@ -41,6 +38,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import com.twilio.audioswitch.AudioDevice;
+import com.twilio.audioswitch.AudioSwitch;
 import com.twilio.voice.AcceptOptions;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
@@ -54,6 +54,7 @@ import com.twilio.voice.Voice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_CONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_DISCONNECT;
@@ -64,15 +65,13 @@ import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_STATE_RINGI
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CALL_INVITE_CANCELLED;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_IS_RECONNECTING;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_RECONNECT;
+import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_AUDIO_DEVICES_UPDATED;
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
     public static String TAG = "RNTwilioVoice";
 
     private static final int MIC_PERMISSION_REQUEST_CODE = 1;
-
-    private AudioManager audioManager;
-    private int savedAudioMode = AudioManager.MODE_NORMAL;
 
     private boolean isReceiverRegistered = false;
     private VoiceBroadcastReceiver voiceBroadcastReceiver;
@@ -96,13 +95,20 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private CallInvite activeCallInvite;
     private Call activeCall;
 
-    private AudioFocusRequest focusRequest;
     private HeadsetManager headsetManager;
     private EventManager eventManager;
     private int existingCallInviteIntent;
 
+    /*
+     * Audio device management
+     */
+    private AudioSwitch audioSwitch;
+    private int savedVolumeControlStream;
+    AudioDevice selectedAudioDevice;
+    Map<String, AudioDevice> availableAudioDevices;
+
     public TwilioVoiceModule(ReactApplicationContext reactContext,
-    boolean shouldAskForMicPermission) {
+                             boolean shouldAskForMicPermission) {
         super(reactContext);
 
         if (BuildConfig.DEBUG) {
@@ -127,10 +133,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
         TwilioVoiceModule.callNotificationMap = new HashMap<>();
 
-        /*
-         * Needed for setting/abandoning audio focus during a call
-         */
-        audioManager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
+        audioSwitch = new AudioSwitch(reactContext);
+        availableAudioDevices = new HashMap<>();
 
         /*
          * Ensure the microphone permission is enabled
@@ -142,6 +146,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @Override
     public void onHostResume() {
+        savedVolumeControlStream = getCurrentActivity().getVolumeControlStream();
         /*
          * Enable changing the volume using the up/down keys during a conversation
          */
@@ -184,7 +189,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public void onHostDestroy() {
         disconnect();
         callNotificationManager.removeHangupNotification(getReactApplicationContext());
-        unsetAudioFocus();
+        /*
+         * Tear down audio device management and restore previous volume stream
+         */
+        audioSwitch.stop();
+        getCurrentActivity().setVolumeControlStream(savedVolumeControlStream);
     }
 
     @Override
@@ -257,7 +266,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onConnected(). Call state: " + call.getState());
                 }
-                setAudioFocus();
+                audioSwitch.activate();
                 proximityManager.startProximitySensor();
                 headsetManager.startWiredHeadsetEvent(getReactApplicationContext());
 
@@ -316,7 +325,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onDisconnected(). Call state: " + call.getState());
                 }
-                unsetAudioFocus();
+                audioSwitch.deactivate();
                 proximityManager.stopProximitySensor();
                 headsetManager.stopWiredHeadsetEvent(getReactApplicationContext());
 
@@ -347,11 +356,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onConnectFailure(). Call state: " + call.getState());
                 }
-                unsetAudioFocus();
+                audioSwitch.deactivate();
                 proximityManager.stopProximitySensor();
 
                 Log.e(TAG, String.format("CallListener onConnectFailure error: %d, %s",
-                    error.getErrorCode(), error.getMessage()));
+                        error.getErrorCode(), error.getMessage()));
 
                 WritableMap params = Arguments.createMap();
                 params.putString(Constants.ERROR, error.getMessage());
@@ -587,6 +596,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         WritableMap params = Arguments.createMap();
         params.putBoolean("initialized", true);
         promise.resolve(params);
+        startAudioSwitch();
     }
 
     /*
@@ -779,72 +789,50 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     @ReactMethod
-    public void setSpeakerPhone(Boolean value) {
-        // TODO check whether it is necessary to call setAudioFocus again
-//        setAudioFocus();
-        audioManager.setSpeakerphoneOn(value);
-    }
-
-    @ReactMethod
     public void setOnHold(Boolean value) {
         if (activeCall != null) {
             activeCall.hold(value);
         }
     }
 
-    private void setAudioFocus() {
-        if (audioManager == null) {
-            audioManager.setMode(savedAudioMode);
-            audioManager.abandonAudioFocus(null);
-            return;
+    @ReactMethod
+    public void getAudioDevices(Promise promise) {
+        List<AudioDevice> availableAudioDevices = audioSwitch.getAvailableAudioDevices();
+
+        WritableMap devices = Arguments.createMap();
+        for (AudioDevice a : availableAudioDevices) {
+            devices.putBoolean(a.getName(), selectedAudioDevice.getName().equals(a.getName()));
         }
-        savedAudioMode = audioManager.getMode();
-        // Request audio focus before making any device switch
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            AudioAttributes playbackAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .build();
-            focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                .setAudioAttributes(playbackAttributes)
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
-                    @Override
-                    public void onAudioFocusChange(int i) { }
-                })
-                .build();
-            audioManager.requestAudioFocus(focusRequest);
-        } else {
-            int focusRequestResult = audioManager.requestAudioFocus(new AudioManager.OnAudioFocusChangeListener() {
-                @Override
-                public void onAudioFocusChange(int focusChange) {}
-            },
-            AudioManager.STREAM_VOICE_CALL,
-            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        }
-        /*
-         * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-         * required to be in this mode when playout and/or recording starts for
-         * best possible VoIP performance. Some devices have difficulties with speaker mode
-         * if this is not set.
-         */
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        promise.resolve(devices);
     }
 
-    private void unsetAudioFocus() {
-        if (audioManager == null) {
-            audioManager.setMode(savedAudioMode);
-            audioManager.abandonAudioFocus(null);
+    @ReactMethod
+    public void getSelectedAudioDevice(Promise promise) {
+        WritableMap device = Arguments.createMap();
+        device.putString(Constants.SELECTED_AUDIO_DEVICE, selectedAudioDevice.getName());
+        promise.resolve(device);
+    }
+
+    @ReactMethod
+    public void selectAudioDevice(String name) {
+        AudioDevice selected = availableAudioDevices.get(name);
+        if (selected == null) {
             return;
         }
-        audioManager.setMode(savedAudioMode);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (focusRequest != null) {
-                audioManager.abandonAudioFocusRequest(focusRequest);
+        audioSwitch.selectDevice(selected);
+    }
+
+    private void startAudioSwitch() {
+        audioSwitch.start((devices, device) -> {
+            selectedAudioDevice = device;
+            WritableMap params = Arguments.createMap();
+            for (AudioDevice a : devices) {
+                params.putBoolean(a.getName(), device.getName().equals(a.getName()));
+                availableAudioDevices.put(a.getName(), a);
             }
-        } else {
-            audioManager.abandonAudioFocus(null);
-        }
+            eventManager.sendEvent(EVENT_AUDIO_DEVICES_UPDATED, params);
+            return Unit.INSTANCE;
+        });
     }
 
     private boolean checkPermissionForMicrophone() {
@@ -868,6 +856,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (intent == null || intent.getAction() == null) {
             return initialProperties;
         }
+
         Bundle callBundle = new Bundle();
         switch (intent.getAction()) {
             case Constants.ACTION_INCOMING_CALL_NOTIFICATION:
