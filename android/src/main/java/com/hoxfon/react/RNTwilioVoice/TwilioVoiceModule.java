@@ -52,6 +52,9 @@ import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -379,6 +382,34 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 toName = "";
                 activeCallInvite = null;
             }
+
+            /*
+             * currentWarnings: existing quality warnings that have not been cleared yet
+             * previousWarnings: last set of warnings prior to receiving this callback
+             *
+             * Example:
+             *   - currentWarnings: { A, B }
+             *   - previousWarnings: { B, C }
+             *
+             * Newly raised warnings = currentWarnings - intersection = { A }
+             * Newly cleared warnings = previousWarnings - intersection = { C }
+             */
+            public void onCallQualityWarningsChanged(@NonNull Call call,
+                                            @NonNull Set<Call.CallQualityWarning> currentWarnings,
+                                            @NonNull Set<Call.CallQualityWarning> previousWarnings) {
+                if (previousWarnings.size() > 1) {
+                    Set<Call.CallQualityWarning> intersection = new HashSet<>(currentWarnings);
+                    currentWarnings.removeAll(previousWarnings);
+                    intersection.retainAll(previousWarnings);
+                    previousWarnings.removeAll(intersection);
+                }
+                String message = String.format(
+                        Locale.US,
+                        "Newly raised warnings: " + currentWarnings + " Clear warnings " + previousWarnings);
+                Log.e(TAG, message);
+
+                // TODO send event to JS
+            }
         };
     }
 
@@ -522,6 +553,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
             case Constants.ACTION_OPEN_CALL_IN_PROGRESS:
                 // the notification already brings the activity to the top
+                if (activeCall == null) {
+                    callNotificationManager.removeHangupNotification(getReactApplicationContext());
+                }
                 break;
 
             default:
