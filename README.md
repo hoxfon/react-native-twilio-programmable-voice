@@ -16,7 +16,7 @@ Tested with:
 
 The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon/react-native-twilio-programmable-voice/tree/feat/twilio-android-sdk-5) which is aligned with:
 
-- Android 5.3.1
+- Android 5.4.2
 - iOS 5.2.0
 
 It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
@@ -174,6 +174,10 @@ getSelectedAudioDevice()
 // selectAudioDevice selects the passed audio device for the current active call
 selectAudioDevice(name: string)
 ```
+
+#### Event deviceDidReceiveIncoming
+
+When a call invite is received, the [SHAKEN/STIR](https://www.twilio.com/docs/voice/trusted-calling-using-shakenstir) `caller_verification` field has been added to the list of params for  `deviceDidReceiveIncoming`. Values are: `verified`, `unverified`, `unknown`.
 
 ## ICE
 

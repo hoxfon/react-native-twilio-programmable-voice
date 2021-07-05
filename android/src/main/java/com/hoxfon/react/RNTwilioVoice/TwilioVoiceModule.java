@@ -578,6 +578,14 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         params.putString(Constants.CALL_SID, activeCallInvite.getCallSid());
         params.putString(Constants.CALL_FROM, activeCallInvite.getFrom());
         params.putString(Constants.CALL_TO, activeCallInvite.getTo());
+        String verificationStatus = Constants.CALLER_VERIFICATION_UNKNOWN;
+        if (activeCallInvite.getCallerInfo().isVerified() != null) {
+            verificationStatus = activeCallInvite.getCallerInfo().isVerified() == true
+                    ? Constants.CALLER_VERIFICATION_VERIFIED
+                    : Constants.CALLER_VERIFICATION_UNVERIFIED
+            ;
+        }
+        params.putString(Constants.CALLER_VERIFICATION_STATUS, verificationStatus);
         eventManager.sendEvent(EVENT_DEVICE_DID_RECEIVE_INCOMING, params);
     }
 
