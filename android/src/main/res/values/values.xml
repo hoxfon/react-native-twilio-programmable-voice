@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accept" translatable="false">Answer</string>
+    <string name="reject" translatable="false">Decline</string>
+    <string name="hangup" translatable="false">Hang up</string>
+    <string name="call_in_progress" translatable="false">Call in progress</string>
+    <string name="call_incoming_title" translatable="false">Incoming call</string>
+    <string name="call_incoming_content" translatable="false">is calling</string>
+    <string name="call_missed_title" translatable="false">Missed call</string>
+    <string name="call_missed_more" translatable="false">last call from:</string>
+    <string name="call_missed_from" translatable="false"> called</string>
+    <string name="call_missed_title_plural" translatable="false">missed calls</string>
+</resources>

@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -14,6 +16,9 @@ import com.facebook.react.bridge.ReactContext;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.hoxfon.react.RNTwilioVoice.Constants;
+import com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService;
+import com.twilio.voice.CallException;
 import com.hoxfon.react.RNTwilioVoice.BuildConfig;
 import com.hoxfon.react.RNTwilioVoice.CallNotificationManager;
 import com.twilio.voice.CallInvite;
@@ -25,30 +30,18 @@ import java.util.Map;
 import java.util.Random;
 
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_FCM_TOKEN;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CANCEL_CALL_INVITE;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CANCELLED_CALL_INVITE;
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
-import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
-
-    private CallNotificationManager callNotificationManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        callNotificationManager = new CallNotificationManager();
     }
 
     @Override
     public void onNewToken(String token) {
-        Log.d(TAG, "Refreshed token: " + token);
-
-        // Notify Activity of FCM token
-        Intent intent = new Intent(ACTION_FCM_TOKEN);
+        super.onNewToken(token);
+        Intent intent = new Intent(Constants.ACTION_FCM_TOKEN);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -71,76 +64,53 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
-            boolean valid = Voice.handleMessage(data, new MessageListener() {
+            boolean valid = Voice.handleMessage(this, data, new MessageListener() {
                 @Override
                 public void onCallInvite(final CallInvite callInvite) {
-
                     // We need to run this on the main thread, as the React code assumes that is true.
                     // Namely, DevServerHelper constructs a Handler() without a Looper, which triggers:
                     // "Can't create handler inside thread that has not called Looper.prepare()"
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
+                            CallNotificationManager callNotificationManager = new CallNotificationManager();
                             // Construct and load our normal React JS code bundle
                             ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
                             ReactContext context = mReactInstanceManager.getCurrentReactContext();
-                            // If it's constructed, send a notification
+
+                            // initialise appImportance to the highest possible importance in case context is null
+                            int appImportance = ActivityManager.RunningAppProcessInfo.IMPORTANCE_GONE;
+
                             if (context != null) {
-                                int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
-                                if (BuildConfig.DEBUG) {
-                                    Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
-                                }
-                                Intent launchIntent = callNotificationManager.getLaunchIntent(
-                                        (ReactApplicationContext)context,
-                                        notificationId,
-                                        callInvite,
-                                        false,
-                                        appImportance
-                                );
-                                // app is not in foreground
-                                if (appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                                    context.startActivity(launchIntent);
-                                }
-                                Intent intent = new Intent(ACTION_INCOMING_CALL);
-                                intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-                                intent.putExtra(INCOMING_CALL_INVITE, callInvite);
-                                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                            } else {
-                                // Otherwise wait for construction, then handle the incoming call
-                                mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
-                                    public void onReactContextInitialized(ReactContext context) {
-                                        int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
-                                        if (BuildConfig.DEBUG) {
-                                            Log.d(TAG, "CONTEXT not present appImportance = " + appImportance);
-                                        }
-                                        Intent launchIntent = callNotificationManager.getLaunchIntent((ReactApplicationContext)context, notificationId, callInvite, true, appImportance);
-                                        context.startActivity(launchIntent);
-                                        Intent intent = new Intent(ACTION_INCOMING_CALL);
-                                        intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
-                                        intent.putExtra(INCOMING_CALL_INVITE, callInvite);
-                                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                                        callNotificationManager.createIncomingCallNotification(
-                                                (ReactApplicationContext) context, callInvite, notificationId,
-                                                launchIntent);
-                                    }
-                                });
-                                if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
-                                    // Construct it in the background
-                                    mReactInstanceManager.createReactContextInBackground();
-                                }
+                                appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
                             }
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "context: " + context + ". appImportance = " + appImportance);
+                            }
+
+                            // when the app is not started or in the background
+                            if (appImportance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
+                                if (BuildConfig.DEBUG) {
+                                    Log.d(TAG, "Background");
+                                }
+                                handleInvite(callInvite, notificationId);
+                                return;
+                            }
+
+                            Intent intent = new Intent(Constants.ACTION_INCOMING_CALL);
+                            intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
+                            intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
                     });
                 }
 
                 @Override
-                public void onCancelledCallInvite(final CancelledCallInvite cancelledCallInvite) {
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        public void run() {
-                            VoiceFirebaseMessagingService.this.sendCancelledCallInviteToActivity(cancelledCallInvite);
-                        }
-                    });
+                public void onCancelledCallInvite(@NonNull CancelledCallInvite cancelledCallInvite, @Nullable CallException callException) {
+                    // The call is prematurely disconnected by the caller.
+                    // The callee does not accept or reject the call within 30 seconds.
+                    // The Voice SDK is unable to establish a connection to Twilio.
+                    handleCancelledCallInvite(cancelledCallInvite, callException);
                 }
             });
 
@@ -155,13 +125,22 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    /*
-     * Send the CancelledCallInvite to the TwilioVoiceModule
-     */
-    private void sendCancelledCallInviteToActivity(CancelledCallInvite cancelledCallInvite) {
-        SoundPoolManager.getInstance((this)).stopRinging();
-        Intent intent = new Intent(ACTION_CANCEL_CALL_INVITE);
-        intent.putExtra(CANCELLED_CALL_INVITE, cancelledCallInvite);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    private void handleInvite(CallInvite callInvite, int notificationId) {
+        Intent intent = new Intent(this, IncomingCallNotificationService.class);
+        intent.setAction(Constants.ACTION_INCOMING_CALL);
+        intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
+        intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
+
+        startService(intent);
+    }
+
+    private void handleCancelledCallInvite(CancelledCallInvite cancelledCallInvite, CallException callException) {
+        Intent intent = new Intent(this, IncomingCallNotificationService.class);
+        intent.setAction(Constants.ACTION_CANCEL_CALL);
+        intent.putExtra(Constants.CANCELLED_CALL_INVITE, cancelledCallInvite);
+        if (callException != null) {
+            intent.putExtra(Constants.CANCELLED_CALL_INVITE_EXCEPTION, callException.getMessage());
+        }
+        startService(intent);
     }
 }
