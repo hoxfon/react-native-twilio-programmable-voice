@@ -26,6 +26,8 @@ public class Constants {
     public static final String ACTION_FCM_TOKEN = "ACTION_FCM_TOKEN";
     public static final String ACTION_CLEAR_MISSED_CALLS_COUNT = "CLEAR_MISSED_CALLS_COUNT";
     public static final String ACTION_OPEN_CALL_IN_PROGRESS = "CALL_IN_PROGRESS";
+    public static final String ACTION_ANSWER = "ACTION_ANSWER";
+    public static final String ACTION_DECLINE = "ACTION_DECLINE";
 
     public static final String CALL_SID = "call_sid";
     public static final String CALL_STATE = "call_state";
