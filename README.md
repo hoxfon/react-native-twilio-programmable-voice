@@ -565,7 +565,7 @@ TwilioVoice.getCallInvite()
         }
     })
 
-// Unregister device with Twilio (iOS only)
+// Unregister device with Twilio
 TwilioVoice.unregister()
 ```
 
