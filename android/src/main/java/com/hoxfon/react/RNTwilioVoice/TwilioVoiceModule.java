@@ -237,7 +237,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         };
     }
 
-    private UnregistrationListener unregistrationListener() {    //
+    private UnregistrationListener unregistrationListener() {   
         return new UnregistrationListener() {
             @Override
             public void onUnregistered(String accessToken, String fcmToken) {
