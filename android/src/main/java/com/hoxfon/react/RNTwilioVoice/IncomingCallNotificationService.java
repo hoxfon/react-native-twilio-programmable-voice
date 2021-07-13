@@ -63,11 +63,11 @@ public class IncomingCallNotificationService extends Service {
                 handleCancelledCall(intent);
                 break;
 
-            case Constants.ACTION_JS_ANSWER:
+            case Constants.ACTION_ANSWER:
                 endForeground();
                 break;   
 
-            case Constants.ACTION_JS_REJECT:
+            case Constants.ACTION_DECLINE:
                 endForeground();
                 break;    
 

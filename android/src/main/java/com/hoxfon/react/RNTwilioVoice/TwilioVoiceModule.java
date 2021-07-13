@@ -743,7 +743,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
 
         Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
-        intent.setAction(Constants.ACTION_JS_ANSWER);
+        intent.setAction(Constants.ACTION_ANSWER);
 
         getReactApplicationContext().startService(intent);
 
@@ -765,7 +765,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         
         Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
-        intent.setAction(Constants.ACTION_JS_REJECT);
+        intent.setAction(Constants.ACTION_DECLINE);
         
         getReactApplicationContext().startService(intent);
 
