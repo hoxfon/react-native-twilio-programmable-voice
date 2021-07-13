@@ -244,15 +244,13 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Successfully unregistered FCM");
                 }
-                // eventManager.sendEvent(EVENT_DEVICE_UNREGISTERED, null);
-                eventManager.sendEvent(EVENT_DEVICE_NOT_READY, null);
             }
 
             @Override
             public void onError(RegistrationException error, String accessToken, String fcmToken) {
                 Log.e(TAG, String.format("Unregistration Error: %d, %s", error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
-                params.putString("err", error.getMessage());
+                params.putString(Constants.ERROR, error.getMessage());
                 eventManager.sendEvent(EVENT_DEVICE_NOT_READY, params);
             }
         };
@@ -690,9 +688,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod  //
     public void unregister(Promise promise) {
         unregisterForCallInvites();
-        WritableMap params = Arguments.createMap();
-        params.putBoolean("initialized", false);
-        promise.resolve(params);
+        promise.resolve(true);
     }
 
     private void unregisterForCallInvites() {
@@ -701,7 +697,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            Log.w(TAG, "FCM unregistration failed", task.getException());
                             return;
                         }
 
@@ -747,7 +743,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
 
         Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
-        intent.setAction(Constants.ACTION_ANSWER);
+        intent.setAction(Constants.ACTION_JS_ANSWER);
 
         getReactApplicationContext().startService(intent);
 
@@ -769,7 +765,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
         
         Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
-        intent.setAction(Constants.ACTION_DECLINE);
+        intent.setAction(Constants.ACTION_JS_REJECT);
         
         getReactApplicationContext().startService(intent);
 
