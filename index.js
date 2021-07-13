@@ -92,9 +92,7 @@ const Twilio = {
         }
     },
     unregister() {
-        if (Platform.OS === IOS) {
-            TwilioVoice.unregister()
-        }
+        TwilioVoice.unregister()
     },
     // getAudioDevices returns all audio devices connected
     // {
