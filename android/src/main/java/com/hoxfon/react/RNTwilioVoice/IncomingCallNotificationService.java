@@ -63,6 +63,14 @@ public class IncomingCallNotificationService extends Service {
                 handleCancelledCall(intent);
                 break;
 
+            case Constants.ACTION_JS_ANSWER:
+                endForeground();
+                break;   
+
+            case Constants.ACTION_JS_REJECT:
+                endForeground();
+                break;    
+
             default:
                 break;
         }
@@ -246,6 +254,7 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private void reject(CallInvite callInvite, int notificationId) {
+        SoundPoolManager.getInstance(this).stopRinging();
         endForeground();
         callInvite.reject(getApplicationContext());
     }

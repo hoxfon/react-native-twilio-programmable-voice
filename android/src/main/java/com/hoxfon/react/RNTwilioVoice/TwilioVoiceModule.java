@@ -50,6 +50,7 @@ import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.LogLevel;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
+import com.twilio.voice.UnregistrationListener;
 import com.twilio.voice.Voice;
 
 import java.util.HashSet;
@@ -93,6 +94,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     static Map<String, Integer> callNotificationMap;
 
     private RegistrationListener registrationListener = registrationListener();
+    private UnregistrationListener unregistrationListener = unregistrationListener(); 
     private Call.Listener callListener = callListener();
 
     private CallInvite activeCallInvite;
@@ -231,6 +233,22 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 WritableMap params = Arguments.createMap();
                 params.putString(Constants.ERROR, error.getMessage());
                 eventManager.sendEvent(EVENT_DEVICE_NOT_READY, params);
+            }
+        };
+    }
+
+    private UnregistrationListener unregistrationListener() {   
+        return new UnregistrationListener() {
+            @Override
+            public void onUnregistered(String accessToken, String fcmToken) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Successfully unregistered FCM");
+                }
+            }
+
+            @Override
+            public void onError(RegistrationException error, String accessToken, String fcmToken) {
+                Log.e(TAG, String.format("Unregistration Error: %d, %s", error.getErrorCode(), error.getMessage()));
             }
         };
     }
@@ -659,6 +677,39 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         Voice.register(accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
     }
 
+     /*
+     * Unregister your android device with Twilio
+     *
+     */
+
+    @ReactMethod  //
+    public void unregister(Promise promise) {
+        unregisterForCallInvites();
+        promise.resolve(true);
+    }
+
+    private void unregisterForCallInvites() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "FCM unregistration failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String fcmToken = task.getResult().getToken();
+                        if (fcmToken != null) {
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "Unregistering with FCM");
+                            }
+                            Voice.unregister(accessToken, Voice.RegistrationChannel.FCM, fcmToken, unregistrationListener);
+                        }
+                    }
+                });
+    }
+
     public void acceptFromIntent(Intent intent) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "acceptFromIntent()");
@@ -687,6 +738,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accept()");
         }
+
+        Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
+        intent.setAction(Constants.ACTION_JS_ANSWER);
+
+        getReactApplicationContext().startService(intent);
+
         AcceptOptions acceptOptions = new AcceptOptions.Builder()
                 .enableDscp(true)
                 .build();
@@ -703,6 +760,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             params.putString(Constants.CALL_TO,    activeCallInvite.getTo());
             activeCallInvite.reject(getReactApplicationContext());
         }
+        
+        Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
+        intent.setAction(Constants.ACTION_JS_REJECT);
+        
+        getReactApplicationContext().startService(intent);
+
         eventManager.sendEvent(EVENT_CALL_INVITE_CANCELLED, params);
         activeCallInvite = null;
     }
