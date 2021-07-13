@@ -249,9 +249,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             @Override
             public void onError(RegistrationException error, String accessToken, String fcmToken) {
                 Log.e(TAG, String.format("Unregistration Error: %d, %s", error.getErrorCode(), error.getMessage()));
-                WritableMap params = Arguments.createMap();
-                params.putString(Constants.ERROR, error.getMessage());
-                eventManager.sendEvent(EVENT_DEVICE_NOT_READY, params);
             }
         };
     }
