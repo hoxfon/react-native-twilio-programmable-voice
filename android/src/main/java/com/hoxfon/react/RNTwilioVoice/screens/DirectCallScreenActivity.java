@@ -78,15 +78,6 @@ public class DirectCallScreenActivity extends ReactActivity {
     });
   }
 
-  @Override protected void onPause() {
-    super.onPause();
-    if (isReceiverRegistered) {
-      LocalBroadcastManager.getInstance(
-          getReactInstanceManager().getCurrentReactContext()
-      ).unregisterReceiver(directCallBroadcastReceiver);
-    }
-  }
-
   private class DirectCallBroadcastReceiver extends BroadcastReceiver {
 
     @Override public void onReceive(Context context, Intent intent) {

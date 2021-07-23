@@ -200,7 +200,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
                                             context.startActivities(launchIntent);
 
-                                            intent.putExtra(SHOW_UNLOCK_SCREEN, true);
+                                            intent.putExtra(SHOW_UNLOCK_SCREEN, false);
 
                                             LocalBroadcastManager.getInstance(context)
                                                     .sendBroadcast(intent);

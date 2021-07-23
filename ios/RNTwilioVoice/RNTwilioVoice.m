@@ -1,8 +1,5 @@
 //
-//  ViewController.m
-//  Twilio Voice with Quickstart - Objective-C
-//
-//  Copyright © 2016-2018 Twilio, Inc. All rights reserved.
+//  TwilioVoice.m
 //
 
 #import "RNTwilioVoice.h"
@@ -40,7 +37,6 @@ NSString * const kCachedDeviceToken = @"CachedDeviceToken";
   NSString *_token;
 }
 
-NSString * const StatePending = @"PENDING";
 NSString * const StateConnecting = @"CONNECTING";
 NSString * const StateConnected = @"CONNECTED";
 NSString * const StateDisconnected = @"DISCONNECTED";
@@ -262,6 +258,8 @@ RCT_REMAP_METHOD(getCallInvite,
                  [self sendEventWithName:@"deviceReady" body:nil];
              }
          }];
+    } else {
+        [self sendEventWithName:@"deviceReady" body:nil];
     }
   }
 }
@@ -352,7 +350,7 @@ withCompletionHandler:(void (^)(void))completion {
         from = [callInvite.from stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     }
     // Always report to CallKit
-    [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
+    [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
     self.activeCallInvites[[callInvite.uuid UUIDString]] = callInvite;
     if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
         [self incomingPushHandled];
@@ -434,19 +432,8 @@ withCompletionHandler:(void (^)(void))completion {
     }
 }
 
-#pragma mark - TVOCallDelegate
-- (void)callDidStartRinging:(TVOCall *)call {
-    NSLog(@"RNTwilioVoice callDidStartRinging:");
-    
-    /*
-     When [answerOnBridge](https://www.twilio.com/docs/voice/twiml/dial#answeronbridge) is enabled in the
-     <Dial> TwiML verb, the caller will not hear the ringback while the call is ringing and awaiting to be
-     accepted on the callee's side. The application can use the `AVAudioPlayer` to play custom audio files
-     between the `[TVOCallDelegate callDidStartRinging:]` and the `[TVOCallDelegate callDidConnect:]` callbacks.
-     */
-    //if (self.playCustomRingback) {
-    //    [self playRingback];
-    //}
+- (void)notificationError:(NSError *)error {
+  NSLog(@"notificationError: %@", [error localizedDescription]);
 }
 
 #pragma mark - TVOCallDelegate
@@ -529,6 +516,9 @@ withCompletionHandler:(void (^)(void))completion {
     } else {
         NSLog(@"didDisconnect");
     }
+
+    UIDevice* device = [UIDevice currentDevice];
+    device.proximityMonitoringEnabled = NO;
 
     if (!self.userInitiatedDisconnect) {
         CXCallEndedReason reason = CXCallEndedReasonRemoteEnded;
@@ -621,27 +611,7 @@ withCompletionHandler:(void (^)(void))completion {
 }
 
 - (void)provider:(CXProvider *)provider performStartCallAction:(CXStartCallAction *)action {
-    NSLog(@"provider:performStartCallAction:");
-    
-    [self toggleUIState:NO showCallControl:NO];
-    [self startSpin];
-
-    self.audioDevice.enabled = NO;
-    self.audioDevice.block();
-    
-    [self.callKitProvider reportOutgoingCallWithUUID:action.callUUID startedConnectingAtDate:[NSDate date]];
-    
-    __weak typeof(self) weakSelf = self;
-    [self performVoiceCallWithUUID:action.callUUID client:nil completion:^(BOOL success) {
-        __strong typeof(self) strongSelf = weakSelf;
-        if (success) {
-            [strongSelf.callKitProvider reportOutgoingCallWithUUID:action.callUUID connectedAtDate:[NSDate date]];
-            [action fulfill];
-        } else {
-            [action fail];
-        }
-    }];
-}
+  NSLog(@"provider:performStartCallAction");
 
     self.audioDevice.enabled = NO;
     self.audioDevice.block();
@@ -660,17 +630,8 @@ withCompletionHandler:(void (^)(void))completion {
   }];
 }
 
-- (void)provider:(CXProvider *)provider performSetHeldCallAction:(CXSetHeldCallAction *)action {
-    NSLog(@"RNTwilioVoice provider:performSetHeldCallAction:");
-    
-    TVOCall *call = self.activeCalls[action.callUUID.UUIDString];
-    if (call) {
-        [call setOnHold:action.isOnHold];
-        [action fulfill];
-    } else {
-        [action fail];
-    }
-}
+- (void)provider:(CXProvider *)provider performAnswerCallAction:(CXAnswerCallAction *)action {
+  NSLog(@"provider:performAnswerCallAction");
 
   self.audioDevice.enabled = NO;
   self.audioDevice.block();
@@ -682,14 +643,7 @@ withCompletionHandler:(void (^)(void))completion {
     }
   }];
 
-    [self.callKitProvider reportNewIncomingCallWithUUID:uuid update:callUpdate completion:^(NSError *error) {
-        if (!error) {
-            NSLog(@"RNTwilioVoice Incoming call successfully reported.");
-        }
-        else {
-            NSLog(@"RNTwilioVoice Failed to report incoming call successfully: %@.", [error localizedDescription]);
-        }
-    }];
+  [action fulfill];
 }
 
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action {
@@ -732,33 +686,29 @@ withCompletionHandler:(void (^)(void))completion {
     }
 }
 
+- (void)provider:(CXProvider *)provider performPlayDTMFCallAction:(CXPlayDTMFCallAction *)action {
+  TVOCall *call = self.activeCalls[action.callUUID.UUIDString];
+  if (call && call.state == TVOCallStateConnected) {
+    NSLog(@"SendDigits %@", action.digits);
+    [call sendDigits:action.digits];
+  }
+}
+
 #pragma mark - CallKit Actions
 - (void)performStartCallActionWithUUID:(NSUUID *)uuid handle:(NSString *)handle {
   if (uuid == nil || handle == nil) {
     return;
   }
 
-#pragma mark - Ringtone
+  CXHandle *callHandle = [[CXHandle alloc] initWithType:CXHandleTypeGeneric value:handle];
+  CXStartCallAction *startCallAction = [[CXStartCallAction alloc] initWithCallUUID:uuid handle:callHandle];
+  CXTransaction *transaction = [[CXTransaction alloc] initWithAction:startCallAction];
 
-- (void)playRingback {
-    NSString *ringtonePath = [[NSBundle mainBundle] pathForResource:@"ringtone" ofType:@"wav"];
-    if ([ringtonePath length] <= 0) {
-        NSLog(@"Can't find sound file");
-        return;
-    }
-    
-    NSError *error;
-    self.ringtonePlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:ringtonePath] error:&error];
-    if (error != nil) {
-        NSLog(@"Failed to initialize audio player: %@", error);
+  [self.callKitCallController requestTransaction:transaction completion:^(NSError *error) {
+    if (error) {
+      NSLog(@"StartCallAction transaction request failed: %@", [error localizedDescription]);
     } else {
-        self.ringtonePlayer.delegate = self;
-        self.ringtonePlayer.numberOfLoops = -1;
-        
-        self.ringtonePlayer.volume = 1.0f;
-        [self.ringtonePlayer play];
-    }
-}
+      NSLog(@"StartCallAction transaction request successful");
 
       CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
       callUpdate.remoteHandle = callHandle;
@@ -768,17 +718,13 @@ withCompletionHandler:(void (^)(void))completion {
       callUpdate.supportsUngrouping = NO;
       callUpdate.hasVideo = NO;
 
-- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
-    if (flag) {
-        NSLog(@"RNTwilioVoice Audio player finished playing successfully");
-    } else {
-        NSLog(@"RNTwilioVoice Audio player finished playing with some error");
+      [self.callKitProvider reportCallWithUUID:uuid updated:callUpdate];
     }
+  }];
 }
 
-- (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error {
-    NSLog(@"RNTwilioVoice Decode error occurred: %@", error);
-}
+- (void)reportIncomingCallFrom:(NSString *)from withUUID:(NSUUID *)uuid {
+  CXHandle *callHandle = [[CXHandle alloc] initWithType:CXHandleTypeGeneric value:from];
 
   CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
   callUpdate.remoteHandle = callHandle;
@@ -787,6 +733,12 @@ withCompletionHandler:(void (^)(void))completion {
   callUpdate.supportsGrouping = NO;
   callUpdate.supportsUngrouping = NO;
   callUpdate.hasVideo = NO;
+    
+  if ([from containsString:@"client:"]) {
+    callUpdate.localizedCallerName = @"Seguridad";
+  } else {
+    callUpdate.localizedCallerName = @"Visitante";
+  }
 
   [self.callKitProvider reportNewIncomingCallWithUUID:uuid update:callUpdate completion:^(NSError *error) {
     if (!error) {
@@ -797,80 +749,17 @@ withCompletionHandler:(void (^)(void))completion {
   }];
 }
 
-RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
-  _token = token;
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
-  [self initPushRegistry];
-}
-
-RCT_EXPORT_METHOD(initWithAccessTokenUrl:(NSString *)tokenUrl) {
-  _tokenUrl = tokenUrl;
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
-  [self initPushRegistry];
-}
-
-RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
-  NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
-
-  UIDevice* device = [UIDevice currentDevice];
-  device.proximityMonitoringEnabled = YES;
-
-  if (self.activeCall && self.activeCall.state == TVOCallStateConnected) {
-    [self.activeCall disconnect];
-  } else {
-    NSUUID *uuid = [NSUUID UUID];
-    NSString *handle = [params valueForKey:@"To"];
-    _callParams = [[NSMutableDictionary alloc] initWithDictionary:params];
-    [self performStartCallActionWithUUID:uuid handle:handle];
+- (void)performEndCallActionWithUUID:(NSUUID *)uuid {
+  if (uuid == nil) {
+    return;
   }
-}
 
-RCT_EXPORT_METHOD(disconnect) {
-  NSLog(@"Disconnecting call");
-    self.userInitiatedDisconnect = YES;
-  [self performEndCallActionWithUUID:self.activeCall.uuid];
-}
+  CXEndCallAction *endCallAction = [[CXEndCallAction alloc] initWithCallUUID:uuid];
+  CXTransaction *transaction = [[CXTransaction alloc] initWithAction:endCallAction];
 
-RCT_EXPORT_METHOD(setMuted: (BOOL *)muted) {
-  NSLog(@"Mute/UnMute call");
-  self.activeCall.muted = muted;
-}
-
-RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
-  [self toggleAudioRoute:speaker];
-}
-
-RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
-  if (self.activeCall && self.activeCall.state == TVOCallStateConnected) {
-    NSLog(@"SendDigits %@", digits);
-    [self.activeCall sendDigits:digits];
-  }
-  UIDevice* device = [UIDevice currentDevice];
-  device.proximityMonitoringEnabled = NO;
-
-  [TwilioVoice unregisterWithAccessToken:accessToken
-                             deviceToken:self.deviceTokenString
-                              completion:^(NSError * _Nullable error) {
-                                if (error) {
-                                  NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
-                                } else {
-                                  NSLog(@"Successfully unregistered for VoIP push notifications.");
-                                }
-                              }];
-
-  self.deviceTokenString = nil;
-}
-
-RCT_REMAP_METHOD(getActiveCall,
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject){
-  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-  if (self.activeCallInvite) {
-    if (self.callInvite.callSid){
-      [params setObject:self.callInvite.callSid forKey:@"call_sid"];
-    }
-    if (self.callInvite.from){
-      [params setObject:self.callInvite.from forKey:@"from"];
+  [self.callKitCallController requestTransaction:transaction completion:^(NSError *error) {
+    if (error) {
+      NSLog(@"EndCallAction transaction request failed: %@", [error localizedDescription]);
     }
   }];
 }
@@ -928,4 +817,3 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 @end
-
