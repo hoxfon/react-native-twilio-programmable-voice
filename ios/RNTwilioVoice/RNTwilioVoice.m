@@ -13,7 +13,6 @@ NSString * const kCallerNameCustomParameter = @"CallerName";
 
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
 @property (nonatomic, strong) void(^incomingPushCompletionCallback)(void);
-@property (nonatomic, strong) TVOCallInvite *callInvite;
 @property (nonatomic, strong) void(^callKitCompletionCallback)(BOOL);
 @property (nonatomic, strong) TVODefaultAudioDevice *audioDevice;
 @property (nonatomic, strong) NSMutableDictionary *activeCallInvites;
