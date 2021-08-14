@@ -37,7 +37,10 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import com.twilio.audioswitch.AudioDevice;
 import com.twilio.audioswitch.AudioSwitch;
@@ -94,7 +97,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     static Map<String, Integer> callNotificationMap;
 
     private RegistrationListener registrationListener = registrationListener();
-    private UnregistrationListener unregistrationListener = unregistrationListener(); 
+    private UnregistrationListener unregistrationListener = unregistrationListener();
     private Call.Listener callListener = callListener();
 
     private CallInvite activeCallInvite;
@@ -677,7 +680,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         Voice.register(accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
     }
 
-     /*
+    /*
      * Unregister your android device with Twilio
      *
      */
@@ -760,10 +763,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             params.putString(Constants.CALL_TO,    activeCallInvite.getTo());
             activeCallInvite.reject(getReactApplicationContext());
         }
-        
+
         Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
         intent.setAction(Constants.ACTION_JS_REJECT);
-        
+
         getReactApplicationContext().startService(intent);
 
         eventManager.sendEvent(EVENT_CALL_INVITE_CANCELLED, params);
