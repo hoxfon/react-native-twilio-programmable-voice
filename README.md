@@ -262,7 +262,7 @@ async function initTelephony() {
 }
 
 function initTelephonyWithToken(token) {
-    TwilioVoice.initWithAccessToken(token)
+    TwilioVoice.initWithToken(token)
 
     // iOS only, configure CallKit
     try {
