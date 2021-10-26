@@ -569,6 +569,138 @@ TwilioVoice.getCallInvite()
 TwilioVoice.unregister()
 ```
 
+
+
+
+## Support multiple Firebase-Messaging-Services in android 
+
+1. add dependency com.google.firebase:firebase-messaging
+
+```gradle
+ dependencies {
+   //...other configuration here...
+   implementation 'com.google.firebase:firebase-messaging:19.0.+'
+}
+```
+
+
+
+2. Add a new file if you don't have one (`android/app/src/main/java/com/YOUR_APP/MainMessagingService.java`)
+
+ ```java
+package com.YOUR_APP;
+import io.invertase.firebase.messaging.*;
+import android.content.Intent;
+import android.content.Context;
+import io.invertase.firebase.messaging.ReactNativeFirebaseMessagingService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.dieam.reactnativepushnotification.modules.RNPushNotificationListenerService;
+import com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService;
+import android.util.Log;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class MainMessagingService extends ReactNativeFirebaseMessagingService {
+    private static final String TAG = "MainMessagingService";
+
+    private List<FirebaseMessagingService> messagingServices = new ArrayList<>(2);
+
+   
+
+    public MainMessagingService() {
+        messagingServices.add(new RNPushNotificationListenerService(this));
+        messagingServices.add(new VoiceFirebaseMessagingService(this));
+
+    }
+
+    @Override
+    public void onNewToken(String token) {
+        Log.d(TAG, "onNewToken()");
+        delegate(service -> service.onNewToken(token));
+    }
+
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+
+        delegate(service -> {
+            injectContext(service);
+            service.onMessageReceived(remoteMessage);
+        });
+    }
+    private void injectContext(FirebaseMessagingService service) {
+        // tested on emulator with Android Q (Dev Preview 1)
+        // Accessing hidden field Landroid/content/ContextWrapper;->mBase:Landroid/content/Context; (greylist, reflection)
+        //
+        // https://developer.android.com/distribute/best-practices/develop/restrictions-non-sdk-interfaces
+        // https://android.googlesource.com/platform/frameworks/base/+/pie-release/config/hiddenapi-light-greylist.txt
+        setField(service, "mBase", this);
+    }
+
+    private void delegate(GCAction1<FirebaseMessagingService> action) {
+        for (FirebaseMessagingService service : messagingServices) {
+            Log.d(TAG, " message received"+service.getPackageName());
+            action.run(service);
+        }
+    }
+
+
+    private boolean setField(Object targetObject, String fieldName, Object fieldValue) {
+        Field field;
+        try {
+            field = targetObject.getClass().getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            field = null;
+        }
+        Class superClass = targetObject.getClass().getSuperclass();
+        while (field == null && superClass != null) {
+            try {
+                field = superClass.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException e) {
+                superClass = superClass.getSuperclass();
+            }
+        }
+        if (field == null) {
+            return false;
+        }
+        field.setAccessible(true);
+        try {
+            field.set(targetObject, fieldValue);
+            return true;
+        } catch (IllegalAccessException e) {
+            return false;
+        }
+    }
+    
+    interface GCAction1<T> {
+      void run(T t);
+    }
+}
+ ```
+
+3. Then add the following code to `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+
+     <service
+            android:name=".MainMessagingService"
+            android:exported="false" 
+             android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+```
+
+ * make sure you have only one service intent with action com.google.firebase.MESSAGING_EVENT
+
+   
+
+
 ## Help wanted
 
 There is no need to ask permissions to contribute. Just open an issue or provide a PR. Everybody is welcome to contribute.
@@ -593,3 +725,5 @@ ReactNative success is directly linked to its module ecosystem. One way to make 
 ## License
 
 MIT
+
+

@@ -33,6 +33,19 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
+    private CallNotificationManager callNotificationManager;
+    private FirebaseMessagingService mFirebaseServiceDelegate;
+
+    public VoiceFirebaseMessagingService() {
+        super();
+    }
+    public VoiceFirebaseMessagingService(FirebaseMessagingService delegate) {
+        super();
+        this.mFirebaseServiceDelegate = delegate;
+        callNotificationManager = new CallNotificationManager();
+
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -59,12 +72,12 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Map<String, String> data = remoteMessage.getData();
-
+            final FirebaseMessagingService serviceRef = (this.mFirebaseServiceDelegate == null) ? this : this.mFirebaseServiceDelegate;
             // If notification ID is not provided by the user for push notification, generate one at random
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
-            boolean valid = Voice.handleMessage(this, data, new MessageListener() {
+            boolean valid = Voice.handleMessage(serviceRef, data, new MessageListener() {
                 @Override
                 public void onCallInvite(final CallInvite callInvite) {
                     // We need to run this on the main thread, as the React code assumes that is true.
@@ -73,9 +86,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
-                            CallNotificationManager callNotificationManager = new CallNotificationManager();
+                            // CallNotificationManager callNotificationManager = new CallNotificationManager();
                             // Construct and load our normal React JS code bundle
-                            ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                            ReactInstanceManager mReactInstanceManager = ((ReactApplication)serviceRef.getApplication()).getReactNativeHost().getReactInstanceManager();
                             ReactContext context = mReactInstanceManager.getCurrentReactContext();
 
                             // initialise appImportance to the highest possible importance in case context is null
