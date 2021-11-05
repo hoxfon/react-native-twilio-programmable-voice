@@ -31,10 +31,10 @@ public class SoundPoolManager {
     }
 
     public void playRinging() {
-        if (!playing) {
-            ringtone.play();
-            playing = true;
-        }
+//         if (!playing) {
+//             ringtone.play();
+//             playing = true;
+//         }
     }
 
     public void stopRinging() {
