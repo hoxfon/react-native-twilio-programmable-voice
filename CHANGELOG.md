@@ -1,5 +1,18 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 4.4.0
+
+- iOS:
+  - project.pbxproj aligned to Xcode 12.4
+  - amend podspec
+  - remove not necessary files
+  - improve package.json syntax
+  - add peerDependency on react-native 0.60.0
+
+## 4.3.1
+
+- Android: ensure that intent action is not null
+
 ## 4.3.0
 
 - iOS add handler to hold/unhold call
