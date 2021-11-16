@@ -157,7 +157,12 @@ To pass caller's name to CallKit via Voip push notification add custom parameter
     </Dial>
 ```
 
-If your app gets killed after receiving push notification you must initialize CallKit on start
+Your app must initialize PKPushRegistry with PushKit push type VoIP at the launch time. As mentioned in the
+[PushKit guidelines](https://developer.apple.com/documentation/pushkit/supporting_pushkit_notifications_in_your_app), 
+the system can't deliver push notifications to your app until you create a PKPushRegistry object for VoIP push type and set the delegate. If your app delays the initialization of PKPushRegistry, your app may receive outdated
+PushKit push notifications, and if your app decides not to report the received outdated push notifications to CallKit, iOS may terminate your app.
+
+We will initialize push kit only if RN code had called TwilioVoice.initWithAccessToken(token) and we've cached device token. You can pass same arguments to initPushKitIfTokenCached as you would pass to configureCallKit 
 
 ```obj-c
 // add import
@@ -170,11 +175,10 @@ If your app gets killed after receiving push notification you must initialize Ca
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   // ...
 
-  // add these three lines
-  RNTwilioVoice *voice = [bridge moduleForName:@"RNTwilioVoice"];
-  [voice initPushRegistry];
-  // you can pass same arguments as from your JS code
-  [voice configureCallKit:@{ @"appName" : @"YOUR FANCY APP NAME" }];
+  // add these two lines
+  RNTwilioVoice *voice = [bridge moduleForClass:RNTwilioVoice.class];
+  [voice initPushKitIfTokenCached:@{ @"appName" : @"YOUR FANCY APP NAME" }];
+
   return YES;
 }
 ```
