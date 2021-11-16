@@ -47,6 +47,9 @@ const Twilio = {
         }
         return result
     },
+    initWithAccessTokenUrl (url) {
+        return TwilioVoice.initWithAccessTokenUrl(url)
+    },
     connect(params = {}) {
         TwilioVoice.connect(params)
     },
@@ -88,6 +91,7 @@ const Twilio = {
     unregister() {
         if (Platform.OS === IOS) {
             TwilioVoice.unregister()
+            TwilioVoice.clearAccessTokenUrl()
         }
     },
     addEventListener(type, handler) {

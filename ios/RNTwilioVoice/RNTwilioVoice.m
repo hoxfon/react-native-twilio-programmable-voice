@@ -7,6 +7,7 @@
 @import TwilioVoice;
 
 NSString * const kCachedDeviceToken = @"CachedDeviceToken";
+NSString * const kCachedTokenUrl = @"CachedTokenUrl";
 NSString * const kCallerNameCustomParameter = @"CallerName";
 
 @interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate>
@@ -60,6 +61,32 @@ RCT_EXPORT_MODULE()
 
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
+RCT_EXPORT_METHOD(initWithAccessTokenUrl:(NSString *)tokenUrl) {
+    _tokenUrl = tokenUrl;
+    if (tokenUrl && [tokenUrl length] > 0) {
+        [[NSUserDefaults standardUserDefaults] setObject:tokenUrl forKey:kCachedTokenUrl];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppTerminateNotification) name:UIApplicationWillTerminateNotification object:nil];
+        [self initPushRegistry];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedTokenUrl];
+    }
+}
+
+RCT_EXPORT_METHOD(clearAccessTokenUrl) {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedTokenUrl];
+}
+
+- (void)initWithCachedAccessTokenUrl: (NSDictionary *)params {
+    NSString *cachedAccessTokenUrl = [[NSUserDefaults standardUserDefaults] objectForKey:kCachedTokenUrl];
+    if ([cachedAccessTokenUrl length] > 0) {
+        _tokenUrl = cachedAccessTokenUrl;
+        [self initPushRegistry];
+        [self configureCallKit:(params)];
+    }
+}
+
+
 
 RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
   _token = token;
@@ -157,6 +184,7 @@ RCT_EXPORT_METHOD(unregister) {
                                         NSLog(@"Successfully unregistered for VoIP push notifications.");
                                     }
                                 }];
+      [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedDeviceToken];
   }
 }
 
@@ -232,10 +260,10 @@ RCT_REMAP_METHOD(getCallInvite,
                                                         ntohl(tokenBytes[0]), ntohl(tokenBytes[1]), ntohl(tokenBytes[2]),
                                                         ntohl(tokenBytes[3]), ntohl(tokenBytes[4]), ntohl(tokenBytes[5]),
                                                         ntohl(tokenBytes[6]), ntohl(tokenBytes[7])];
-    NSString *accessToken = [self fetchAccessToken];
     NSString *cachedDeviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:kCachedDeviceToken];
     if (![cachedDeviceToken isEqualToString:deviceTokenString]) {
         cachedDeviceToken = deviceTokenString;
+        NSString *accessToken = [self fetchAccessToken];
 
         /*
          * Perform registration if a new device token is detected.

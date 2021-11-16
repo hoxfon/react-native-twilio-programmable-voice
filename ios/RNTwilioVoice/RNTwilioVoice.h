@@ -4,6 +4,6 @@
 @interface RNTwilioVoice : RCTEventEmitter <RCTBridgeModule>
 
 - (void)initPushRegistry;
-- (void)configureCallKit: (NSDictionary *)params;
+- (void)initWithCachedAccessTokenUrl: (NSDictionary *)params;
 
 @end
