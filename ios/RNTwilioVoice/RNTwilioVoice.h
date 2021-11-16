@@ -3,7 +3,6 @@
 
 @interface RNTwilioVoice : RCTEventEmitter <RCTBridgeModule>
 
-- (void)initPushRegistry;
-- (void)initWithCachedAccessTokenUrl: (NSDictionary *)params;
+- (void) initPushKitIfTokenCached: (NSDictionary *)callKitParams;
 
 @end
