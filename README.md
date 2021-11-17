@@ -188,7 +188,7 @@ We will initialize push kit only if RN code had called TwilioVoice.initWithAcces
 - (BOOL)application:(UIApplication *)application
 continueUserActivity:(NSUserActivity *)userActivity
  restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> *restorableObjects))restorationHandler {
-  RNTwilioVoice* _voice = [_reactBridge moduleForClass:RNTwilioVoice.class];
+  RNTwilioVoice* _voice = [bridge moduleForClass:RNTwilioVoice.class];
   [_voice handleRestoration:userActivity];
   return YES;
 }
