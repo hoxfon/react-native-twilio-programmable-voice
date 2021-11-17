@@ -157,6 +157,43 @@ To pass caller's name to CallKit via Voip push notification add custom parameter
     </Dial>
 ```
 
+Your app must initialize PKPushRegistry with PushKit push type VoIP at the launch time. As mentioned in the
+[PushKit guidelines](https://developer.apple.com/documentation/pushkit/supporting_pushkit_notifications_in_your_app), 
+the system can't deliver push notifications to your app until you create a PKPushRegistry object for VoIP push type and set the delegate. If your app delays the initialization of PKPushRegistry, your app may receive outdated
+PushKit push notifications, and if your app decides not to report the received outdated push notifications to CallKit, iOS may terminate your app.
+
+We will initialize push kit only if RN code had called TwilioVoice.initWithAccessToken(token) and we've cached device token. You can pass same arguments to initPushKitIfTokenCached as you would pass to configureCallKit 
+
+```obj-c
+// add import
+#import <RNTwilioVoice/RNTwilioVoice.h>
+
+@implementation AppDelegate { // <-- add bracket and next two lines
+  RCTBridge* bridge;
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions]; // REMOVE RCTBridge*
+  // ...
+
+  // add these two lines
+  _voice = [bridge moduleForClass:RNTwilioVoice.class];
+  [_voice initPushKitIfTokenCached:@{ @"appName" : @"YOUR FANCY APP NAME" }];
+
+  return YES;
+}
+
+// add this method to handle taps in call log
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> *restorableObjects))restorationHandler {
+  RNTwilioVoice* _voice = [bridge moduleForClass:RNTwilioVoice.class];
+  [_voice handleRestoration:userActivity];
+  return YES;
+}
+```
+
 #### VoIP Service Certificate
 
 Twilio Programmable Voice for iOS utilizes Apple's VoIP Services and VoIP "Push Notifications" instead of FCM. You will need a VoIP Service Certificate from Apple to receive calls. Follow [the official Twilio instructions](https://github.com/twilio/voice-quickstart-ios#7-create-voip-service-certificate) to complete this step.
@@ -349,6 +386,12 @@ TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
+})
+
+TwilioVoice.addEventListener('iosCallHistoryTap', function(data) {
+  // {
+  //     call_to: string,   // "+441234567890"
+  // }
 })
 
 // Android Only
