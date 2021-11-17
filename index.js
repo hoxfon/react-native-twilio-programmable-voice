@@ -22,6 +22,7 @@ const _eventHandlers = {
     callStateRinging: new Map(),
     callInviteCancelled: new Map(),
     callRejected: new Map(),
+    iosCallHistoryTap: new Map(),
 }
 
 const Twilio = {

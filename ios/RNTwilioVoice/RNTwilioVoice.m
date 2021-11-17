@@ -5,6 +5,8 @@
 @import PushKit;
 @import CallKit;
 @import TwilioVoice;
+@import Intents;
+
 
 NSString * const kCachedDeviceToken = @"CachedDeviceToken";
 NSString * const kCachedTokenUrl = @"CachedTokenUrl";
@@ -54,7 +56,19 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady", @"deviceDidReceiveIncoming", @"callInviteCancelled", @"callStateRinging", @"connectionIsReconnecting", @"connectionDidReconnect"];
+    return @[
+        @"connectionDidConnect",
+        @"connectionDidDisconnect",
+        @"callRejected",
+        @"deviceReady",
+        @"deviceNotReady",
+        @"deviceDidReceiveIncoming",
+        @"callInviteCancelled",
+        @"callStateRinging",
+        @"connectionIsReconnecting",
+        @"connectionDidReconnect",
+        @"iosCallHistoryTap"
+    ];
 }
 
 @synthesize bridge = _bridge;
@@ -78,6 +92,21 @@ RCT_EXPORT_MODULE()
         [self initPushRegistry];
         [self configureCallKit:callKitParams];
     }
+}
+
+- (BOOL) handleRestoration: (NSUserActivity *)userActivity {
+    INStartAudioCallIntent *callIntent = (INStartAudioCallIntent *)userActivity.interaction.intent;
+    if (callIntent.contacts[0]) {
+        INPersonHandle *handle = callIntent.contacts[0].personHandle;
+        if ([handle.value length] > 0) {
+            // Start a new call with CallKit
+            NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
+            [callParams setObject:callIntent.contacts[0].personHandle.value forKey:@"call_to"];
+            [self sendEventWithName:@"iosCallHistoryTap" body:callParams];
+        }
+    }
+
+    return YES;
 }
 
 RCT_EXPORT_METHOD(initWithAccessToken:(NSString *)token) {
@@ -112,6 +141,7 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
         if (_settings[@"ringtoneSound"]) {
             configuration.ringtoneSound = _settings[@"ringtoneSound"];
         }
+        configuration.supportedHandleTypes = [NSSet setWithArray:@[@(CXHandleTypeGeneric), @(CXHandleTypePhoneNumber)]];
 
         _callKitProvider = [[CXProvider alloc] initWithConfiguration:configuration];
         [_callKitProvider setDelegate:self queue:nil];

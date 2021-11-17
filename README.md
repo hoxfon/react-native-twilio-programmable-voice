@@ -168,17 +168,28 @@ We will initialize push kit only if RN code had called TwilioVoice.initWithAcces
 // add import
 #import <RNTwilioVoice/RNTwilioVoice.h>
 
-@implementation AppDelegate
+@implementation AppDelegate { // <-- add bracket and next two lines
+  RCTBridge* bridge;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions]; // REMOVE RCTBridge*
   // ...
 
   // add these two lines
-  RNTwilioVoice *voice = [bridge moduleForClass:RNTwilioVoice.class];
-  [voice initPushKitIfTokenCached:@{ @"appName" : @"YOUR FANCY APP NAME" }];
+  _voice = [bridge moduleForClass:RNTwilioVoice.class];
+  [_voice initPushKitIfTokenCached:@{ @"appName" : @"YOUR FANCY APP NAME" }];
 
+  return YES;
+}
+
+// add this method to handle taps in call log
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> *restorableObjects))restorationHandler {
+  RNTwilioVoice* _voice = [_reactBridge moduleForClass:RNTwilioVoice.class];
+  [_voice handleRestoration:userActivity];
   return YES;
 }
 ```
@@ -375,6 +386,12 @@ TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
     //     call_from: string, // "+441234567890"
     //     call_to: string,   // "client:bob"
     // }
+})
+
+TwilioVoice.addEventListener('iosCallHistoryTap', function(data) {
+  // {
+  //     call_to: string,   // "+441234567890"
+  // }
 })
 
 // Android Only
