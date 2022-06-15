@@ -16,8 +16,11 @@ const _eventHandlers = {
     deviceNotReady: new Map(),
     deviceDidReceiveIncoming: new Map(),
     connectionDidConnect: new Map(),
+    connectionIsReconnecting: new Map(),
+    connectionDidReconnect: new Map(),
     connectionDidDisconnect: new Map(),
-    //iOS specific
+    callStateRinging: new Map(),
+    callInviteCancelled: new Map(),
     callRejected: new Map(),
 }
 
@@ -44,17 +47,10 @@ const Twilio = {
         }
         return result
     },
-    initWithTokenUrl(url) {
-        if (Platform.OS === IOS) {
-            TwilioVoice.initWithAccessTokenUrl(url)
-        }
-    },
     connect(params = {}) {
         TwilioVoice.connect(params)
     },
-    disconnect() {
-        TwilioVoice.disconnect()
-    },
+    disconnect: TwilioVoice.disconnect,
     accept() {
         if (Platform.OS === IOS) {
             return
@@ -73,23 +69,17 @@ const Twilio = {
         }
         TwilioVoice.ignore()
     },
-    setMuted(isMuted) {
-        TwilioVoice.setMuted(isMuted)
-    },
-    setSpeakerPhone(value) {
-        TwilioVoice.setSpeakerPhone(value)
-    },
-    sendDigits(digits) {
-        TwilioVoice.sendDigits(digits)
-    },
+    setMuted: TwilioVoice.setMuted,
+    setSpeakerPhone: TwilioVoice.setSpeakerPhone,
+    sendDigits: TwilioVoice.sendDigits,
+    hold: TwilioVoice.hold,
     requestPermissions(senderId) {
         if (Platform.OS === ANDROID) {
             TwilioVoice.requestPermissions(senderId)
         }
     },
-    getActiveCall() {
-        return TwilioVoice.getActiveCall()
-    },
+    getActiveCall: TwilioVoice.getActiveCall,
+    getCallInvite: TwilioVoice.getCallInvite,
     configureCallKit(params = {}) {
         if (Platform.OS === IOS) {
             TwilioVoice.configureCallKit(params)
@@ -104,6 +94,10 @@ const Twilio = {
         }
     },
     addEventListener(type, handler) {
+        if (!_eventHandlers.hasOwnProperty(type)) {
+            throw new Error('Event handler not found: ' + type)
+        }
+        if (_eventHandlers[type])
         if (_eventHandlers[type].has(handler)) {
             return
         }

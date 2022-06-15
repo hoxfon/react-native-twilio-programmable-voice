@@ -24,6 +24,10 @@ public class Visitor {
     return relationship;
   }
 
+  public String getUnit() {
+    return unit;
+  }
+
   private String visitorName;
 
   private String visitorAvatarUri;
@@ -34,4 +38,5 @@ public class Visitor {
 
   private String relationship;
 
+  private String unit;
 }

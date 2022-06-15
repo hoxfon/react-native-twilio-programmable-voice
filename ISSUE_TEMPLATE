@@ -1,8 +1,11 @@
-Please include following information for better support
+Please include the following information for better support
 
+The more context you provide around this issue the faster the community can help you
+
+Did you follow all the instructions as specified in the Twilio Quickstart repositories?
 What version of React Native are you running?
 What version of react-native-twilio-programmable-voice are you running?
-What device are you using? (e.g iOS9 simulator, Android 6 device)?
+What device are you using? (e.g iOS10 simulator, Android 7 device)?
 Is your app running in foreground, background or not running?
 Is there any relevant message in the log?
 If using iOS, which pod version are you using?
@@ -10,8 +13,6 @@ If using iOS, which pod version are you using?
 Step to reproduce
 
 Advanced:
-Have you tried adding break point in native handlers and see the logs printed?
+Have you tried adding break point using AndroidStudio or XCode and analyse the logs?
 can share a project with issue?
 Did you try to reinstall the pods completely?
-
-The more context you provide around this issue the faster the community can help you.
