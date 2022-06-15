@@ -212,8 +212,10 @@ public class AutomaticCallScreenActivity extends ReactActivity {
     : getRelationshipName(visitor.getRelationship());
     TextView visitorType = (TextView) findViewById(R.id.visitor_type);
     visitorType.setText(type);
-
     Log.d(TAG, String.format("displayVisitorCard Type Added: [%s]", type));
+
+    TextView unit = (TextView) findViewById(R.id.unit);
+    unit.setText(visitor.getUnit());
 
     Uri uri = Uri.parse(
       String.format("%s/%s", s3Url, visitor.getVisitorAvatarUri())

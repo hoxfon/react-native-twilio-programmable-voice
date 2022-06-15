@@ -65,6 +65,18 @@
           android:textAlignment="center"
           android:textColor="@color/darkGrey"
           android:textSize="14dp" />
+
+      <TextView
+          android:id="@+id/unit"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/visitor_type"
+          android:layout_marginTop="2pt"
+          android:maxLines="1"
+          android:gravity="center_horizontal"
+          android:textAlignment="center"
+          android:textColor="@color/darkGrey"
+          android:textSize="14dp" />
     </RelativeLayout>
   </androidx.cardview.widget.CardView>
 
