@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -19,6 +21,10 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -52,6 +58,7 @@ import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.LogLevel;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
+import com.twilio.voice.UnregistrationListener;
 import com.twilio.voice.Voice;
 
 import java.util.HashMap;
@@ -129,6 +136,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private AudioFocusRequest focusRequest;
     private HeadsetManager headsetManager;
     private EventManager eventManager;
+    private Context appContext;
 
     public TwilioVoiceModule(ReactApplicationContext reactContext,
     boolean shouldAskForMicPermission) {
@@ -138,6 +146,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         } else {
             Voice.setLogLevel(LogLevel.ERROR);
         }
+        appContext = reactContext.getApplicationContext();
         reactContext.addActivityEventListener(this);
         reactContext.addLifecycleEventListener(this);
 
@@ -202,7 +211,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNewIntent " + intent.toString());
         }
-        handleIncomingCallIntent(intent);
+        if (intent.getAction() != null) handleIncomingCallIntent(intent);
     }
 
     private RegistrationListener registrationListener() {
@@ -456,6 +465,19 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         // Ignored, required to implement ActivityEventListener for RN 0.33
     }
 
+    private boolean hasPhoneAccount() {
+        if(Build.VERSION.SDK_INT < 23) return false;
+
+        TelecomManager telecomManager = (TelecomManager) appContext.getSystemService(Context.TELECOM_SERVICE);
+        if(telecomManager == null) return false;
+
+        ApplicationInfo applicationInfo = appContext.getApplicationInfo();
+        String applicationName = applicationInfo.labelRes == 0 ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(applicationInfo.labelRes);
+        PhoneAccountHandle handle = new PhoneAccountHandle(new ComponentName(appContext, "io.wazo.callkeep.VoiceConnectionService"), applicationName);
+        PhoneAccount account = telecomManager.getPhoneAccount(handle);
+        return account == null ? false: account.isEnabled();
+    }
+
     private void handleIncomingCallIntent(Intent intent) {
         if (intent == null || intent.getAction() == null) {
             return;
@@ -468,7 +490,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
             if (activeCallInvite != null) {
                 callAccepted = false;
-                SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
+                if(!hasPhoneAccount()) SoundPoolManager.getInstance(getReactApplicationContext()).playRinging();
 
                 if (getReactApplicationContext().getCurrentActivity() != null) {
                     Window window = getReactApplicationContext().getCurrentActivity().getWindow();
@@ -559,11 +581,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             return;
         }
 
-        if(!checkPermissionForMicrophone()) {
-            promise.reject(new AssertionException("Allow microphone permission"));
-            return;
-        }
-
         TwilioVoiceModule.this.accessToken = accessToken;
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "initWithAccessToken");
@@ -620,6 +637,11 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void accept() {
+        // if the user accepted microphone permission then answer the call
+        if(!checkPermissionForMicrophone()) {
+            reject();
+            return;
+        }
         callAccepted = true;
         SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
         if (activeCallInvite != null) {
@@ -812,6 +834,42 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (activeCall != null) {
             activeCall.hold(value);
         }
+    }
+
+
+    @ReactMethod  //Unregister your android device with Twilio
+    public void unregister(Promise promise) {
+        unregisterForCallInvites();
+        promise.resolve(true);
+    }
+    private void unregisterForCallInvites() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "FCM unregistration failed", task.getException());
+                            return;
+                        }
+                        // Get new Instance ID token
+                        String fcmToken = task.getResult().getToken();
+                        if (fcmToken != null) {
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "Unregistering with FCM");
+                            }
+                            Voice.unregister(accessToken, Voice.RegistrationChannel.FCM, fcmToken, new UnregistrationListener() {
+                                @Override
+                                public void onUnregistered(String accessToken, String fcmToken) {
+                                    if (BuildConfig.DEBUG) Log.d(TAG, "Successfully unregistered FCM");
+                                }
+                                @Override
+                                public void onError(RegistrationException error, String accessToken, String fcmToken) {
+                                    Log.e(TAG, String.format("Unregistration Error: %d, %s", error.getErrorCode(), error.getMessage()));
+                                }
+                            });
+                        }
+                    }
+                });
     }
 
     private void setAudioFocus() {

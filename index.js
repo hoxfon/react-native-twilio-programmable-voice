@@ -86,9 +86,7 @@ const Twilio = {
         }
     },
     unregister() {
-        if (Platform.OS === IOS) {
-            TwilioVoice.unregister()
-        }
+        TwilioVoice.unregister()
     },
     addEventListener(type, handler) {
         if (!_eventHandlers.hasOwnProperty(type)) {
