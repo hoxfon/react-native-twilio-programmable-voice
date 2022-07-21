@@ -559,6 +559,15 @@ withCompletionHandler:(void (^)(void))completion {
     if (call.state == TVOCallStateDisconnected) {
         [params setObject:StateDisconnected forKey:@"call_state"];
     }
+
+    if (!self.userInitiatedDisconnect) {
+      CXCallEndedReason reason = CXCallEndedReasonRemoteEnded;
+      if (error) {
+          reason = CXCallEndedReasonFailed;
+      }
+      [self.callKitProvider reportCallWithUUID:call.uuid endedAtDate:[NSDate date] reason:reason];
+    }
+    
     [self sendEventWithName:@"connectionDidDisconnect" body:params];
 }
 
