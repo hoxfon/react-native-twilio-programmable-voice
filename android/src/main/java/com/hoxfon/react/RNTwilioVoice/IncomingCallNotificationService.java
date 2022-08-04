@@ -148,25 +148,31 @@ public class IncomingCallNotificationService extends Service {
 
     private PendingIntent createActionPendingIntent(Context context, Intent intent) {
         Log.d(TAG, "createActionPendingIntent");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            stackBuilder.addNextIntentWithParentStack(intent);
-        // Get the PendingIntent containing the entire back stack
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(0,
-                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            return resultPendingIntent;
+        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        //     TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        //     stackBuilder.addNextIntentWithParentStack(intent);
+        // // Get the PendingIntent containing the entire back stack
+        //     PendingIntent resultPendingIntent =
+        //             stackBuilder.getPendingIntent(0,
+        //                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        //     return resultPendingIntent;
 
-        }else{
-            return PendingIntent.getService(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT |
-                            PendingIntent.FLAG_IMMUTABLE
-            );
-        }
-
+        // }else{
+        //     return PendingIntent.getService(
+        //             context,
+        //             0,
+        //             intent,
+        //             PendingIntent.FLAG_UPDATE_CURRENT |
+        //                     PendingIntent.FLAG_IMMUTABLE
+        //     );
+        // }
+        return PendingIntent.getService(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT |
+                    PendingIntent.FLAG_IMMUTABLE
+         );
     }
 
     /**
