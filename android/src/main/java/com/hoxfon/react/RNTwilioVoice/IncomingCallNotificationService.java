@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -30,6 +31,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.twilio.voice.CallInvite;
 
+import static com.hoxfon.react.RNTwilioVoice.CallNotificationManager.createPendingIntentGetActivity;
 import static com.hoxfon.react.RNTwilioVoice.CallNotificationManager.getMainActivityClass;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
@@ -84,9 +86,13 @@ public class IncomingCallNotificationService extends Service {
 
     private Notification createNotification(CallInvite callInvite, int notificationId, int channelImportance) {
         Context context = getApplicationContext();
-
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "createNotification");
+        }
         Intent intent = new Intent(this, getMainActivityClass(context));
+
         intent.setAction(Constants.ACTION_INCOMING_CALL_NOTIFICATION);
+
         intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
         intent.putExtra(Constants.CALL_SID, callInvite.getCallSid());
@@ -95,8 +101,7 @@ public class IncomingCallNotificationService extends Service {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = createPendingIntentGetActivity(this, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
@@ -142,12 +147,26 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private PendingIntent createActionPendingIntent(Context context, Intent intent) {
-        return PendingIntent.getService(
-                context,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        );
+        Log.d(TAG, "createActionPendingIntent");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            stackBuilder.addNextIntentWithParentStack(intent);
+        // Get the PendingIntent containing the entire back stack
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(0,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            return resultPendingIntent;
+
+        }else{
+            return PendingIntent.getService(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT |
+                            PendingIntent.FLAG_IMMUTABLE
+            );
+        }
+
     }
 
     /**
@@ -240,7 +259,9 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private void accept(CallInvite callInvite, int notificationId) {
+        Log.d(TAG, "accept()1");
         endForeground();
+        Log.d(TAG, "accept()");
         Intent activeCallIntent = new Intent(this, getMainActivityClass(this));
         activeCallIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         activeCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -284,7 +305,7 @@ public class IncomingCallNotificationService extends Service {
         int importance = NotificationManager.IMPORTANCE_LOW;
         if (!isAppVisible()) {
             if (BuildConfig.DEBUG) {
-                Log.i(TAG, "app is NOT visible.");
+                Log.i(TAG, "app is NOT visible eeeee.");
             }
             importance = NotificationManager.IMPORTANCE_HIGH;
         }
