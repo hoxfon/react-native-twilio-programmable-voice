@@ -147,25 +147,6 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private PendingIntent createActionPendingIntent(Context context, Intent intent) {
-        Log.d(TAG, "createActionPendingIntent");
-        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        //     TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        //     stackBuilder.addNextIntentWithParentStack(intent);
-        // // Get the PendingIntent containing the entire back stack
-        //     PendingIntent resultPendingIntent =
-        //             stackBuilder.getPendingIntent(0,
-        //                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        //     return resultPendingIntent;
-
-        // }else{
-        //     return PendingIntent.getService(
-        //             context,
-        //             0,
-        //             intent,
-        //             PendingIntent.FLAG_UPDATE_CURRENT |
-        //                     PendingIntent.FLAG_IMMUTABLE
-        //     );
-        // }
         return PendingIntent.getService(
             context,
             0,
@@ -265,7 +246,7 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private void accept(CallInvite callInvite, int notificationId) {
-        Log.d(TAG, "accept()1");
+     
         endForeground();
         Log.d(TAG, "accept()");
         Intent activeCallIntent = new Intent(this, getMainActivityClass(this));
@@ -311,7 +292,7 @@ public class IncomingCallNotificationService extends Service {
         int importance = NotificationManager.IMPORTANCE_LOW;
         if (!isAppVisible()) {
             if (BuildConfig.DEBUG) {
-                Log.i(TAG, "app is NOT visible eeeee.");
+                Log.i(TAG, "app is NOT visible.");
             }
             importance = NotificationManager.IMPORTANCE_HIGH;
         }
