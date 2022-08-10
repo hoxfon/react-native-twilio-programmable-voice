@@ -86,7 +86,6 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
-                            // CallNotificationManager callNotificationManager = new CallNotificationManager();
                             // Construct and load our normal React JS code bundle
                             ReactInstanceManager mReactInstanceManager = ((ReactApplication)serviceRef.getApplication()).getReactNativeHost().getReactInstanceManager();
                             ReactContext context = mReactInstanceManager.getCurrentReactContext();
