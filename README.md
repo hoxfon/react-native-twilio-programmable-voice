@@ -224,7 +224,15 @@ apply plugin: 'com.google.gms.google-services'
 
 ```xml
     <uses-permission android:name="android.permission.VIBRATE" />
-
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH"
+                     android:maxSdkVersion="30" />
+     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+                     android:maxSdkVersion="30" />
+                     
     <application ....>
         <!-- Twilio Voice -->
         <!-- [START fcm_listener] -->
