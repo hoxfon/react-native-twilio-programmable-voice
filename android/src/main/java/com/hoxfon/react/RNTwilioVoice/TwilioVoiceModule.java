@@ -3,6 +3,7 @@ package com.hoxfon.react.RNTwilioVoice;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -63,6 +64,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import static com.hoxfon.react.RNTwilioVoice.CallNotificationManager.getMainActivityClass;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_CONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_DISCONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEIVE_INCOMING;
@@ -729,7 +731,23 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 .enableDscp(true)
                 .build();
         activeCallInvite.accept(getReactApplicationContext(), acceptOptions, callListener);
+      
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            removeAcceptNotification(intent,getReactApplicationContext());
+            getReactApplicationContext().stopService(new Intent(getReactApplicationContext(), IncomingCallNotificationService.class));
+        }
+
     }
+
+    public void removeAcceptNotification(Intent intent,ReactApplicationContext context) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "removeAcceptNotification()");
+        }
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        int notificationId = intent.getIntExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, 0);
+        notificationManager.cancel(notificationId);
+    }
+
 
     @ReactMethod
     public void accept() {
@@ -741,7 +759,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accept()");
         }
-
+        Log.d(TAG, "ACTION_JS_ANSWER()");
         Intent intent = new Intent(getReactApplicationContext(), IncomingCallNotificationService.class);
         intent.setAction(Constants.ACTION_JS_ANSWER);
 
