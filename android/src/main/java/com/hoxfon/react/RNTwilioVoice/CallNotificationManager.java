@@ -52,6 +52,22 @@ public class CallNotificationManager {
         }
         return 0;
     }
+    public static PendingIntent createPendingIntentGetActivity(Context context, int id, Intent intent, int flag) {
+        Log.d(TAG, "createPendingIntentGetActivity");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_IMMUTABLE | flag);
+        } else {
+            return PendingIntent.getActivity(context, id, intent, flag);
+        }
+    }
+
+    public static PendingIntent createPendingIntentGetBroadCast(Context context, int id, Intent intent, int flag) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE | flag);
+        } else {
+            return PendingIntent.getBroadcast(context, id, intent, flag);
+        }
+    }
 
     public static Class getMainActivityClass(Context context) {
         String packageName = context.getPackageName();
@@ -77,7 +93,7 @@ public class CallNotificationManager {
                 .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.MISSED_CALLS_NOTIFICATION_ID)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(
+        PendingIntent pendingIntent = createPendingIntentGetActivity(
                 context,
                 0,
                 intent,
@@ -89,7 +105,7 @@ public class CallNotificationManager {
                 0,
                 new Intent(Constants.ACTION_CLEAR_MISSED_CALLS_COUNT)
                         .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.CLEAR_MISSED_CALLS_NOTIFICATION_ID),
-                0
+                0|PendingIntent.FLAG_IMMUTABLE
         );
         /*
          * Pass the notification id and call sid to use as an identifier to open the notification
@@ -151,7 +167,7 @@ public class CallNotificationManager {
                 .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(
+        PendingIntent pendingIntent = createPendingIntentGetActivity(
                 context,
                 0,
                 intent,
@@ -163,7 +179,7 @@ public class CallNotificationManager {
                 0,
                 new Intent(Constants.ACTION_HANGUP_CALL)
                         .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE
         );
 
         Bundle extras = new Bundle();
