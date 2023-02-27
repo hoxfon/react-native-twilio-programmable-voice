@@ -45,10 +45,6 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CLEAR_MISSED_CALLS_COUNT;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CLEAR_MISSED_CALLS_NOTIFICATION_ID;
 
-int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
-if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-    intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with inline replies or bubbles.
-}
 
 public class CallNotificationManager {
 
@@ -122,10 +118,14 @@ public class CallNotificationManager {
                                                int notificationId,
                                                Intent launchIntent)
     {
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with inline replies or bubbles.
+        }
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "createIncomingCallNotification intent "+launchIntent.getFlags());
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, inte);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, intentFlagType);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -199,6 +199,10 @@ public class CallNotificationManager {
     }
 
     public void createMissedCallNotification(ReactApplicationContext context, CallInvite callInvite) {
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with inline replies or bubbles.
+        }
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
 
@@ -270,6 +274,10 @@ public class CallNotificationManager {
     }
 
     public void createHangupLocalNotification(ReactApplicationContext context, String callSid, String caller) {
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with inline replies or bubbles.
+        }
         PendingIntent pendingHangupIntent = PendingIntent.getBroadcast(
                 context,
                 0,
