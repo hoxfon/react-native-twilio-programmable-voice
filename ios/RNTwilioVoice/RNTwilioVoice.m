@@ -346,11 +346,15 @@ withCompletionHandler:(void (^)(void))completion {
      */
     NSLog(@"callInviteReceived");
     NSString *from = @"Unknown";
+    NSString *voter_id = @"Unknown";
+    NSLog(@"%@", callInvite.customParameters);
     if (callInvite.from) {
+        NSLog(@"callInvite.from.x");
         from = [callInvite.from stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     }
-    if (callInvite.customParameters[kCallerNameCustomParameter]) {
-        from = callInvite.customParameters[kCallerNameCustomParameter];
+    if (callInvite.customParameters) {
+        NSLog(@"callInvite.customParameters.x");
+        voter_id = callInvite.customParameters[@"voter_id"];
     }
     // Always report to CallKit
     [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
@@ -363,8 +367,11 @@ withCompletionHandler:(void (^)(void))completion {
     if (callInvite.callSid) {
       [params setObject:callInvite.callSid forKey:@"call_sid"];
     }
+    if (callInvite.customParameters) {
+        [params setObject:voter_id forKey:@"call_voter_id"];
+    }
     if (callInvite.from) {
-      [params setObject:callInvite.from forKey:@"call_from"];
+      [params setObject:from forKey:@"call_from"];
     }
     if (callInvite.to) {
       [params setObject:callInvite.to forKey:@"call_to"];
