@@ -77,11 +77,16 @@ public class CallNotificationManager {
                 .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.MISSED_CALLS_NOTIFICATION_ID)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with 
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                intentFlagType
         );
 
         PendingIntent clearMissedCallsCountPendingIntent = PendingIntent.getBroadcast(
@@ -150,12 +155,16 @@ public class CallNotificationManager {
         intent.setAction(Constants.ACTION_OPEN_CALL_IN_PROGRESS)
                 .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with 
+        }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                intentFlagType
         );
 
         PendingIntent hangupPendingIntent = PendingIntent.getBroadcast(
@@ -163,7 +172,7 @@ public class CallNotificationManager {
                 0,
                 new Intent(Constants.ACTION_HANGUP_CALL)
                         .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                intentFlagType
         );
 
         Bundle extras = new Bundle();

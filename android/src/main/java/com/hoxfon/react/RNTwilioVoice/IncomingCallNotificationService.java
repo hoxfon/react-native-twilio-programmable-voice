@@ -38,7 +38,7 @@ public class IncomingCallNotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "IncomingCallNotificationService onStartCommand() intent: " + intent + ", flags: " + flags);
+            Log.d(TAG, " rws - IncomingCallNotificationService onStartCommand() intent: " + intent + ", flags: " + flags);
         }
         String action = intent.getAction();
 
@@ -84,6 +84,7 @@ public class IncomingCallNotificationService extends Service {
 
     private Notification createNotification(CallInvite callInvite, int notificationId, int channelImportance) {
         Context context = getApplicationContext();
+        Log.d(TAG, "rws - createNotification");
 
         Intent intent = new Intent(this, getMainActivityClass(context));
         intent.setAction(Constants.ACTION_INCOMING_CALL_NOTIFICATION);
@@ -95,8 +96,13 @@ public class IncomingCallNotificationService extends Service {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with 
+        }
+
         PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.getActivity(this, notificationId, intent, intentFlagType);
 
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
@@ -106,6 +112,8 @@ public class IncomingCallNotificationService extends Service {
         extras.putString(Constants.CALL_SID_KEY, callInvite.getCallSid());
 
         String contentText = callInvite.getFrom() + " " + getString(R.string.call_incoming_content);
+        Log.d(TAG, "rws - Build.VERSION.SDK_INT="+ Build.VERSION.SDK_INT);
+        Log.d(TAG, "rws - Build.VERSION_CODES.O="+ Build.VERSION_CODES.O);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return buildNotification(contentText,
                     pendingIntent,
@@ -142,11 +150,15 @@ public class IncomingCallNotificationService extends Service {
     }
 
     private PendingIntent createActionPendingIntent(Context context, Intent intent) {
+        int intentFlagType = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            intentFlagType = PendingIntent.FLAG_IMMUTABLE;  // or only use FLAG_MUTABLE >> if it needs to be used with 
+        }
         return PendingIntent.getService(
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                intentFlagType
         );
     }
 
@@ -296,19 +308,19 @@ public class IncomingCallNotificationService extends Service {
      */
     private void sendCallInviteToActivity(CallInvite callInvite, int notificationId) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "sendCallInviteToActivity(). Android SDK: " + Build.VERSION.SDK_INT + " app visible: " + isAppVisible());
+            Log.d(TAG, "rws - sendCallInviteToActivity(). Android SDK: " + Build.VERSION.SDK_INT + " app visible: " + isAppVisible());
         }
         SoundPoolManager.getInstance(this).playRinging();
 
         // From Android SDK 29 apps are prevented to start an activity from the background
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !isAppVisible()) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "sendCallInviteToActivity(). DO NOTHING");
+                Log.d(TAG, "rws - sendCallInviteToActivity(). DO NOTHING");
             }
             return;
         }
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "sendCallInviteToActivity(). startActivity()");
+            Log.d(TAG, "rws - sendCallInviteToActivity(). startActivity()");
         }
         // Android SDK < 29 or app is visible
         Intent intent = new Intent(this, getMainActivityClass(this));

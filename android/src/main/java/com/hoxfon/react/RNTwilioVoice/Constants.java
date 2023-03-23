@@ -33,6 +33,7 @@ public class Constants {
     public static final String CALL_STATE = "call_state";
     public static final String CALL_FROM = "call_from";
     public static final String CALL_TO = "call_to";
+    public static final String CALL_VOTER_ID = "call_voter_id";
     public static final String ERROR = "err";
     public static final String CALL_KEY = "call";
     public static final String CALL_INVITE_KEY = "callInvite";

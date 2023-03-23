@@ -599,6 +599,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         params.putString(Constants.CALL_SID, activeCallInvite.getCallSid());
         params.putString(Constants.CALL_FROM, activeCallInvite.getFrom());
         params.putString(Constants.CALL_TO, activeCallInvite.getTo());
+        params.putString(Constants.CALL_VOTER_ID, activeCallInvite.getCustomParameters().get("voter_id"));
         String verificationStatus = Constants.CALLER_VERIFICATION_UNKNOWN;
         if (activeCallInvite.getCallerInfo().isVerified() != null) {
             verificationStatus = activeCallInvite.getCallerInfo().isVerified() == true
@@ -715,7 +716,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     public void acceptFromIntent(Intent intent) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "acceptFromIntent()");
+            Log.d(TAG, "rws - acceptFromIntent()");
         }
         activeCallInvite = intent.getParcelableExtra(Constants.INCOMING_CALL_INVITE);
         if (activeCallInvite == null) {
@@ -960,6 +961,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     }
 
     public static Bundle getActivityLaunchOption(Intent intent) {
+        Log.d(TAG, " rws - getActivityLaunchOption  intent: " + intent);
+
         Bundle initialProperties = new Bundle();
         if (intent == null || intent.getAction() == null) {
             return initialProperties;

@@ -53,7 +53,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Bundle data: " + remoteMessage.getData());
+            Log.d(TAG, "rws Bundle data: " + remoteMessage.getData());
         }
 
         // Check if message contains a data payload.
@@ -63,16 +63,20 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             // If notification ID is not provided by the user for push notification, generate one at random
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
+            Log.d(TAG, "WE BE HERE!");
 
-            boolean valid = Voice.handleMessage(this, data, new MessageListener() {
+            boolean valid = Voice.handleMessage(this, remoteMessage.getData(), new MessageListener() {
                 @Override
-                public void onCallInvite(final CallInvite callInvite) {
-                    // We need to run this on the main thread, as the React code assumes that is true.
-                    // Namely, DevServerHelper constructs a Handler() without a Looper, which triggers:
-                    // "Can't create handler inside thread that has not called Looper.prepare()"
+                public void onCallInvite(@NonNull CallInvite callInvite) {
+                    final int notificationId = (int) System.currentTimeMillis();
+                    Log.d(TAG, "rws - onCallInvite: " + callInvite);
+                    Log.d(TAG, "rws - getCustomParameters: " + callInvite.getCustomParameters().get("voter_id"));
+
                     Handler handler = new Handler(Looper.getMainLooper());
+                    Log.d(TAG, "rws - handler: " + handler);
                     handler.post(new Runnable() {
                         public void run() {
+                            Log.d(TAG, "rws - new Runnable()");
                             CallNotificationManager callNotificationManager = new CallNotificationManager();
                             // Construct and load our normal React JS code bundle
                             ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
@@ -85,7 +89,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                                 appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
                             }
                             if (BuildConfig.DEBUG) {
-                                Log.d(TAG, "context: " + context + ". appImportance = " + appImportance);
+                                Log.d(TAG, "rws - context: " + context + ". appImportance = " + appImportance + "ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE= "+ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE);
                             }
 
                             // when the app is not started or in the background
@@ -101,12 +105,14 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                             intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
                             intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
                             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+//                            handleInvite(callInvite, notificationId);
                         }
                     });
                 }
 
                 @Override
                 public void onCancelledCallInvite(@NonNull CancelledCallInvite cancelledCallInvite, @Nullable CallException callException) {
+                    Log.d(TAG, "onCancelledCallInvite: " + cancelledCallInvite);
                     // The call is prematurely disconnected by the caller.
                     // The callee does not accept or reject the call within 30 seconds.
                     // The Voice SDK is unable to establish a connection to Twilio.
@@ -130,7 +136,6 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         intent.setAction(Constants.ACTION_INCOMING_CALL);
         intent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
-
         startService(intent);
     }
 
