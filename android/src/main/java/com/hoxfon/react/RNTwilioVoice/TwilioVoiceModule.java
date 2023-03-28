@@ -810,13 +810,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         }
     }
 
-    @ReactMethod
-    public void setEdge(String location) {
-        if (!location.isEmpty()) {
-            Voice.setEdge(location);
-        }
-    }
-
     private void setAudioFocus() {
         if (audioManager == null) {
             audioManager.setMode(originalAudioMode);
