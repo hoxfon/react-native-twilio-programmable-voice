@@ -81,7 +81,7 @@ public class CallNotificationManager {
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         PendingIntent clearMissedCallsCountPendingIntent = PendingIntent.getBroadcast(
@@ -155,7 +155,7 @@ public class CallNotificationManager {
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         PendingIntent hangupPendingIntent = PendingIntent.getBroadcast(
@@ -163,7 +163,7 @@ public class CallNotificationManager {
                 0,
                 new Intent(Constants.ACTION_HANGUP_CALL)
                         .putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, Constants.HANGUP_NOTIFICATION_ID),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         Bundle extras = new Bundle();
