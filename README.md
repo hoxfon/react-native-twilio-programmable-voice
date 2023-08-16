@@ -16,12 +16,13 @@ Tested with:
 
 The most updated branch is [feat/twilio-android-sdk-5](https://github.com/hoxfon/react-native-twilio-programmable-voice/tree/feat/twilio-android-sdk-5) which is aligned with:
 
-- Android 5.0.2
+- Android 5.4.2
 - iOS 5.2.0
 
 It contains breaking changes from `react-native-twilio-programmable-voice` v4, and it will be released as v5.
 
 You can install it with:
+
 ```bash
 # Yarn
 yarn add https://github.com/hoxfon/react-native-twilio-programmable-voice#feat/twilio-android-sdk-5
@@ -52,6 +53,159 @@ Allow Android to use the built in Android telephony service to make and receive 
 
 - Android 4.5.0
 - iOS 5.2.0
+
+### Breaking changes in v5.0.0
+
+Changes on [Android Twilio Voice SDK v5](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog#500) are reflected in the JavaScript API, the way call invites are handled has changed and other v5 features like `audioSwitch` have been implemented.
+`setSpeakerPhone()` has been removed from Android, use selectAudioDevice(name: string) instead.
+
+#### Background incoming calls
+
+- When the app is not in foreground incoming calls result in a heads-up notification with action to "ACCEPT" and "REJECT".
+- ReactMethod `accept` does not dispatch any event. In v4 it dispatched `connectionDidDisconnect`.
+- ReactMethod `reject` dispatches a `callInviteCancelled` event instead of `connectionDidDisconnect`.
+- ReactMethod `ignore` does not dispatch any event. In v4 it dispatched `connectionDidDisconnect`.
+
+To show heads up notifications, you must add the following lines to your application's `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+    <!-- receive calls when the app is in the background-->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        ...
+    >
+        <!-- Twilio Voice -->
+        <!-- [START fcm_listener] -->
+        <service
+            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:enabled="true"
+            android:name="com.hoxfon.react.RNTwilioVoice.IncomingCallNotificationService"
+            android:foregroundServiceType="phoneCall">
+            <intent-filter>
+                <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_ACCEPT" />
+                <action android:name="com.hoxfon.react.RNTwilioVoice.ACTION_REJECT" />
+            </intent-filter>
+        </service>
+        <!-- [END fcm_listener] -->
+        <!-- Twilio Voice -->
+    </application>
+```
+
+Firebase Messaging 19.0.+ is imported by this module, so there is no need to import it in your app's `bundle.gradle` file.
+
+In v4 the flow to launch the app when receiving a call was:
+
+1. the module launched the app
+2. after the React app is initialised, it always asked to the native module whether there were incoming call invites
+3. if there were any incoming call invites, the module would have sent an event to the React app with the incoming call invite parameters
+4. the Reach app would have listened to the event and would have launched the view with the appropriate incoming call answer/reject controls
+
+This loop was long and prone to race conditions. For example,when the event was sent before the React main view was completely initialised, it would not be handled at all.
+
+V5 replaces the previous flow by using `getLaunchOptions()` to pass initial properties from the native module to React, when receiving a call invite as explained here: https://reactnative.dev/docs/communication-android.
+
+The React app is launched with the initial properties `callInvite` or `call`.
+
+To handle correctly `lauchedOptions`, you must add the following blocks to your app's `MainActivity`:
+
+```java
+
+import com.hoxfon.react.RNTwilioVoice.TwilioModule;
+...
+
+public class MainActivity extends ReactActivity {
+
+    @Override
+    protected ReactActivityDelegate createReactActivityDelegate() {
+        return new ReactActivityDelegate(this, getMainComponentName()) {
+            @Override
+            protected ReactRootView createRootView() {
+                return new RNGestureHandlerEnabledRootView(MainActivity.this);
+            }
+            @Override
+            protected Bundle getLaunchOptions() {
+                return TwilioModule.getActivityLaunchOption(this.getPlainActivity().getIntent());
+            }
+        };
+    }
+
+    // ...
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    // ...
+}
+```
+
+#### Audio Switch
+
+Access to native Twilio SDK AudioSwitch module for Android has been added to the JavaScript API:
+
+```javascript
+// getAudioDevices returns all audio devices connected
+// {
+//     "Speakerphone": false,
+//     "Earnpiece": true, // true indicates the selected device
+// }
+getAudioDevices()
+
+// getSelectedAudioDevice returns the selected audio device
+getSelectedAudioDevice()
+
+// selectAudioDevice selects the passed audio device for the current active call
+selectAudioDevice(name: string)
+```
+
+#### Event deviceDidReceiveIncoming
+
+When a call invite is received, the [SHAKEN/STIR](https://www.twilio.com/docs/voice/trusted-calling-using-shakenstir) `caller_verification` field has been added to the list of params for  `deviceDidReceiveIncoming`. Values are: `verified`, `unverified`, `unknown`.
+
+## ICE
+
+See https://www.twilio.com/docs/stun-turn
+
+```bash
+curl -X POST https://api.twilio.com/2010-04-01/Accounts/ACb0b56ae3bf07ce4045620249c3c90b40/Tokens.json \
+-u ACb0b56ae3bf07ce4045620249c3c90b40:f5c84f06e5c02b55fa61696244a17c84
+```
+
+```java
+Set<IceServer> iceServers = new HashSet<>();
+// server URLs returned by calling the Twilio Rest API to generate a new token
+iceServers.add(new IceServer("stun:global.stun.twilio.com:3478?transport=udp"));
+iceServers.add(new IceServer("turn:global.turn.twilio.com:3478?transport=udp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
+iceServers.add(new IceServer("turn:global.turn.twilio.com:3478?transport=tcp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
+iceServers.add(new IceServer("turn:global.turn.twilio.com:443?transport=tcp","8e6467be547b969ad913f7bdcfb73e411b35f648bd19f2c1cb4161b4d4a067be","n8zwmkgjIOphHN93L/aQxnkUp1xJwrZVLKc/RXL0ZpM="));
+
+IceOptions iceOptions = new IceOptions.Builder()
+		.iceServers(iceServers)
+		.build();
+
+ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+		.iceOptions(iceOptions)
+		.enableDscp(true)
+		.params(twiMLParams)
+		.build();
+```
 
 ### Breaking changes in v4.0.0
 
@@ -192,7 +346,8 @@ apply plugin: 'com.google.gms.google-services'
         <!-- Twilio Voice -->
         <!-- [START fcm_listener] -->
         <service
-            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService">
+            android:name="com.hoxfon.react.RNTwilioVoice.fcm.VoiceFirebaseMessagingService"
+            android:stopWithTask="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -410,7 +565,7 @@ TwilioVoice.getCallInvite()
         }
     })
 
-// Unregister device with Twilio (iOS only)
+// Unregister device with Twilio
 TwilioVoice.unregister()
 ```
 

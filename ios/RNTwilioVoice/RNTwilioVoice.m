@@ -13,7 +13,6 @@ NSString * const kCallerNameCustomParameter = @"CallerName";
 
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
 @property (nonatomic, strong) void(^incomingPushCompletionCallback)(void);
-@property (nonatomic, strong) TVOCallInvite *callInvite;
 @property (nonatomic, strong) void(^callKitCompletionCallback)(BOOL);
 @property (nonatomic, strong) TVODefaultAudioDevice *audioDevice;
 @property (nonatomic, strong) NSMutableDictionary *activeCallInvites;
@@ -154,6 +153,7 @@ RCT_EXPORT_METHOD(unregister) {
                                     if (error) {
                                         NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                     } else {
+                                        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:kCachedDeviceToken];
                                         NSLog(@"Successfully unregistered for VoIP push notifications.");
                                     }
                                 }];
@@ -278,6 +278,7 @@ RCT_REMAP_METHOD(getCallInvite,
                                                    if (error) {
                                                      NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                                    } else {
+                                                     [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:kCachedDeviceToken];
                                                      NSLog(@"Successfully unregistered for VoIP push notifications.");
                                                    }
                                                  }];
@@ -410,7 +411,7 @@ withCompletionHandler:(void (^)(void))completion {
     * with a `TVOCancelledCallInvite` if the caller hangs up or the client encounters any other error before the called
     * party could answer or reject the call.
     */
-    NSLog(@"cancelledCallInviteReceived with error");
+    NSLog(@"cancelledCallInviteReceived with error %@", error);
     TVOCallInvite *callInvite;
     for (NSString *activeCallInviteId in self.activeCallInvites) {
         TVOCallInvite *activeCallInvite = [self.activeCallInvites objectForKey:activeCallInviteId];

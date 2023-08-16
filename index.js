@@ -22,6 +22,7 @@ const _eventHandlers = {
     callStateRinging: new Map(),
     callInviteCancelled: new Map(),
     callRejected: new Map(),
+    audioDevicesUpdated: new Map(),
 }
 
 const Twilio = {
@@ -70,7 +71,12 @@ const Twilio = {
         TwilioVoice.ignore()
     },
     setMuted: TwilioVoice.setMuted,
-    setSpeakerPhone: TwilioVoice.setSpeakerPhone,
+    setSpeakerPhone(value) {
+        if (Platform.OS === ANDROID) {
+            return
+        }
+        return TwilioVoice.setSpeakerPhone(value)
+    },
     sendDigits: TwilioVoice.sendDigits,
     hold: TwilioVoice.setOnHold,
     requestPermissions(senderId) {
@@ -86,9 +92,32 @@ const Twilio = {
         }
     },
     unregister() {
+        TwilioVoice.unregister()
+    },
+    // getAudioDevices returns all audio devices connected
+    // {
+    //     "Speakerphone": false,
+    //     "Earnpiece": true, // true indicates the selected audio device
+    // }
+    getAudioDevices() {
         if (Platform.OS === IOS) {
-            TwilioVoice.unregister()
+            return
         }
+        TwilioVoice.getAudioDevices()
+    },
+    // getSelectedAudioDevice returns the selected audio device
+    getSelectedAudioDevice() {
+        if (Platform.OS === IOS) {
+            return
+        }
+        TwilioVoice.getSelectedAudioDevice()
+    },
+    // selectAudioDevice selects the passed audio device for the current active call
+    selectAudioDevice(name: string) {
+        if (Platform.OS === IOS) {
+            return
+        }
+        TwilioVoice.selectAudioDevice(name)
     },
     addEventListener(type, handler) {
         if (!_eventHandlers.hasOwnProperty(type)) {
@@ -106,7 +135,7 @@ const Twilio = {
         }
         _eventHandlers[type].get(handler).remove()
         _eventHandlers[type].delete(handler)
-    }
+    },
 }
 
 export default Twilio
