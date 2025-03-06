@@ -20,6 +20,7 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
 import com.twilio.voice.MessageListener;
 import com.twilio.voice.Voice;
+import com.twilio.voice.CallException;
 
 import java.util.Map;
 import java.util.Random;
@@ -71,10 +72,9 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
             Random randomNumberGenerator = new Random(System.currentTimeMillis());
             final int notificationId = randomNumberGenerator.nextInt();
 
-            boolean valid = Voice.handleMessage(data, new MessageListener() {
+            boolean valid = Voice.handleMessage(getApplicationContext(), data, new MessageListener() {
                 @Override
                 public void onCallInvite(final CallInvite callInvite) {
-
                     // We need to run this on the main thread, as the React code assumes that is true.
                     // Namely, DevServerHelper constructs a Handler() without a Looper, which triggers:
                     // "Can't create handler inside thread that has not called Looper.prepare()"
@@ -133,8 +133,17 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                     });
                 }
 
-                @Override
                 public void onCancelledCallInvite(final CancelledCallInvite cancelledCallInvite) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            VoiceFirebaseMessagingService.this.sendCancelledCallInviteToActivity(cancelledCallInvite);
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelledCallInvite(CancelledCallInvite cancelledCallInvite, CallException callException) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
